@@ -12,13 +12,23 @@ const (
 	workingDIRName = ".working"
 )
 
-var logger *log.Logger
+var (
+	logger *log.Logger
+	// overwritten at build time
+	version, tag, sha, buildDate string
+)
 
 func init() {
 	logger = log.New(os.Stdout, "soba: ", log.Lshortfile|log.LstdFlags)
 }
 
 func main() {
+	if tag != "" && buildDate != "" {
+		logger.Printf("[%s-%s] %s UTC", tag, sha, buildDate)
+	} else {
+		logger.Println(version)
+	}
+
 	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
 		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN.")
 	}
