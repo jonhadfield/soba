@@ -61,14 +61,14 @@ install:
 	go install ./cmd/...
 
 bintray:
-	curl -X PUT -0 -T .local_dist/soba_darwin_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_darwin_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -X PUT -0 -T .local_dist/soba_linux_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_linux_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -X PUT -0 -T .local_dist/soba_linux_arm -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_linux_arm;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -X PUT -0 -T .local_dist/soba_linux_arm64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_linux_arm64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -X PUT -0 -T .local_dist/soba_netbsd_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_netbsd_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -X PUT -0 -T .local_dist/soba_openbsd_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_openbsd_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -X PUT -0 -T .local_dist/soba_freebsd_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/soba_freebsd_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
-	curl -XPOST -0 -ujonhadfield:$(BINTRAY_APIKEY) https://api.bintray.com/content/jonhadfield/soba/$(BUILD_TAG)/publish
+	curl -X PUT -0 -T .local_dist/soba_darwin_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_darwin_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -X PUT -0 -T .local_dist/soba_linux_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_linux_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -X PUT -0 -T .local_dist/soba_linux_arm -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_linux_arm;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -X PUT -0 -T .local_dist/soba_linux_arm64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_linux_arm64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -X PUT -0 -T .local_dist/soba_netbsd_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_netbsd_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -X PUT -0 -T .local_dist/soba_openbsd_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_openbsd_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -X PUT -0 -T .local_dist/soba_freebsd_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_freebsd_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
+	curl -XPOST -0 -ujonhadfield:$(BINTRAY_APIKEY) https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/publish
 
 release: build-all bintray wait-for-publish build-docker release-docker
 
