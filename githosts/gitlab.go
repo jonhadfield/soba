@@ -22,11 +22,17 @@ func (provider gitlabHost) getAuthenticatedGitlabUserID(client http.Client) int 
 	}
 	// get user id
 	getUserIDURL := provider.APIURL + string(os.PathSeparator) + "user"
-	req, _ := http.NewRequest("GET", getUserIDURL, nil)
+	req, newReqErr := http.NewRequest("GET", getUserIDURL, nil)
+	if newReqErr != nil {
+		logger.Fatal(newReqErr)
+	}
 	req.Header.Set("Private-Token", os.Getenv("GITLAB_TOKEN"))
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Accept", "application/json; charset=utf-8")
-	resp, _ := client.Do(req)
+	resp, reqErr := client.Do(req)
+	if reqErr != nil {
+		logger.Fatal(reqErr)
+	}
 	bodyB, _ := ioutil.ReadAll(resp.Body)
 	bodyStr := string(bytes.Replace(bodyB, []byte("\r"), []byte("\r\n"), -1))
 	var respObj gitLabNameResponse

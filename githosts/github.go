@@ -59,12 +59,18 @@ func (provider githubHost) describeRepos() describeReposOutput {
 	for {
 		mJSON := reqBody
 		contentReader := bytes.NewReader([]byte(mJSON))
-		req, _ := http.NewRequest("POST", "https://api.github.com/graphql", contentReader)
+		req, newReqErr := http.NewRequest("POST", "https://api.github.com/graphql", contentReader)
+		if newReqErr != nil {
+			logger.Fatal(newReqErr)
+		}
 		req.Header.Set("Authorization", fmt.Sprintf("bearer %s", os.Getenv("GITHUB_TOKEN")))
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
 		req.Header.Set("Accept", "application/json; charset=utf-8")
 
-		resp, _ := client.Do(req)
+		resp, reqErr := client.Do(req)
+		if reqErr != nil {
+			logger.Fatal(reqErr)
+		}
 		bodyB, _ := ioutil.ReadAll(resp.Body)
 		bodyStr := string(bytes.Replace(bodyB, []byte("\r"), []byte("\r\n"), -1))
 		var respObj githubQueryNamesResponse
