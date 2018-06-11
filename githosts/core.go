@@ -64,7 +64,7 @@ func processBackup(repo repository, backupDIR string) {
 		logger.Fatal(delErr)
 	}
 	// CLONE REPO
-	logger.Printf("cloning repo '%s'", repo.HTTPSUrl)
+	logger.Printf("cloning '%s'", repo.HTTPSUrl)
 	cloneCmd := exec.Command("git", "clone", "--mirror", repo.URLWithToken, workingPath)
 	cloneCmd.Dir = backupDIR
 	var cloneOut bytes.Buffer
@@ -78,7 +78,7 @@ func processBackup(repo repository, backupDIR string) {
 	dirs, _ := ioutil.ReadDir(objectsPath)
 	emptyPack, _ := IsEmpty(objectsPath + string(os.PathSeparator) + "pack")
 	if len(dirs) == 2 && emptyPack {
-		logger.Printf("repo %s is empty, so not creating bundle", repo.Name)
+		logger.Printf("%s is empty, so not creating bundle", repo.Name)
 	} else {
 		logger.Printf("creating bundle for '%s'", repo.Name)
 		backupFile := repo.Name + "." + getTimestamp() + ".bundle"
