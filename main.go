@@ -32,6 +32,8 @@ func main() {
 	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
 		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN.")
 	}
+	logger.Printf("GITHUB_TOKEN = %s\n", os.Getenv("GITHUB_TOKEN"))
+	logger.Printf("GITLAB_TOKEN = %s\n", os.Getenv("GITLAB_TOKEN"))
 	var backupDIR = os.Getenv("GIT_BACKUP_DIR")
 	if backupDIR == "" {
 		logger.Fatal("environment variable GIT_BACKUP_DIR must be set.")
