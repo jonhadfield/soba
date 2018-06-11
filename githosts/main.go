@@ -37,4 +37,6 @@ func Backup(providerName string, backupDIR string) {
 		}
 	}
 	provider.Backup(backupDIR)
+	logger.Println("cleaning up")
+	deleteDirIfExists(backupDIR + string(os.PathSeparator) + workingDIRName)
 }
