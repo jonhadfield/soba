@@ -59,7 +59,7 @@ func (provider githubHost) describeRepos() describeReposOutput {
 	for {
 		mJSON := reqBody
 		contentReader := bytes.NewReader([]byte(mJSON))
-		req, newReqErr := http.NewRequest("POST", "https://api.github.com/graphql", contentReader)
+		req, newReqErr := http.NewRequest(http.MethodPost, "https://api.github.com/graphql", contentReader)
 		if newReqErr != nil {
 			logger.Fatal(newReqErr)
 		}

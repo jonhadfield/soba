@@ -13,7 +13,7 @@ func init() {
 	logger = log.New(os.Stdout, "soba: ", log.Lshortfile|log.LstdFlags)
 }
 
-func Backup(providerName string, backupDIR string) {
+func Backup(providerName, backupDIR string) {
 	var provider gitProvider
 	var err error
 	switch providerName {

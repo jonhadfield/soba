@@ -22,7 +22,7 @@ func (provider gitlabHost) getAuthenticatedGitlabUserID(client http.Client) int 
 	}
 	// get user id
 	getUserIDURL := provider.APIURL + string(os.PathSeparator) + "user"
-	req, newReqErr := http.NewRequest("GET", getUserIDURL, nil)
+	req, newReqErr := http.NewRequest(http.MethodGet, getUserIDURL, nil)
 	if newReqErr != nil {
 		logger.Fatal(newReqErr)
 	}
@@ -52,7 +52,7 @@ type gitLabGetProjectsResponse []gitLabProject
 
 func (provider gitlabHost) getProjectsByUserID(client http.Client, userID int) (repos []repository) {
 	getUserIDURL := provider.APIURL + string(os.PathSeparator) + "users" + string(os.PathSeparator) + strconv.Itoa(userID) + string(os.PathSeparator) + "projects"
-	req, _ := http.NewRequest("GET", getUserIDURL, nil)
+	req, _ := http.NewRequest(http.MethodGet, getUserIDURL, nil)
 	req.Header.Set("Private-Token", os.Getenv("GITLAB_TOKEN"))
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Accept", "application/json; charset=utf-8")
