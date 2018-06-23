@@ -57,6 +57,10 @@ build-all: fmt
 	GOOS=openbsd CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_openbsd_amd64"
 	GOOS=freebsd CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_freebsd_amd64"
 
+critic:
+	gocritic check-package github.com/jonhadfield/soba
+	gocritic check-package github.com/jonhadfield/soba/githosts
+
 install:
 	go install ./cmd/...
 
