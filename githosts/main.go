@@ -5,7 +5,10 @@ import (
 	"os"
 )
 
-const workingDIRName = ".working"
+const (
+	workingDIRName  = ".working"
+	bundleExtension = ".bundle"
+)
 
 var logger *log.Logger
 
@@ -37,6 +40,4 @@ func Backup(providerName, backupDIR string) {
 		}
 	}
 	provider.Backup(backupDIR)
-	logger.Println("cleaning up")
-	deleteDirIfExists(backupDIR + string(os.PathSeparator) + workingDIRName)
 }

@@ -59,6 +59,10 @@ func main() {
 
 	logger.Println("backing up GitHub repos")
 	githosts.Backup("github", backupDIR)
-
+	logger.Println("cleaning up")
+	delErr := os.RemoveAll(backupDIR + string(os.PathSeparator) + workingDIRName)
+	if delErr != nil {
+		logger.Printf("failed to delete working directory: %s", backupDIR+string(os.PathSeparator)+workingDIRName)
+	}
 	logger.Println("backups complete")
 }

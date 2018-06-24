@@ -2,10 +2,15 @@ package githosts
 
 import (
 	"bytes"
+	"crypto/md5"
 	"errors"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"reflect"
+	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -59,7 +64,7 @@ func processBackup(repo repository, backupDIR string) {
 	workingPath := backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
 	backupPath := backupDIR + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
 	// DELETE EXISTING CLONE
-	delErr := deleteDirIfExists(workingPath)
+	delErr := os.RemoveAll(workingPath)
 	if delErr != nil {
 		logger.Fatal(delErr)
 	}
@@ -76,17 +81,21 @@ func processBackup(repo repository, backupDIR string) {
 	// CREATE BUNDLE
 	objectsPath := workingPath + string(os.PathSeparator) + "objects"
 	dirs, _ := ioutil.ReadDir(objectsPath)
-	emptyPack, _ := IsEmpty(objectsPath + string(os.PathSeparator) + "pack")
+	emptyPack, checkEmptyErr := isEmpty(objectsPath + string(os.PathSeparator) + "pack")
+	if checkEmptyErr != nil {
+		logger.Printf("failed to check if: '%s' is empty", objectsPath+string(os.PathSeparator)+"pack")
+	}
 	if len(dirs) == 2 && emptyPack {
 		logger.Printf("%s is empty, so not creating bundle", repo.Name)
 	} else {
-		logger.Printf("creating bundle for '%s'", repo.Name)
-		backupFile := repo.Name + "." + getTimestamp() + ".bundle"
+
+		backupFile := repo.Name + "." + getTimestamp() + bundleExtension
 		backupFilePath := backupPath + string(os.PathSeparator) + backupFile
 		createErr := createDirIfAbsent(backupPath)
 		if createErr != nil {
 			logger.Fatal(createErr)
 		}
+		logger.Printf("creating bundle for '%s'", repo.Name)
 		bundleCmd := exec.Command("git", "bundle", "create", backupFilePath, "--all")
 		bundleCmd.Dir = workingPath
 		var bundleOut bytes.Buffer
@@ -96,5 +105,91 @@ func processBackup(repo repository, backupDIR string) {
 		if bundleErr != nil {
 			logger.Fatal(bundleErr)
 		}
+		removeBundleIfDuplicate(backupPath)
+
 	}
+}
+
+func removeBundleIfDuplicate(dir string) {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		logger.Println(err)
+		return
+	}
+	if len(files) == 1 {
+		return
+	}
+	fNameTimes := map[string]int{}
+	for _, f := range files {
+		parts := strings.Split(f.Name(), ".")
+		strTimestamp := parts[len(parts)-2]
+		intTimestamp, convErr := strconv.Atoi(strTimestamp)
+		if convErr == nil {
+			fNameTimes[f.Name()] = intTimestamp
+		}
+	}
+	type kv struct {
+		Key   string
+		Value int
+	}
+	var ss []kv
+	for k, v := range fNameTimes {
+		ss = append(ss, kv{k, v})
+	}
+
+	sort.Slice(ss, func(i, j int) bool {
+		return ss[i].Value > ss[j].Value
+	})
+
+	// check if file sizes are same
+	latestBundleSize := getFileSize(dir + string(os.PathSeparator) + ss[0].Key)
+	previousBundleSize := getFileSize(dir + string(os.PathSeparator) + ss[1].Key)
+	if latestBundleSize == previousBundleSize {
+		// check if hashes match
+		latestBundleHash, latestHashErr := getMD5Hash(dir + string(os.PathSeparator) + ss[0].Key)
+		if latestHashErr != nil {
+			logger.Printf("failed to get md5 hash for: %s", dir+string(os.PathSeparator)+ss[0].Key)
+		}
+		previousBundleHash, previousHashErr := getMD5Hash(dir + string(os.PathSeparator) + ss[1].Key)
+		if previousHashErr != nil {
+			logger.Printf("failed to get md5 hash for: %s", dir+string(os.PathSeparator)+ss[1].Key)
+		}
+		if reflect.DeepEqual(latestBundleHash, previousBundleHash) {
+			logger.Printf("no change since previous bundle: %s", ss[1].Key)
+			logger.Printf("deleting duplicate bundle: %s", ss[0].Key)
+			if deleteFile(dir+string(os.PathSeparator)+ss[0].Key) != nil {
+				logger.Println("failed to remove duplicate bundle")
+			}
+		}
+	}
+}
+
+func deleteFile(path string) (err error) {
+	err = os.Remove(path)
+	return
+}
+
+func getMD5Hash(filePath string) ([]byte, error) {
+	var result []byte
+	file, err := os.Open(filePath)
+	if err != nil {
+		return result, err
+	}
+	defer file.Close()
+
+	hash := md5.New()
+	if _, err := io.Copy(hash, file); err != nil {
+		return result, err
+	}
+
+	return hash.Sum(result), nil
+}
+
+func getFileSize(path string) int64 {
+	fi, err := os.Stat(path)
+	if err != nil {
+		logger.Println(err)
+		return 0
+	}
+	return fi.Size()
 }
