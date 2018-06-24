@@ -64,7 +64,7 @@ func processBackup(repo repository, backupDIR string) {
 	workingPath := backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
 	backupPath := backupDIR + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
 	// DELETE EXISTING CLONE
-	delErr := os.RemoveAll(workingPath)
+	delErr := os.RemoveAll(workingPath + string(os.PathSeparator))
 	if delErr != nil {
 		logger.Fatal(delErr)
 	}
