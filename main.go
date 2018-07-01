@@ -49,7 +49,7 @@ func main() {
 	workingDIR := backupDIR + string(os.PathSeparator) + workingDIRName
 
 	logger.Println("creating working directory: ", workingDIR)
-	createWorkingDIRErr := createDirIfAbsent(workingDIR)
+	createWorkingDIRErr := os.MkdirAll(workingDIR, 0755)
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
 	}

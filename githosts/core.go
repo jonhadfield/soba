@@ -175,7 +175,11 @@ func getMD5Hash(filePath string) ([]byte, error) {
 	if err != nil {
 		return result, err
 	}
-	defer file.Close()
+	defer func() {
+		if cErr := file.Close(); cErr != nil {
+			logger.Printf("warn: failed to close: %s", filePath)
+		}
+	}()
 
 	hash := md5.New()
 	if _, err := io.Copy(hash, file); err != nil {
