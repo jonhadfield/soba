@@ -28,7 +28,6 @@ func main() {
 	} else {
 		logger.Println(version)
 	}
-
 	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
 		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN.")
 	}
@@ -54,11 +53,15 @@ func main() {
 		logger.Fatal(createWorkingDIRErr)
 	}
 
-	logger.Println("backing up GitLab repos")
-	githosts.Backup("gitlab", backupDIR)
+	if os.Getenv("GITLAB_TOKEN") != "" {
+		logger.Println("backing up GitLab repos")
+		githosts.Backup("gitlab", backupDIR)
+	}
 
-	logger.Println("backing up GitHub repos")
-	githosts.Backup("github", backupDIR)
+	if os.Getenv("GITHUB_TOKEN") != "" {
+		logger.Println("backing up GitHub repos")
+		githosts.Backup("github", backupDIR)
+	}
 	logger.Println("cleaning up")
 	delErr := os.RemoveAll(backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator))
 	if delErr != nil {
