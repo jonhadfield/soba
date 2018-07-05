@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/jonhadfield/soba/githosts"
+	"github.com/whiteshtef/clockwork"
 )
 
 const (
@@ -25,9 +26,10 @@ func init() {
 func main() {
 	if tag != "" && buildDate != "" {
 		logger.Printf("[%s-%s] %s UTC", tag, sha, buildDate)
-	} else {
+	} else if version != "" {
 		logger.Println(version)
 	}
+	logger.Println("starting")
 	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
 		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN.")
 	}
@@ -51,6 +53,18 @@ func main() {
 		logger.Fatal(createWorkingDIRErr)
 	}
 
+	if os.Getenv("GIT_BACKUP_SCHEDULE") != "" {
+		scheduler := clockwork.NewScheduler()
+		scheduler.Schedule().Every().Day().Do(execProviderBackups)
+		scheduler.Run()
+	} else {
+		execProviderBackups()
+	}
+
+}
+
+func execProviderBackups() {
+	backupDIR := os.Getenv("GIT_BACKUP_DIR")
 	if os.Getenv("GITLAB_TOKEN") != "" {
 		logger.Println("backing up GitLab repos")
 		githosts.Backup("gitlab", backupDIR)
@@ -63,7 +77,8 @@ func main() {
 	logger.Println("cleaning up")
 	delErr := os.RemoveAll(backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator))
 	if delErr != nil {
-		logger.Printf("failed to delete working directory: %s", backupDIR+string(os.PathSeparator)+workingDIRName)
+		logger.Printf("failed to delete working directory: %s",
+			backupDIR+string(os.PathSeparator)+workingDIRName)
 	}
 	logger.Println("backups complete")
 }
