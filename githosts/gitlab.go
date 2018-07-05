@@ -91,10 +91,6 @@ func (provider gitlabHost) describeRepos() describeReposOutput {
 		Repos: provider.getProjectsByUserID(*client, userID),
 	}
 	return result
-
-	return describeReposOutput{
-		Repos: nil,
-	}
 }
 
 func (provider gitlabHost) getAPIURL() string {
