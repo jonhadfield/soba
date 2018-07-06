@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	"strconv"
+
 	"github.com/jonhadfield/soba/githosts"
 	"github.com/whiteshtef/clockwork"
 )
@@ -21,6 +23,20 @@ var (
 
 func init() {
 	logger = log.New(os.Stdout, "soba: ", log.Lshortfile|log.LstdFlags)
+}
+
+func validateStringTime(input string) bool {
+	startTimeParts := strings.Split(input, ":")
+	if len(startTimeParts) == 2 {
+		if _, hrConvErr := strconv.Atoi(startTimeParts[0]); hrConvErr != nil {
+			return false
+		}
+		if _, minConvErr := strconv.Atoi(startTimeParts[1]); minConvErr != nil {
+			return false
+		}
+		return true
+	}
+	return false
 }
 
 func main() {
@@ -42,6 +58,25 @@ func main() {
 			logger.Fatalf("specified backup directory \"%s\" does not exist.", backupDIR)
 		}
 	}
+	backupIntervalEnv := os.Getenv("GIT_BACKUP_INTERVAL")
+	backupStartTimeEnv := os.Getenv("GIT_BACKUP_START_TIME")
+	var backupInterval int
+	var intervalConversionErr error
+	if backupIntervalEnv != "" {
+		backupInterval, intervalConversionErr = strconv.Atoi(backupIntervalEnv)
+		if intervalConversionErr != nil {
+			logger.Fatal("GIT_BACKUP_INTERVAL must be a number.")
+		}
+	}
+	var backupStartTime string
+	if backupStartTimeEnv != "" {
+		if validateStringTime(backupStartTimeEnv) {
+			backupStartTime = backupStartTimeEnv
+		} else {
+			logger.Fatal("GIT_BACKUP_START_TIME is invalid. Please use HH:MM format.")
+		}
+	}
+
 	if len(backupDIR) > 1 && strings.HasSuffix(backupDIR, "/") {
 		backupDIR = backupDIR[:len(backupDIR)-1]
 	}
@@ -53,14 +88,25 @@ func main() {
 		logger.Fatal(createWorkingDIRErr)
 	}
 
-	if os.Getenv("GIT_BACKUP_SCHEDULE") != "" {
+	if backupStartTime != "" || backupInterval != 0 {
 		scheduler := clockwork.NewScheduler()
-		scheduler.Schedule().Every().Day().Do(execProviderBackups)
+		// if start time only, then schedule to run once
+		if backupStartTime != "" && backupInterval == 0 {
+			scheduler.Schedule().At(backupStartTime).Do(execProviderBackups)
+		}
+		// if interval only, then schedule and start now
+		if backupStartTime == "" && backupInterval > 0 {
+			scheduler.Schedule().Every(backupInterval).Hours().Do(execProviderBackups)
+
+		}
+		// if start time and interval then schedule
+		if backupStartTime == "" && backupInterval > 0 {
+			scheduler.Schedule().Every(backupInterval).Hours().At(backupStartTime).Do(execProviderBackups)
+		}
 		scheduler.Run()
 	} else {
 		execProviderBackups()
 	}
-
 }
 
 func execProviderBackups() {
