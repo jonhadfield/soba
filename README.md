@@ -109,8 +109,9 @@ $ source /home/<your-user-id>/.bashrc
 
 | Provider | Environment Variable | Generating token |
 |:---------|:---------------------|:-----------------|
-| GitHub   | GITHUB_TOKEN         | [instructions](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
-| GitLab   | GITLAB_TOKEN         | [instructions](https://gitlab.com/profile/personal_access_tokens)
+| GitHub   | GITHUB_TOKEN         | <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">instructions</a>
+| GitLab   | GITLAB_TOKEN         | <a href="https://gitlab.com/profile/personal_access_tokens" target="_blank">instructions</a>
+
 
 _additional providers coming soon_  
 
