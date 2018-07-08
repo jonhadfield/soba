@@ -117,7 +117,7 @@ _additional providers coming soon_
 
 
 ### run on Synology NAS
-_Note: Tested on DS916+_
+_Tested on DS916+_
 
 
 1. Create a directory on your NAS for backing up Git repositories to
