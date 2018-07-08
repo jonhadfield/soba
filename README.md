@@ -16,12 +16,15 @@ An unchanged git repository will create an identical bundle file so bundles will
 ## configuration
 
 soba can be run from the command line or as docker container. In both cases the only configuration required is an environment variable with the directory in which to create backups and one with a token for each of the providers. For example, the following would create a directory for each provider in existing directory /repo-backups/:
-
-    GIT_BACKUP_DIR="/repo-backups/"
+``` bash
+GIT_BACKUP_DIR="/repo-backups/"
+```
 
 On Linux and MacOS you would set this using:
 
-    export GIT_BACKUP_DIR="/repo-backups/"
+```bash
+$ export GIT_BACKUP_DIR="/repo-backups/"
+```
 
 To set provider tokens see [below](#setting-provider-tokens).
 
@@ -68,14 +71,24 @@ $ docker run --rm -t quay.io/jonhadfield/soba \
 Backups can be scheduled to run by setting an additional environment variable: GIT_BACKUP_INTERVAL. The value is the number of hours between backups. For example, this will run the backup daily:
 
 ```bash
-export GIT_BACKUP_INTERVAL=24
+$ export GIT_BACKUP_INTERVAL=24
 ```
+
+if using docker then add:
+
+```bash
+-e GIT_BACKUP_INTERVAL=24
+```
+
+Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the interval is greater than the duration of a backup.
 
 ## setting provider tokens
 
 On Linux and MacOS you can set environment variables manually before each time you run soba:
 
-    export NAME='VALUE'
+```bash
+$ export NAME='VALUE'
+```
     
 or by defining in a startup file for your shell so they are automatically set and available when you need them. For example, if using the bash shell and running soba as your user, add the relevant export statements to the following file: 
 
