@@ -75,7 +75,12 @@ func main() {
 	backupInterval := getBackupInterval()
 
 	if backupInterval != 0 {
-		logger.Printf("scheduling to run every %d hours", backupInterval)
+		hourOutput := "hour"
+		if backupInterval > 1 {
+			hourOutput = "hours"
+		}
+		logger.Printf("scheduling to run every %d %s", backupInterval, hourOutput)
+
 		_, schedulerErr := scheduler.Every(backupInterval).Hours().Run(execProviderBackups)
 		if schedulerErr != nil {
 			logger.Fatalln(schedulerErr)
