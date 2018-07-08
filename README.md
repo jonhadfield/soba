@@ -52,6 +52,7 @@ Docker requires you pass environment variables to the container using the '-e' o
 ```bash
 $ docker run --rm -t quay.io/jonhadfield/soba \
              -v <your backup dir>:/backup \
+             -e GIT_BACKUP_DIR='MYBACKUPDIR' \
              -e GITHUB_TOKEN='MYGITHUBTOKEN' \
              -e GITLAB_TOKEN='MYGITLABTOKEN'
 ```
@@ -61,6 +62,7 @@ To hide credentials, you can instead use exported environment variables and spec
 ```bash
 $ docker run --rm -t quay.io/jonhadfield/soba \
             -v <your backup dir>:/backup \
+             -e GIT_BACKUP_DIR='MYBACKUPDIR' \
              -e GITHUB_TOKEN=$GITHUB_TOKEN \
              -e GITLAB_TOKEN=$GITLAB_TOKEN
 ```
