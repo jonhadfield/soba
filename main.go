@@ -7,8 +7,12 @@ import (
 
 	"strconv"
 
+	"runtime"
+
+	"time"
+
+	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/soba/githosts"
-	"github.com/whiteshtef/clockwork"
 )
 
 const (
@@ -25,41 +29,8 @@ func init() {
 	logger = log.New(os.Stdout, "soba: ", log.Lshortfile|log.LstdFlags)
 }
 
-func validateStringTime(input string) bool {
-	startTimeParts := strings.Split(input, ":")
-	if len(startTimeParts) == 2 {
-		if _, hrConvErr := strconv.Atoi(startTimeParts[0]); hrConvErr != nil {
-			return false
-		}
-		if _, minConvErr := strconv.Atoi(startTimeParts[1]); minConvErr != nil {
-			return false
-		}
-		return true
-	}
-	return false
-}
-
-func main() {
-	if tag != "" && buildDate != "" {
-		logger.Printf("[%s-%s] %s UTC", tag, sha, buildDate)
-	} else if version != "" {
-		logger.Println(version)
-	}
-	logger.Println("starting")
-	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
-		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN.")
-	}
-	var backupDIR = os.Getenv("GIT_BACKUP_DIR")
-	if backupDIR == "" {
-		logger.Fatal("environment variable GIT_BACKUP_DIR must be set.")
-	} else {
-		_, err := os.Stat(backupDIR)
-		if os.IsNotExist(err) {
-			logger.Fatalf("specified backup directory \"%s\" does not exist.", backupDIR)
-		}
-	}
+func getBackupInterval() int {
 	backupIntervalEnv := os.Getenv("GIT_BACKUP_INTERVAL")
-	backupStartTimeEnv := os.Getenv("GIT_BACKUP_START_TIME")
 	var backupInterval int
 	var intervalConversionErr error
 	if backupIntervalEnv != "" {
@@ -68,12 +39,25 @@ func main() {
 			logger.Fatal("GIT_BACKUP_INTERVAL must be a number.")
 		}
 	}
-	var backupStartTime string
-	if backupStartTimeEnv != "" {
-		if validateStringTime(backupStartTimeEnv) {
-			backupStartTime = backupStartTimeEnv
-		} else {
-			logger.Fatal("GIT_BACKUP_START_TIME is invalid. Please use HH:MM format.")
+	return backupInterval
+}
+func main() {
+	if tag != "" && buildDate != "" {
+		logger.Printf("[%s-%s] %s UTC", tag, sha, buildDate)
+	} else if version != "" {
+		logger.Println(version)
+	}
+	logger.Println("starting")
+	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
+		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN")
+	}
+	var backupDIR = os.Getenv("GIT_BACKUP_DIR")
+	if backupDIR == "" {
+		logger.Fatal("environment variable GIT_BACKUP_DIR must be set")
+	} else {
+		_, err := os.Stat(backupDIR)
+		if os.IsNotExist(err) {
+			logger.Fatalf("specified backup directory \"%s\" does not exist", backupDIR)
 		}
 	}
 
@@ -88,28 +72,22 @@ func main() {
 		logger.Fatal(createWorkingDIRErr)
 	}
 
-	if backupStartTime != "" || backupInterval != 0 {
-		scheduler := clockwork.NewScheduler()
-		// if start time only, then schedule to run once
-		if backupStartTime != "" && backupInterval == 0 {
-			scheduler.Schedule().At(backupStartTime).Do(execProviderBackups)
-		}
-		// if interval only, then schedule and start now
-		if backupStartTime == "" && backupInterval > 0 {
-			scheduler.Schedule().Every(backupInterval).Hours().Do(execProviderBackups)
+	backupInterval := getBackupInterval()
 
+	if backupInterval != 0 {
+		logger.Printf("scheduling to run every %d hours", backupInterval)
+		_, schedulerErr := scheduler.Every(backupInterval).Hours().Run(execProviderBackups)
+		if schedulerErr != nil {
+			logger.Fatalln(schedulerErr)
 		}
-		// if start time and interval then schedule
-		if backupStartTime == "" && backupInterval > 0 {
-			scheduler.Schedule().Every(backupInterval).Hours().At(backupStartTime).Do(execProviderBackups)
-		}
-		scheduler.Run()
+		runtime.Goexit()
 	} else {
 		execProviderBackups()
 	}
 }
 
 func execProviderBackups() {
+	startTime := time.Now()
 	backupDIR := os.Getenv("GIT_BACKUP_DIR")
 	if os.Getenv("GITLAB_TOKEN") != "" {
 		logger.Println("backing up GitLab repos")
@@ -127,4 +105,11 @@ func execProviderBackups() {
 			backupDIR+string(os.PathSeparator)+workingDIRName)
 	}
 	logger.Println("backups complete")
+	if backupInterval := getBackupInterval(); backupInterval > 0 {
+		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Hour)
+		if nextBackupTime.Before(time.Now()) {
+			logger.Fatal("error: backup took longer than scheduled interval")
+		}
+		logger.Printf("next run scheduled for: %v", nextBackupTime)
+	}
 }
