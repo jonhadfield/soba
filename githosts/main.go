@@ -16,6 +16,7 @@ func init() {
 	logger = log.New(os.Stdout, "soba: ", log.Lshortfile|log.LstdFlags)
 }
 
+// Backup accepts a Git hosting provider and executes the backup task for it
 func Backup(providerName, backupDIR string) {
 	var provider gitProvider
 	var err error
