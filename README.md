@@ -62,6 +62,15 @@ $ docker run --rm -t quay.io/jonhadfield/soba \
              -e GITLAB_TOKEN=$GITLAB_TOKEN
 ```
 
+
+## scheduling backups
+
+Backups can be scheduled to run by setting an additional environment variable: GIT_BACKUP_INTERVAL. The value is the number of hours between backups. For example, this will run the backup daily:
+
+```bash
+export GIT_BACKUP_INTERVAL=24
+```
+
 ## setting provider tokens
 
 On Linux and MacOS you can set environment variables manually before each time you run soba:
