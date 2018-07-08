@@ -21,7 +21,7 @@ type githubHost struct {
 	APIURL   string
 }
 
-type Edge struct {
+type edge struct {
 	Node struct {
 		Name          string
 		NameWithOwner string
@@ -35,7 +35,7 @@ type githubQueryNamesResponse struct {
 	Data struct {
 		Viewer struct {
 			Repositories struct {
-				Edges    []Edge
+				Edges    []edge
 				PageInfo struct {
 					EndCursor   string
 					HasNextPage bool
