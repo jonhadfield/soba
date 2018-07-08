@@ -1,10 +1,13 @@
 
 # soba: backup hosted git repositories
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
+
 - [about](#about)
 - [configuration](#configuration)
-- [running using command line](#run-using-command-line)
-- [running using docker](#run-using-docker)
+- [run using command line](#run-using-command-line)
+- [run using docker](#run-using-docker)
+- [run on Synology NAS](#run-on-synology-nas)
 
 ## about
 
@@ -82,7 +85,7 @@ if using docker then add:
 -e GIT_BACKUP_INTERVAL=24
 ```
 
-Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the interval is greater than the duration of a backup.
+_Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the interval is greater than the duration of a backup._
 
 ## setting provider tokens
 
@@ -110,4 +113,32 @@ $ source /home/<your-user-id>/.bashrc
 | GitLab   | GITLAB_TOKEN         | [instructions](https://gitlab.com/profile/personal_access_tokens)
 
 _additional providers coming soon_  
+
+
+### run on Synology NAS
+_Note: Tested on DS916+_
+
+
+1. Create a directory on your NAS for backing up Git repositories to
+2. Install Docker from the Synology Package Center
+3. Open Docker and select 'Image'
+4. Select 'Add' from the top menu and choose 'Add From URL'
+5. In 'Repository URL' enter 'https://quay.io/jonhadfield/soba', leave other options as default and click 'Add'
+6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'
+7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu
+8. Set 'Container Name' to 'soba' and select 'Advanced Settings'
+9. Check 'Enable auto-restart'
+10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'
+11. Under 'Network' check 'Use the same network as Docker Host'
+12. Under 'Environment' click '+' to add each of the following:
+  - **variable** GIT_BACKUP_DIR **Value** /backup
+  - **variable** GIT_BACKUP_INTERVAL **Value** [hours between backups]
+  - **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
+  - **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
+13. Click 'Apply'
+14. Leave settings as default and select 'Next'
+15. Check 'Run this container after the wizard is finished' and click 'Apply'
+
+The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu, select 'soba', choose 'details' and then click on 'Log'
+  
 
