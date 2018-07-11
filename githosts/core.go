@@ -131,9 +131,10 @@ func removeBundleIfDuplicate(dir string) {
 	if len(files) == 1 {
 		return
 	}
+	// get timestamps in filenames for sorting
 	fNameTimes := map[string]int{}
 	for _, f := range files {
-		if strings.Count(f.Name(), ".") == 2 {
+		if strings.Count(f.Name(), ".") >= 2 {
 			parts := strings.Split(f.Name(), ".")
 			strTimestamp := parts[len(parts)-2]
 			intTimestamp, convErr := strconv.Atoi(strTimestamp)
