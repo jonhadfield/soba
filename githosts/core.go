@@ -15,12 +15,13 @@ import (
 )
 
 type repository struct {
-	Name          string
-	NameWithOwner string
-	Domain        string
-	HTTPSUrl      string
-	SSHUrl        string
-	URLWithToken  string
+	Name             string
+	NameWithOwner    string
+	Domain           string
+	HTTPSUrl         string
+	SSHUrl           string
+	URLWithToken     string
+	URLWithBasicAuth string
 }
 
 type describeReposOutput struct {
@@ -42,6 +43,11 @@ type newHostInput struct {
 func createHost(input newHostInput) (gitProvider, error) {
 	var hostErr error
 	switch strings.ToLower(input.ProviderName) {
+	case "bitbucket":
+		return bitbucketHost{
+			Provider: "BitBucket",
+			APIURL:   input.APIURL,
+		}, nil
 	case "github":
 		return githubHost{
 			Provider: "Github",
@@ -70,7 +76,13 @@ func processBackup(repo repository, backupDIR string) {
 	}
 	// CLONE REPO
 	logger.Printf("cloning '%s'", repo.HTTPSUrl)
-	cloneCmd := exec.Command("git", "clone", "--mirror", repo.URLWithToken, workingPath)
+	var cloneURL string
+	if repo.URLWithToken != "" {
+		cloneURL = repo.URLWithToken
+	} else if repo.URLWithBasicAuth != "" {
+		cloneURL = repo.URLWithBasicAuth
+	}
+	cloneCmd := exec.Command("git", "clone", "--mirror", cloneURL, workingPath)
 	cloneCmd.Dir = backupDIR
 	var cloneOut bytes.Buffer
 	cloneCmd.Stdout = &cloneOut
@@ -121,12 +133,15 @@ func removeBundleIfDuplicate(dir string) {
 	}
 	fNameTimes := map[string]int{}
 	for _, f := range files {
-		parts := strings.Split(f.Name(), ".")
-		strTimestamp := parts[len(parts)-2]
-		intTimestamp, convErr := strconv.Atoi(strTimestamp)
-		if convErr == nil {
-			fNameTimes[f.Name()] = intTimestamp
+		if strings.Count(f.Name(), ".") == 2 {
+			parts := strings.Split(f.Name(), ".")
+			strTimestamp := parts[len(parts)-2]
+			intTimestamp, convErr := strconv.Atoi(strTimestamp)
+			if convErr == nil {
+				fNameTimes[f.Name()] = intTimestamp
+			}
 		}
+
 	}
 	type kv struct {
 		Key   string

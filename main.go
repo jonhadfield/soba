@@ -11,6 +11,8 @@ import (
 
 	"time"
 
+	"fmt"
+
 	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/soba/githosts"
 )
@@ -23,6 +25,26 @@ var (
 	logger *log.Logger
 	// overwritten at build time
 	version, tag, sha, buildDate string
+
+	enabledProviderAuth = map[string][]string{
+		"GitHub": {
+			"GITHUB_TOKEN",
+		},
+		"GitLab": {
+			"GITLAB_TOKEN",
+		},
+		"BitBucket": {
+			"BITBUCKET_USER",
+			"BITBUCKET_APP_PASSWORD",
+		},
+	}
+	justTokenProviders = []string{
+		"GitHub",
+		"GitLab",
+	}
+	userAndPasswordProviders = []string{
+		"BitBucket",
+	}
 )
 
 func init() {
@@ -41,6 +63,49 @@ func getBackupInterval() int {
 	}
 	return backupInterval
 }
+
+func checkProviderFactory(provider string) func() {
+	retFunc := func() {
+		var outputErrs strings.Builder
+		//tokenOnlyProviders
+		if stringInStrings(provider, justTokenProviders) {
+			for _, param := range enabledProviderAuth[provider] {
+				val, exists := os.LookupEnv(param)
+				if exists && val == "" {
+					fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+				}
+			}
+		}
+		//userAndPasswordProviders
+		if stringInStrings(provider, userAndPasswordProviders) {
+			var firstParamFound bool
+			for _, param := range enabledProviderAuth[provider] {
+				val, exists := os.LookupEnv(param)
+				if firstParamFound && !exists {
+					fmt.Fprintf(&outputErrs, "both parameters for '%s' are required.\n", provider)
+				}
+				if exists {
+					firstParamFound = true
+					if val == "" {
+						fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+					}
+				}
+			}
+		}
+
+		if outputErrs.Len() > 0 {
+			logger.Fatalln(outputErrs.String())
+		}
+	}
+	return retFunc
+}
+
+func checkProvidersDefined() {
+	for provider := range enabledProviderAuth {
+		checkProviderFactory(provider)()
+	}
+}
+
 func main() {
 	if tag != "" && buildDate != "" {
 		logger.Printf("[%s-%s] %s UTC", tag, sha, buildDate)
@@ -48,9 +113,6 @@ func main() {
 		logger.Println(version)
 	}
 	logger.Println("starting")
-	if os.Getenv("GITHUB_TOKEN") == "" && os.Getenv("GITLAB_TOKEN") == "" {
-		logger.Fatal("no tokens passed. Please set environment variables GITHUB_TOKEN and/or GITLAB_TOKEN")
-	}
 	var backupDIR = os.Getenv("GIT_BACKUP_DIR")
 	if backupDIR == "" {
 		logger.Fatal("environment variable GIT_BACKUP_DIR must be set")
@@ -60,6 +122,7 @@ func main() {
 			logger.Fatalf("specified backup directory \"%s\" does not exist", backupDIR)
 		}
 	}
+	checkProvidersDefined()
 
 	if len(backupDIR) > 1 && strings.HasSuffix(backupDIR, "/") {
 		backupDIR = backupDIR[:len(backupDIR)-1]
@@ -94,6 +157,11 @@ func main() {
 func execProviderBackups() {
 	startTime := time.Now()
 	backupDIR := os.Getenv("GIT_BACKUP_DIR")
+	if os.Getenv("BITBUCKET_USER") != "" {
+		logger.Println("backing up BitBucket repos")
+		githosts.Backup("bitbucket", backupDIR)
+	}
+
 	if os.Getenv("GITLAB_TOKEN") != "" {
 		logger.Println("backing up GitLab repos")
 		githosts.Backup("gitlab", backupDIR)
@@ -103,6 +171,7 @@ func execProviderBackups() {
 		logger.Println("backing up GitHub repos")
 		githosts.Backup("github", backupDIR)
 	}
+
 	logger.Println("cleaning up")
 	delErr := os.RemoveAll(backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator))
 	if delErr != nil {
