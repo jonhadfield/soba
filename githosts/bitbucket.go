@@ -72,7 +72,7 @@ func (provider bitbucketHost) Backup(backupDIR string) {
 	describe := provider.describeRepos()
 	for _, repo := range describe.Repos {
 		parts := strings.Split(repo.HTTPSUrl, "//")
-		repo.URLWithToken = parts[0] + "//" + os.Getenv("BITBUCKET_USER") + ":" + os.Getenv("BITBUCKET_APP_PASSWORD") + "@" + parts[1]
+		repo.URLWithBasicAuth = parts[0] + "//" + os.Getenv("BITBUCKET_USER") + ":" + os.Getenv("BITBUCKET_APP_PASSWORD") + "@" + parts[1]
 		processBackup(repo, backupDIR)
 	}
 }
