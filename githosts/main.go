@@ -21,6 +21,15 @@ func Backup(providerName, backupDIR string) {
 	var provider gitProvider
 	var err error
 	switch providerName {
+	case "bitbucket":
+		input := newHostInput{
+			ProviderName: "BitBucket",
+			APIURL:       "https://api.bitbucket.org/1.0",
+		}
+		provider, err = createHost(input)
+		if err != nil {
+			logger.Fatal(err)
+		}
 	case "github":
 		input := newHostInput{
 			ProviderName: "Github",
