@@ -52,9 +52,10 @@ func (provider bitbucketHost) describeRepos() describeReposOutput {
 	for _, project := range respObj {
 		if project.Scm == "git" {
 			var repo = repository{
-				Name:     project.Name,
-				Domain:   "bitbucket.org",
-				HTTPSUrl: "https://bitbucket.org/" + project.Owner + "/" + project.Name + ".git",
+				Name:          project.Name,
+				Domain:        "bitbucket.org",
+				HTTPSUrl:      "https://bitbucket.org/" + project.Owner + "/" + project.Name + ".git",
+				NameWithOwner: project.Owner + "/" + project.Name,
 			}
 			repos = append(repos, repo)
 		}
