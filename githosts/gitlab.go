@@ -42,11 +42,18 @@ func (provider gitlabHost) getAuthenticatedGitlabUserID(client http.Client) int 
 	return respObj.ID
 }
 
+type gitLabOwner struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	CreatedAt string `json:"created_at"`
+}
+
 type gitLabProject struct {
-	Path              string `json:"path"`
-	PathWithNameSpace string `json:"path_with_namespace"`
-	HTTPSURL          string `json:"http_url_to_repo"`
-	SSHURL            string `json:"ssh_url_to_repo"`
+	Path              string      `json:"path"`
+	PathWithNameSpace string      `json:"path_with_namespace"`
+	HTTPSURL          string      `json:"http_url_to_repo"`
+	SSHURL            string      `json:"ssh_url_to_repo"`
+	Owner             gitLabOwner `json:"owner"`
 }
 type gitLabGetProjectsResponse []gitLabProject
 
@@ -67,6 +74,7 @@ func (provider gitlabHost) getProjectsByUserID(client http.Client, userID int) (
 	for _, project := range respObj {
 		var repo = repository{
 			Name:          project.Path,
+			Owner:         project.Owner.Name,
 			NameWithOwner: project.PathWithNameSpace,
 			HTTPSUrl:      project.HTTPSURL,
 			SSHUrl:        project.SSHURL,
@@ -102,7 +110,7 @@ func (provider gitlabHost) Backup(backupDIR string) {
 
 	for _, repo := range describeReposOutput.Repos {
 		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + os.Getenv("GITLAB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
+		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + "/" + repo.Owner + ":" + os.Getenv("GITLAB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
 		processBackup(repo, backupDIR)
 	}
 }
