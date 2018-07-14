@@ -16,6 +16,7 @@ import (
 
 type repository struct {
 	Name             string
+	Owner            string
 	NameWithOwner    string
 	Domain           string
 	HTTPSUrl         string
