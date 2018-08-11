@@ -17,3 +17,6 @@ run_soba_*
 
 # Temporary files
 *.swp
+
+# ide
+.idea
