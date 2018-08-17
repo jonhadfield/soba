@@ -144,7 +144,7 @@ func main() {
 		}
 		logger.Printf("scheduling to run every %d %s", backupInterval, hourOutput)
 
-		_, schedulerErr := scheduler.Every(backupInterval).Hours().Run(execProviderBackups)
+		_, schedulerErr := scheduler.Every(time.Duration(backupInterval)).Hours().Run(execProviderBackups)
 		if schedulerErr != nil {
 			logger.Fatalln(schedulerErr)
 		}
