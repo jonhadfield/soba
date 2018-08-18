@@ -80,6 +80,7 @@ func checkProviderFactory(provider string) func() {
 						numUserDefinedProviders++
 					}
 				}
+
 			}
 		}
 		//userAndPasswordProviders
@@ -100,7 +101,6 @@ func checkProviderFactory(provider string) func() {
 				}
 			}
 		}
-
 		if outputErrs.Len() > 0 {
 			logger.Fatalln(outputErrs.String())
 		}
@@ -132,8 +132,10 @@ func main() {
 
 func run() error {
 	logger.Println("starting")
-	var backupDIR = os.Getenv("GIT_BACKUP_DIR")
-	if backupDIR == "" {
+	var backupDIR string
+	var backupDIRKeyExists bool
+	backupDIR, backupDIRKeyExists = os.LookupEnv("GIT_BACKUP_DIR")
+	if !backupDIRKeyExists || backupDIR == "" {
 		return fmt.Errorf("environment variable GIT_BACKUP_DIR must be set")
 	} else {
 		_, err := os.Stat(backupDIR)
