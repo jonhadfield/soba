@@ -7,14 +7,15 @@ import (
 
 	"strconv"
 
-	"runtime"
-
 	"time"
 
 	"fmt"
 
+	"runtime"
+
 	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/soba/githosts"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -45,6 +46,7 @@ var (
 	userAndPasswordProviders = []string{
 		"BitBucket",
 	}
+	numUserDefinedProviders int64
 )
 
 func init() {
@@ -71,8 +73,12 @@ func checkProviderFactory(provider string) func() {
 		if stringInStrings(provider, justTokenProviders) {
 			for _, param := range enabledProviderAuth[provider] {
 				val, exists := os.LookupEnv(param)
-				if exists && val == "" {
-					fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+				if exists {
+					if strings.Trim(val, " ") == "" {
+						fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+					} else {
+						numUserDefinedProviders++
+					}
 				}
 			}
 		}
@@ -88,6 +94,8 @@ func checkProviderFactory(provider string) func() {
 					firstParamFound = true
 					if val == "" {
 						fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+					} else {
+						numUserDefinedProviders++
 					}
 				}
 			}
@@ -100,10 +108,14 @@ func checkProviderFactory(provider string) func() {
 	return retFunc
 }
 
-func checkProvidersDefined() {
+func checkProvidersDefined() error {
 	for provider := range enabledProviderAuth {
 		checkProviderFactory(provider)()
 	}
+	if numUserDefinedProviders == 0 {
+		return errors.New("no providers defined")
+	}
+	return nil
 }
 
 func main() {
@@ -112,18 +124,26 @@ func main() {
 	} else if version != "" {
 		logger.Println(version)
 	}
+	err := run()
+	if err != nil {
+		logger.Fatal(err)
+	}
+}
+
+func run() error {
 	logger.Println("starting")
 	var backupDIR = os.Getenv("GIT_BACKUP_DIR")
 	if backupDIR == "" {
-		logger.Fatal("environment variable GIT_BACKUP_DIR must be set")
+		return fmt.Errorf("environment variable GIT_BACKUP_DIR must be set")
 	} else {
 		_, err := os.Stat(backupDIR)
 		if os.IsNotExist(err) {
-			logger.Fatalf("specified backup directory \"%s\" does not exist", backupDIR)
+			return fmt.Errorf("specified backup directory \"%s\" does not exist", backupDIR)
 		}
 	}
-	checkProvidersDefined()
-
+	if checkProvidersDefined() != nil {
+		logger.Fatal("no providers defined")
+	}
 	if len(backupDIR) > 1 && strings.HasSuffix(backupDIR, "/") {
 		backupDIR = backupDIR[:len(backupDIR)-1]
 	}
@@ -146,12 +166,13 @@ func main() {
 
 		_, schedulerErr := scheduler.Every(time.Duration(backupInterval)).Hours().Run(execProviderBackups)
 		if schedulerErr != nil {
-			logger.Fatalln(schedulerErr)
+			return schedulerErr
 		}
 		runtime.Goexit()
 	} else {
 		execProviderBackups()
 	}
+	return nil
 }
 
 func execProviderBackups() {
