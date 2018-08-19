@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"github.com/pkg/errors"
-	"fmt"
 )
 
 type repository struct {
@@ -77,7 +76,6 @@ func processBackup(repo repository, backupDIR string) {
 		logger.Fatal(delErr)
 	}
 	// CLONE REPO
-	logger.Println(repo.HTTPSUrl)
 	logger.Printf("cloning '%s'", repo.HTTPSUrl)
 	var cloneURL string
 	if repo.URLWithToken != "" {
@@ -85,7 +83,6 @@ func processBackup(repo repository, backupDIR string) {
 	} else if repo.URLWithBasicAuth != "" {
 		cloneURL = repo.URLWithBasicAuth
 	}
-	logger.Println("being clones: ", cloneURL)
 	cloneCmd := exec.Command("git", "clone", "-v", "--mirror", cloneURL, workingPath)
 	cloneCmd.Dir = backupDIR
 	var cloneOut bytes.Buffer
@@ -93,7 +90,6 @@ func processBackup(repo repository, backupDIR string) {
 	cloneErr := cloneCmd.Run()
 	cloneErr = errors.WithStack(cloneErr)
 
-	fmt.Println("err is: ", cloneErr)
 	if cloneErr != nil {
 		logger.Fatal(cloneErr)
 	}
