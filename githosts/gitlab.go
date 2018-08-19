@@ -110,6 +110,7 @@ func (provider gitlabHost) Backup(backupDIR string) {
 
 	for _, repo := range describeReposOutput.Repos {
 		firstPos := strings.Index(repo.HTTPSUrl, "//")
+		logger.Println("owner: ", repo.Owner)
 		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + "/" + repo.Owner + ":" + os.Getenv("GITLAB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
 		processBackup(repo, backupDIR)
 	}
