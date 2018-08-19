@@ -1,18 +1,18 @@
 package main
 
 import (
-	"testing"
 	"os"
 	"strings"
-	)
+	"testing"
+)
 
-var sobaEnvVarKeys = []string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITLAB_TOKEN"}
+var sobaEnvVarKeys = []string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITLAB_TOKEN",
+	"BITBUCKET_USER", "BITBUCKET_APP_PASSWORD"}
 
 func resetGlobals() {
 	// reset global var
 	numUserDefinedProviders = 0
 }
-
 
 func backupEnvironmentVariables() map[string]string {
 	m := make(map[string]string)
@@ -25,7 +25,7 @@ func backupEnvironmentVariables() map[string]string {
 	return m
 }
 
-func restoreEnvironmentVariables(input map[string]string)  {
+func restoreEnvironmentVariables(input map[string]string) {
 	for key, val := range input {
 		os.Setenv(key, val)
 	}
@@ -33,17 +33,16 @@ func restoreEnvironmentVariables(input map[string]string)  {
 
 func unsetEnvVars(exceptionList []string) {
 	for _, sobaVar := range sobaEnvVarKeys {
-		if ! stringInStrings(sobaVar, exceptionList) {
+		if !stringInStrings(sobaVar, exceptionList) {
 			os.Unsetenv(sobaVar)
 		}
 	}
 }
 
-
-
 func TestPublicGithubRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN"})
 	err := run()
 	restoreEnvironmentVariables(envBackup)
 	if err != nil {
@@ -54,6 +53,7 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
 	err := run()
 	restoreEnvironmentVariables(envBackup)
 	if err != nil {
@@ -61,7 +61,18 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	}
 }
 
-func TestCheckProvidersFailureWhenNonDefined(t *testing.T) {
+func TestPublicBitBucketRepositoryBackup(t *testing.T) {
+	resetGlobals()
+	envBackup := backupEnvironmentVariables()
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_APP_PASSWORD"})
+	err := run()
+	restoreEnvironmentVariables(envBackup)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
