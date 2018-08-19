@@ -64,7 +64,7 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 func TestCheckProvidersFailureWhenNonDefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
-	os.Unsetenv("GITHUB_TOKEN")
+	unsetEnvVars([]string{})
 	err := checkProvidersDefined()
 	restoreEnvironmentVariables(envBackup)
 	if err == nil {
