@@ -6,8 +6,8 @@ before_install:
 - go get github.com/axw/gocov/gocov
 - go get github.com/mattn/goveralls
 - go get github.com/carlescere/scheduler
-- if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover;
-  fi
+- if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+- mkdir /tmp
 install:
 - go get golang.org/x/text/encoding
 - go get golang.org/x/net/context
