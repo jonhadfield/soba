@@ -71,10 +71,14 @@ func (provider gitlabHost) getProjectsByUserID(client http.Client, userID int) (
 		logger.Fatal(err)
 		os.Exit(1)
 	}
+
 	for _, project := range respObj {
+		// gitlab replaces hyphens with spaces in owner names, so fix
+		var owner string
+		owner = strings.Replace(project.Owner.Name, " ", "-", -1)
 		var repo = repository{
 			Name:          project.Path,
-			Owner:         project.Owner.Name,
+			Owner:         owner,
 			NameWithOwner: project.PathWithNameSpace,
 			HTTPSUrl:      project.HTTPSURL,
 			SSHUrl:        project.SSHURL,
