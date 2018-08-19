@@ -6,7 +6,8 @@ before_install:
 - go get github.com/axw/gocov/gocov
 - go get github.com/mattn/goveralls
 - go get github.com/carlescere/scheduler
-- if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover; fi
+- if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover;
+  fi
 - mkdir /tmp/backup
 install:
 - go get golang.org/x/text/encoding
@@ -15,10 +16,10 @@ install:
 os:
 - linux
 env:
-  global: 
+  global:
+    secure: oSL9vt6xrpwMQJSkh36tDNNAaeKpz/FBwyJHo6BbuoaJ46f8Mm0W84wyIJofECLNPXtWJuHqypYuXBv0RX49FeMtbo/2oaBzVy+ncfd9LH7FhbeEmeK2SB4yV3SNcQidIumpHasLnZF4mOh9Hhwfv/b1dYz2xV9l8AgLI0fyDBAjE2Yb8Y6YSE4AH437pFuUm3fzP7xz95E+xTbKPt4lwTb3mSSCWflf4ia0LobHifptR7qNQG+yXYxzE+iHRLDs8NIqB9Be8SD22HB8p2HZ6PyaRtMtU45na9gR+INHtBeufXMfLDKMnu/54ISyzvDTs4MeT4EzIJIiLrfqcag1y8bUrPj/nIyl/82tX98FRfrQWzjYWvMM++jRWK6reNrENv24iJyxS0e46h7XSeOiwhznzlvXInXkMky2aRJ0lTnq9H3ESgRoEDq3w1vEcwuO9er584B5Isozis/WksfSxhdW3YAEOarwTtY+K2/ZL+5lHgpNX99+RyY7XqhWTDWuu/qjahJuwHJttoJrDtWKeqfxgKpauScDtjDxX1fhd3coUArMS86d4Cgo7WUxYJs59EwRe8Rhee0NqVA6s1dWQD7dWj8s8jeDT46yvZgYW+jRWIr6VI3pV0JXrSr/AIYIEXKNTeGu4pdkmRxvDHCQxH/Y3dqMmbIgm3MbLSkBeks=
   matrix:
   - GIT_BACKUP_DIR=/tmp/backup
-  - secure: jj9MhP+XX2gF67j+qTcb/4KsfSqOWKRDzRS/mqw4sNJfKtc1Ptft0Azx8H+WexN+ymoA6FYj39ypuK6CMHmgKuykSQC8Yl8qU+nDEiiO22OgVZfYivfh1vsjJTT0gtzq6h9zkz3cNUVpEnP1iZZ+Wl+xg0k+7MIQcoWz6y7j4GRtIbolli2clzasEpVWuNtM8GhmP1GZCsqwU43qmiK0zYyQZtTt4CMGZqlMjrSnJDM0+oKsG0tc+P/joKfaePYctBBk6UbXOrkQ2sgCvnPs1KrRxN2Gr1hSLCq1VfWA0G+JmKImPSl8qODl1+g6oBKN/b1z06Qr9UZAO3nw5J4AbbgpHapC/k/3NaRAralKiDZGy526zl5l8cZEouiiUFW4NM97mu1PmHN621bZeTzXH3m69dcHQoQnGk/6z9N6wJfoytKBZv8S4T44tfzzAFZh4/3o2nuJ8jpAUu1PVzY2UMc6ePfmgvFtD3OVzty+Njlqtckqkv3cfZ3rUpz8wg8NGAe0vfM56xyeL7JQmRg8wwJgpd5KqcmJgd/Zb+jjKuXuMYdWHe8fAWoZw0uNj28rdx7VrwQaEM1uhjnBp2DeGp8rX6taZIVUmqQ6Qwc8BEuQstyyiLt1j+uA71EZNYM2xdcoyiwwPLc5deb2QJKymZPUowqUUvBfGQIv7+eZXSM=
 script:
 - base=$(echo $PWD | sed "s|$GOPATH/src/||") && go test -race -v $(go list ./... |
   grep -v vendor | sed "s|$base/|./|")
