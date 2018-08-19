@@ -1,7 +1,6 @@
 
 # soba: backup hosted git repositories
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
+[![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba) [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba) [![Coverage Status](https://coveralls.io/repos/github/jonhadfield/soba/badge.svg?branch=master)](https://coveralls.io/github/jonhadfield/soba?branch=master)
 
 - [about](#about)
 - [configuration](#configuration)
