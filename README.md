@@ -57,21 +57,23 @@ Using docker enables you to run soba without anything else installed.
 Docker requires you pass environment variables to the container using the '-e' option and that you mount your preferred backup directory. For example:
 
 ```bash
-$ docker run --rm -t quay.io/jonhadfield/soba \
+$ docker run --rm -t \
              -v <your backup dir>:/backup \
-             -e GIT_BACKUP_DIR='MYBACKUPDIR' \
+             -e GIT_BACKUP_DIR='/backup' \
              -e GITHUB_TOKEN='MYGITHUBTOKEN' \
-             -e GITLAB_TOKEN='MYGITLABTOKEN'
+             -e GITLAB_TOKEN='MYGITLABTOKEN' \
+             quay.io/jonhadfield/soba
 ```
 
 To hide credentials, you can instead use exported environment variables and specify using this syntax:
 
 ```bash
-$ docker run --rm -t quay.io/jonhadfield/soba \
-            -v <your backup dir>:/backup \
-             -e GIT_BACKUP_DIR='MYBACKUPDIR' \
+$ docker run --rm -t \
+             -v <your backup dir>:/backup \
+             -e GIT_BACKUP_DIR='/backup' \
              -e GITHUB_TOKEN=$GITHUB_TOKEN \
-             -e GITLAB_TOKEN=$GITLAB_TOKEN
+             -e GITLAB_TOKEN=$GITLAB_TOKEN \
+             quay.io/jonhadfield/soba
 ```
 
 
