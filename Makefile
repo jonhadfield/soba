@@ -8,6 +8,7 @@ setup:
 	go get -u golang.org/x/tools/cmd/cover
 	gometalinter --install --update
 
+# This requires credentials are set for all providers!!!
 test:
 	gotestcover $(TEST_OPTIONS) -covermode=atomic -coverprofile=coverage.txt $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=30s
 
