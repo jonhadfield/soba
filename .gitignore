@@ -11,6 +11,7 @@ run_soba
 .local_dist/
 /coverage.txt
 run_soba_*
+testing/backups
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
