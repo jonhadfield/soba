@@ -117,7 +117,7 @@ func gitlabWorker(backupDIR string, jobs <-chan repository, results chan<- error
 }
 
 func (provider gitlabHost) Backup(backupDIR string) {
-	maxConcurrent := 2
+	maxConcurrent := 5
 	repoDesc := provider.describeRepos()
 
 	jobs := make(chan repository, len(repoDesc.Repos))

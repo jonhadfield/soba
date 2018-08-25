@@ -78,7 +78,7 @@ func bitBucketWorker(backupDIR string, jobs <-chan repository, results chan<- er
 }
 
 func (provider bitbucketHost) Backup(backupDIR string) {
-	maxConcurrent := 2
+	maxConcurrent := 5
 	repoDesc := provider.describeRepos()
 
 	jobs := make(chan repository, len(repoDesc.Repos))
