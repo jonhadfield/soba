@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -111,11 +112,18 @@ func (provider gitlabHost) getAPIURL() string {
 
 func (provider gitlabHost) Backup(backupDIR string) {
 	describeReposOutput := provider.describeRepos()
+	var wg sync.WaitGroup
+	for x := range describeReposOutput.Repos {
+		wg.Add(1)
+		repo := describeReposOutput.Repos[x]
+		go func(repo repository) {
+			defer wg.Done()
+			firstPos := strings.Index(repo.HTTPSUrl, "//")
+			logger.Println("owner: ", repo.Owner)
+			repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + repo.Owner + ":" + os.Getenv("GITLAB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
+			processBackup(repo, backupDIR)
+		}(repo)
 
-	for _, repo := range describeReposOutput.Repos {
-		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		logger.Println("owner: ", repo.Owner)
-		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + repo.Owner + ":" + os.Getenv("GITLAB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
-		processBackup(repo, backupDIR)
 	}
+	wg.Wait()
 }

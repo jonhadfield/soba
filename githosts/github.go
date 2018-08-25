@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -105,9 +106,16 @@ func (provider githubHost) getAPIURL() string {
 
 func (provider githubHost) Backup(backupDIR string) {
 	output := provider.describeRepos()
-	for _, repo := range output.Repos {
-		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + os.Getenv("GITHUB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
-		processBackup(repo, backupDIR)
+	var wg sync.WaitGroup
+	for x := range output.Repos {
+		repo := output.Repos[x]
+		wg.Add(1)
+		go func(repo repository) {
+			defer wg.Done()
+			firstPos := strings.Index(repo.HTTPSUrl, "//")
+			repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + os.Getenv("GITHUB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
+			processBackup(repo, backupDIR)
+		}(repo)
 	}
+	wg.Wait()
 }
