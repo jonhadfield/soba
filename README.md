@@ -131,7 +131,7 @@ _Tested on DS916+_
 2. Install Docker from the Synology Package Center
 3. Open Docker and select 'Image'
 4. Select 'Add' from the top menu and choose 'Add From URL'
-5. In 'Repository URL' enter 'https://quay.io/jonhadfield/soba', leave other options as default and click 'Add'
+5. In 'Repository URL' enter 'jonhadfield/soba', leave other options as default and click 'Add'
 6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'
 7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu
 8. Set 'Container Name' to 'soba' and select 'Advanced Settings'
