@@ -112,7 +112,7 @@ func gitHubWorker(backupDIR string, jobs <-chan repository, results chan<- error
 }
 
 func (provider githubHost) Backup(backupDIR string) {
-	maxConcurrent := 2
+	maxConcurrent := 5
 	repoDesc := provider.describeRepos()
 
 	jobs := make(chan repository, len(repoDesc.Repos))
