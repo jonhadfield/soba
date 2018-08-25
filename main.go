@@ -137,12 +137,12 @@ func run() error {
 	backupDIR, backupDIRKeyExists = os.LookupEnv("GIT_BACKUP_DIR")
 	if !backupDIRKeyExists || backupDIR == "" {
 		return fmt.Errorf("environment variable GIT_BACKUP_DIR must be set")
-	} else {
-		_, err := os.Stat(backupDIR)
-		if os.IsNotExist(err) {
-			return fmt.Errorf("specified backup directory \"%s\" does not exist", backupDIR)
-		}
 	}
+	_, err := os.Stat(backupDIR)
+	if os.IsNotExist(err) {
+		return fmt.Errorf("specified backup directory \"%s\" does not exist", backupDIR)
+	}
+
 	if checkProvidersDefined() != nil {
 		logger.Fatal("no providers defined")
 	}
