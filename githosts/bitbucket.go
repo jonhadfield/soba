@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -70,19 +69,35 @@ func (provider bitbucketHost) getAPIURL() string {
 	return provider.APIURL
 }
 
-func (provider bitbucketHost) Backup(backupDIR string) {
-	describe := provider.describeRepos()
-	var wg sync.WaitGroup
-	for x := range describe.Repos {
-		repo := describe.Repos[x]
-		wg.Add(1)
-		go func(repo repository) {
-			defer wg.Done()
-			parts := strings.Split(repo.HTTPSUrl, "//")
-			repo.URLWithBasicAuth = parts[0] + "//" + os.Getenv("BITBUCKET_USER") + ":" + os.Getenv("BITBUCKET_APP_PASSWORD") + "@" + parts[1]
-			processBackup(repo, backupDIR)
-		}(repo)
-
+func bitBucketWorker(backupDIR string, jobs <-chan repository, results chan<- error) {
+	for repo := range jobs {
+		parts := strings.Split(repo.HTTPSUrl, "//")
+		repo.URLWithBasicAuth = parts[0] + "//" + os.Getenv("BITBUCKET_USER") + ":" + os.Getenv("BITBUCKET_APP_PASSWORD") + "@" + parts[1]
+		results <- processBackup(repo, backupDIR)
 	}
-	wg.Wait()
+}
+
+func (provider bitbucketHost) Backup(backupDIR string) {
+	maxConcurrent := 2
+	repoDesc := provider.describeRepos()
+
+	jobs := make(chan repository, len(repoDesc.Repos))
+	results := make(chan error, maxConcurrent)
+
+	for w := 1; w <= maxConcurrent; w++ {
+		go bitBucketWorker(backupDIR, jobs, results)
+	}
+
+	for x := range repoDesc.Repos {
+		repo := repoDesc.Repos[x]
+		jobs <- repo
+	}
+	close(jobs)
+
+	for a := 1; a <= len(repoDesc.Repos); a++ {
+		res := <-results
+		if res != nil {
+			logger.Fatal(res)
+		}
+	}
 }

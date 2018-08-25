@@ -67,7 +67,7 @@ func createHost(input newHostInput) (gitProvider, error) {
 	return nil, hostErr
 }
 
-func processBackup(repo repository, backupDIR string) {
+func processBackup(repo repository, backupDIR string) error {
 	// CREATE BACKUP PATH
 	workingPath := backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
 	backupPath := backupDIR + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
@@ -124,6 +124,7 @@ func processBackup(repo repository, backupDIR string) {
 		removeBundleIfDuplicate(backupPath)
 
 	}
+	return nil
 }
 
 func removeBundleIfDuplicate(dir string) {

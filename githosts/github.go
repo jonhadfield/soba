@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 )
 
@@ -104,18 +103,35 @@ func (provider githubHost) getAPIURL() string {
 	return provider.APIURL
 }
 
-func (provider githubHost) Backup(backupDIR string) {
-	output := provider.describeRepos()
-	var wg sync.WaitGroup
-	for x := range output.Repos {
-		repo := output.Repos[x]
-		wg.Add(1)
-		go func(repo repository) {
-			defer wg.Done()
-			firstPos := strings.Index(repo.HTTPSUrl, "//")
-			repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + os.Getenv("GITHUB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
-			processBackup(repo, backupDIR)
-		}(repo)
+func gitHubWorker(backupDIR string, jobs <-chan repository, results chan<- error) {
+	for repo := range jobs {
+		firstPos := strings.Index(repo.HTTPSUrl, "//")
+		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + os.Getenv("GITHUB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
+		results <- processBackup(repo, backupDIR)
 	}
-	wg.Wait()
+}
+
+func (provider githubHost) Backup(backupDIR string) {
+	maxConcurrent := 2
+	repoDesc := provider.describeRepos()
+
+	jobs := make(chan repository, len(repoDesc.Repos))
+	results := make(chan error, maxConcurrent)
+
+	for w := 1; w <= maxConcurrent; w++ {
+		go gitHubWorker(backupDIR, jobs, results)
+	}
+
+	for x := range repoDesc.Repos {
+		repo := repoDesc.Repos[x]
+		jobs <- repo
+	}
+	close(jobs)
+
+	for a := 1; a <= len(repoDesc.Repos); a++ {
+		res := <-results
+		if res != nil {
+			logger.Fatal(res)
+		}
+	}
 }
