@@ -1,6 +1,11 @@
 package main
 
-import "strings"
+import (
+	"os"
+	"strings"
+)
+
+const pathSep = string(os.PathSeparator)
 
 func stringInStrings(single string, group []string) bool {
 	for _, item := range group {

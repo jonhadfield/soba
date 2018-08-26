@@ -150,7 +150,7 @@ func run() error {
 	if len(backupDIR) > 1 && strings.HasSuffix(backupDIR, "/") {
 		backupDIR = backupDIR[:len(backupDIR)-1]
 	}
-	workingDIR := backupDIR + string(os.PathSeparator) + workingDIRName
+	workingDIR := backupDIR + pathSep + workingDIRName
 
 	logger.Println("creating working directory:", workingDIR)
 	createWorkingDIRErr := os.MkdirAll(workingDIR, 0755)
@@ -197,10 +197,10 @@ func execProviderBackups() {
 	}
 
 	logger.Println("cleaning up")
-	delErr := os.RemoveAll(backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator))
+	delErr := os.RemoveAll(backupDIR + pathSep + workingDIRName + pathSep)
 	if delErr != nil {
 		logger.Printf("failed to delete working directory: %s",
-			backupDIR+string(os.PathSeparator)+workingDIRName)
+			backupDIR+pathSep+workingDIRName)
 	}
 	logger.Println("backups complete")
 	if backupInterval := getBackupInterval(); backupInterval > 0 {
