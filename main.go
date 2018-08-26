@@ -138,7 +138,7 @@ func run() error {
 	if !backupDIRKeyExists || backupDIR == "" {
 		return fmt.Errorf("environment variable GIT_BACKUP_DIR must be set")
 	}
-	backupDIR = stripTrailing(backupDIR, "\n")
+	backupDIR = stripTrailingLineBreak(backupDIR)
 	_, err := os.Stat(backupDIR)
 	if os.IsNotExist(err) {
 		return fmt.Errorf("specified backup directory \"%s\" does not exist", backupDIR)
