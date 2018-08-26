@@ -11,7 +11,6 @@ setup:
 # This requires credentials are set for all providers!!!
 test:
 	echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -v -timeout=600s -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
-#	gotestcover $(TEST_OPTIONS) -covermode=atomic -coverprofile=coverage.txt $(SOURCE_FILES) -run $(TEST_PATTERN) -timeout=600s
 
 cover: test
 	go tool cover -html=coverage.txt
@@ -63,7 +62,6 @@ build-all: fmt
 
 critic:
 	gocritic check-package github.com/jonhadfield/soba
-	gocritic check-package github.com/jonhadfield/soba/githosts
 
 install:
 	go install ./cmd/...
