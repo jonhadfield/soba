@@ -3,6 +3,7 @@ TEST_PATTERN?=.
 TEST_OPTIONS?=-race -v
 
 setup:
+	go get -u github.com/go-critic/go-critic/...
 	go get -u github.com/alecthomas/gometalinter
 	go get -u golang.org/x/tools/cmd/cover
 	gometalinter --install
