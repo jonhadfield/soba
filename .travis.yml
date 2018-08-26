@@ -5,6 +5,7 @@ go:
 - tip
 before_install:
 - go get github.com/axw/gocov/gocov
+- go get github.com/schrej/godacov
 - go get github.com/mattn/goveralls
 - go get github.com/carlescere/scheduler
 - if ! go get github.com/golang/tools/cmd/cover; then go get golang.org/x/tools/cmd/cover;
@@ -23,9 +24,11 @@ env:
   - secure: KQwHWkALfiPf89QR30i/mxBxZ3WnBRAN3ehGVASzjVRmbhbB2FaYheVeOpL+1P28ru9+5xjPKrM8xruM2k1HMvRISYtQ2weWss+xAdtEsfUFg7MDFNVcgGbIBHa9CbQMan9X8WcNWI/eNohRpXRx+Yqw9P4oR2b2Grn80iXDFTh2gB/R37IQuPPp4XB1HR6robiZpwYUVdeNqqKbHN0ekzZkFrKClYwOnTVIrrJHvoxrTlNs+sCdYZecDx4m0vVFk2ocqKz3NGWejQTflQE0q30lK6pdsNeiagLES+QPtTkWovOmtL0eJgO9c9s1SkWQvQqGE4azYvyjCquR3l7R9qh1YYXcMyITe0dtDApwOAbhd8jkoR2gIUlVqm23K1m/51PAelWwnD8Oa45dtDUpBy/XhkKdrHcXKE99c4qEW3SKAGii0qg4rBGeHUZtK3IWMpSDwSkNElaYXS4zIoBxOZ34IrJTQo8FYMGFjxVYnA4neKf9PfXFplIWld0bH+2O3JsDDI65mjLG0XI74KP/t5AyGzEi8svcSRUIYFVTPnXcAj+wwJFvRHFt7s3u+dTn5jcE6LrB8SmEsFtIqEI7YPwmc3YfLKsx12BQ6a+4tiOPzRhrrNQhcUyuFH+TpbA1rqyEzWAV0mHRRCJamoPzeZ3HsSufHpslR6m1qHRcgvg=
   - secure: FAKQNvCv22mpgPXfo01pZb557EBkXhDJzXeTTq5j5RKsiD0yKgLfS5C4TTg88Gw7kKT41VLthT29FwauMe0gTfF1Rg1deqRWlQpRmzldU5tpJVP9wMfue3BW9jypX/mvV0A8ZGAzjqlE0bWiCL0mhNTi3NpKCQBUHlYX8ztX9GZKiv9VpSwvvfXuRjrcSG0AAkG/pfnri/pt9ilIidNqxDZdLyPddVn3aRI/amd4lXyfj6X2hBYvIRLAiWY8ffJUQMb8kGg8BkPgTu6s1fq+PPz+DTvq3zm0bwVBuZbJfAOt38zlnzPFTQvxhK2ROoMDqll/Y1QN/Tcttax/zAVBCjt0+ghskqqcOLg/kVgSBXDOvKQVaAisYjjBCQbNaAuR+I5j7Y1mZJOOI5KcrWw02m9LafQe2dUi6xuVax0X2bUTj+T+Nm4PqtUP3vrvS76yy7KjUqsHWYceAhplE3tTtTy8+BlmHwxUrDfJ2gJjLOeIcKVkRfi/xrta0CWX6ywlnIBJt3yk/PmdZ1E68gRXxOqnA4bwgY6CrN3wYFre4zwp2KM0IClcMWT+16oWy5n3RrLzo+Y3At/Sqc7Tf9FrpsamOzpk42Sl7xjSAKrPFe9w4PZearQptTosc/c4xKu8jnyltEbUNI8blWB/hcQAvLcTfilSOetMsQHhXSsC72U=
   - secure: oinYkl5YIwalKH16z6kg8KvvNyGZdImpKyRUR/YbIfuLgfjQXHBR2d+EiQ28hOj9eAjzIhn6q9m/XgQ8ZyqvNFb7nJHo7lM6hIpyrqgI/trNJCNo9B/2cgjURP4/dV35wgizNMMok2Izsv//2sTszJgTJo9HkyFzx5x14WQ0wEljS3YVSydvko4jbx8joatsUtqa5AaS/wjjxlXL/o+T/UZr+2REtFPTzKu1aJa1vTt5Z4AWDuwiguxNs08+YCH1MEMvAhW0KkMGs3y22Cvzg3ltJMb1iRQkp/Nif4H0iSNq23KTuNSRL1AzhFGZB3kD1gsHyW1i7jmKBZqWArDfCL/BVySvALNcVz5gt3zLjECSbVYNLFPF17RbgBNsYM83LMiZ/yiPUISbWi8oko72v/JolNaf7kSoC7kXHyjTm/DvzSwLehC1AVFpFSAgkaRqZWINvQYSCmaA5PfNV/NaD782+evbs6+7CWZSvvjBeSQqyq6WofIC7pk8wxICf1aoeM5b/Dzl0lz+/Gz19sxsrviWVu+Tze771J0tsNOowP4rFqgY3GFS1v/5838yBCt58iwhEMdz8f9lsCN1p6TwO6AD3XaRCBuXEhEhlNAbF/m3dl1ylBBjDnV2w96Ip6S8YX2kwOCxvU/IMIXiHZcentTsJ6Xf8axCsibM2ateqtI=
+  - secure: jUerGmCi076s+n1V7O4D3Flsrk7o6qvJe3puqrahU4PG4WEsrqQg0qWpimkcma2m0spz1+WsuxqjTtZsLMHM7DxTNgxfsdwwcP29e2q4vnhv+MgtDDqvpDWgRLnvmGmaUEDp70KE3nWFiGxhjAxjZ+oYqcuFsZJYRXV+vLTB8DIA0pbVFDXl7rcKLhNvl9+xoaqCESWEM5BdJN/tK3502Cvm0h5d+VaYGdsHQ0ot5C5yXP9ERsbZWM5+JZE9aYmPsKITSU5zB40gnn6rSDuzu+GsFptBVXNSHLWVSOW8tLcIlszaA4lp1vzkWBIV/ukW2w9qWRLKarQp6ZQUuS//MToHGmWtTEZnePP145PmbwotMTVKMdEdiMI3twx9rT/OQMTwJZubbCHlgiUS+A0EwlNE75axjzm9eEcqPbMgLJ+RmA/rC6dl3Esb5tqz3m6TbGRDkaZKhNQeT4VJm3Qgo9O+wJBY6judmfCyeRycaEXx6lRfMxO+gYv2Y0NDBwvugWO9G3zZaFrOT3VkkPRUiGpGjIi0wT5uDUrdZQhHSGVJWB1DuJtRni8rKrLAkQ7DSBEut/obghYMlwVw19yymM+lVclpoOvVN63OmxCbwoYehMKe5pbXVPHByvdjiy4LGGMXTVBlCAKrXRWrmOwJT9udJXeSZzlwUX9pLn0kVt0=
   matrix:
   - GIT_BACKUP_DIR=/tmp/backup
 script:
-- base=$(echo $PWD | sed "s|$GOPATH/src/||") && go test -race -v $(go list ./... |
+- base=$(echo $PWD | sed "s|$GOPATH/src/||") && go test -coverprofile=coverage.out -race -v $(go list ./... |
   grep -v vendor | sed "s|$base/|./|")
 - "$GOPATH/bin/goveralls -service=travis-ci"
+- "$GOPATH/bin/godacov -t $CODACY_TOKEN -r ./coverage.out -c $TRAVIS_COMMIT"
