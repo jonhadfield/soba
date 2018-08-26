@@ -16,9 +16,9 @@ func stringInStrings(single string, group []string) bool {
 	return false
 }
 
-func stripTrailing(input, toStrip string) string {
-	if strings.HasSuffix(input, toStrip) {
-		return input[:len(input)-len(toStrip)]
+func stripTrailingLineBreak(input string) string {
+	if strings.HasSuffix(input, "\n") {
+		return input[:len(input)-2]
 	}
 	return input
 }
