@@ -24,7 +24,7 @@ type bitbucketGetProjectsResponse []bitbucketProject
 
 func injectCreds(url string) string {
 	parts := strings.Split(url, "://")
-	return parts[0] + "://" + os.Getenv("BITBUCKET_USER") + ":" + os.Getenv("BITBUCKET_APP_PASSWORD") + "@" + parts[1]
+	return parts[0] + "://" + os.Getenv("BITBUCKET_USER") + ":" + stripTrailing(os.Getenv("BITBUCKET_APP_PASSWORD"), "\n") + "@" + parts[1]
 }
 
 func (provider bitbucketHost) describeRepos() describeReposOutput {
@@ -34,11 +34,15 @@ func (provider bitbucketHost) describeRepos() describeReposOutput {
 		IdleConnTimeout:    30 * time.Second,
 		DisableCompression: true,
 	}
+
 	client := &http.Client{Transport: tr}
 	var repos []repository
-	rawRequestURL := provider.APIURL + string(os.PathSeparator) + "user" + string(os.PathSeparator) + "repositories"
+	rawRequestURL := provider.APIURL + "/user/repositories"
 	getReposURL := injectCreds(rawRequestURL)
-	req, _ := http.NewRequest(http.MethodGet, getReposURL, nil)
+	req, errNewReq := http.NewRequest(http.MethodGet, getReposURL, nil)
+	if errNewReq != nil {
+		logger.Fatal(errNewReq)
+	}
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Accept", "application/json; charset=utf-8")
 	resp, _ := client.Do(req)
@@ -72,7 +76,7 @@ func (provider bitbucketHost) getAPIURL() string {
 func bitBucketWorker(backupDIR string, jobs <-chan repository, results chan<- error) {
 	for repo := range jobs {
 		parts := strings.Split(repo.HTTPSUrl, "//")
-		repo.URLWithBasicAuth = parts[0] + "//" + os.Getenv("BITBUCKET_USER") + ":" + os.Getenv("BITBUCKET_APP_PASSWORD") + "@" + parts[1]
+		repo.URLWithBasicAuth = parts[0] + "//" + os.Getenv("BITBUCKET_USER") + ":" + stripTrailing(os.Getenv("BITBUCKET_APP_PASSWORD"), "\n") + "@" + parts[1]
 		results <- processBackup(repo, backupDIR)
 	}
 }

@@ -21,7 +21,7 @@ func (provider gitlabHost) getAuthenticatedGitlabUserID(client http.Client) int 
 		ID int
 	}
 	// get user id
-	getUserIDURL := provider.APIURL + string(os.PathSeparator) + "user"
+	getUserIDURL := provider.APIURL + "/user"
 	req, newReqErr := http.NewRequest(http.MethodGet, getUserIDURL, nil)
 	if newReqErr != nil {
 		logger.Fatal(newReqErr)
@@ -58,8 +58,9 @@ type gitLabProject struct {
 type gitLabGetProjectsResponse []gitLabProject
 
 func (provider gitlabHost) getProjectsByUserID(client http.Client, userID int) (repos []repository) {
-	getUserIDURL := provider.APIURL + string(os.PathSeparator) + "users" + string(os.PathSeparator) + strconv.Itoa(userID) + string(os.PathSeparator) + "projects"
+	getUserIDURL := provider.APIURL + "/users/" + strconv.Itoa(userID) + "/projects"
 	req, _ := http.NewRequest(http.MethodGet, getUserIDURL, nil)
+
 	req.Header.Set("Private-Token", os.Getenv("GITLAB_TOKEN"))
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
 	req.Header.Set("Accept", "application/json; charset=utf-8")
@@ -111,7 +112,7 @@ func (provider gitlabHost) getAPIURL() string {
 func gitlabWorker(backupDIR string, jobs <-chan repository, results chan<- error) {
 	for repo := range jobs {
 		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + repo.Owner + ":" + os.Getenv("GITLAB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
+		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + repo.Owner + ":" + stripTrailing(os.Getenv("GITLAB_TOKEN"), "\n") + "@" + repo.HTTPSUrl[firstPos+2:]
 		results <- processBackup(repo, backupDIR)
 	}
 }

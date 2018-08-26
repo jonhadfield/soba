@@ -3,6 +3,7 @@ package githosts
 import (
 	"bytes"
 	"crypto/md5"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -86,12 +87,15 @@ func processBackup(repo repository, backupDIR string) error {
 	}
 	cloneCmd := exec.Command("git", "clone", "-v", "--mirror", cloneURL, workingPath)
 	cloneCmd.Dir = backupDIR
-	var cloneOut bytes.Buffer
-	cloneCmd.Stdout = &cloneOut
+	var cloneStdErr bytes.Buffer
+	cloneCmd.Stderr = &cloneStdErr
 	cloneErr := cloneCmd.Run()
-	cloneErr = errors.WithStack(cloneErr)
+	stderr := cloneStdErr.String()
+	var errOutString string
 
 	if cloneErr != nil {
+		errOutString = cloneErr.Error() + "\n" + stderr
+		cloneErr = errors.WithStack(fmt.Errorf(errOutString))
 		logger.Fatal(cloneErr)
 	}
 	// CREATE BUNDLE
