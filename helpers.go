@@ -16,7 +16,7 @@ func stringInStrings(single string, group []string) bool {
 	return false
 }
 
-func stripTrailing(input string, toStrip string) string {
+func stripTrailing(input, toStrip string) string {
 	if strings.HasSuffix(input, toStrip) {
 		return input[:len(input)-len(toStrip)]
 	}
