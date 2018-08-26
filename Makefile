@@ -5,7 +5,7 @@ TEST_OPTIONS?=-race -v
 setup:
 	go get -u github.com/alecthomas/gometalinter
 	go get -u golang.org/x/tools/cmd/cover
-	gometalinter --install --update
+	gometalinter --install
 
 # This requires credentials are set for all providers!!!
 test:
