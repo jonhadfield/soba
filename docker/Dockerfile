@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.8
 MAINTAINER Jon Hadfield <jon@lessknown.co.uk>
 ARG build_tag
 RUN apk add --update --no-cache ca-certificates bash curl git && rm -f /var/cache/apk/* \
