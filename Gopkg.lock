@@ -10,6 +10,14 @@
   version = "0.1"
 
 [[projects]]
+  branch = "master"
+  digest = "1:7fd66d5af49163a19d7ce520c126554488cc28248634c584b6dad0cfeac80823"
+  name = "github.com/jonhadfield/githosts-utils"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "8b104d0e124978ff3bf93f1083c5170ad2308b02"
+
+[[projects]]
   digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
   name = "github.com/pkg/errors"
   packages = ["."]
@@ -22,6 +30,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/carlescere/scheduler",
+    "github.com/jonhadfield/githosts-utils",
     "github.com/pkg/errors",
   ]
   solver-name = "gps-cdcl"
