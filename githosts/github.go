@@ -63,7 +63,8 @@ func (provider githubHost) describeRepos() describeReposOutput {
 		if newReqErr != nil {
 			logger.Fatal(newReqErr)
 		}
-		req.Header.Set("Authorization", fmt.Sprintf("bearer %s", os.Getenv("GITHUB_TOKEN")))
+		req.Header.Set("Authorization", fmt.Sprintf("bearer %s",
+			stripTrailing(os.Getenv("GITHUB_TOKEN"), "\n")))
 		req.Header.Set("Content-Type", "application/json; charset=utf-8")
 		req.Header.Set("Accept", "application/json; charset=utf-8")
 
@@ -77,7 +78,6 @@ func (provider githubHost) describeRepos() describeReposOutput {
 		if err := json.Unmarshal([]byte(bodyStr), &respObj); err != nil {
 			logger.Fatal(err)
 		}
-
 		for _, repo := range respObj.Data.Viewer.Repositories.Edges {
 			repos = append(repos, repository{
 				Name:          repo.Node.Name,
@@ -106,7 +106,7 @@ func (provider githubHost) getAPIURL() string {
 func gitHubWorker(backupDIR string, jobs <-chan repository, results chan<- error) {
 	for repo := range jobs {
 		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		repo.URLWithToken = repo.HTTPSUrl[:firstPos+2] + os.Getenv("GITHUB_TOKEN") + "@" + repo.HTTPSUrl[firstPos+2:]
+		repo.URLWithToken = fmt.Sprintf("%s%s@%s", repo.HTTPSUrl[:firstPos+2], stripTrailing(os.Getenv("GITHUB_TOKEN"), "\n"), repo.HTTPSUrl[firstPos+2:])
 		results <- processBackup(repo, backupDIR)
 	}
 }

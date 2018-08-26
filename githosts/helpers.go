@@ -3,6 +3,7 @@ package githosts
 import (
 	"io"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -13,6 +14,13 @@ func createDirIfAbsent(path string) error {
 func getTimestamp() string {
 	t := time.Now()
 	return t.Format("20060102150405")
+}
+
+func stripTrailing(input string, toStrip string) string {
+	if strings.HasSuffix(input, toStrip) {
+		return input[:len(input)-len(toStrip)]
+	}
+	return input
 }
 
 func isEmpty(name string) (bool, error) {

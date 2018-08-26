@@ -57,7 +57,7 @@ build-all: fmt
 	GOOS=netbsd  CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_netbsd_amd64"
 	GOOS=openbsd CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_openbsd_amd64"
 	GOOS=freebsd CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_freebsd_amd64"
-	GOOS=windows CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_windows_amd64"
+	GOOS=windows CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_windows_amd64.exe"
 
 critic:
 	gocritic check-package github.com/jonhadfield/soba
@@ -84,10 +84,14 @@ wait-for-publish:
 build-docker:
 	cd docker ; docker build --build-arg build_tag=$(BUILD_TAG) --no-cache -t quay.io/jonhadfield/soba:$(BUILD_TAG) .
 	cd docker ; docker tag quay.io/jonhadfield/soba:$(BUILD_TAG) quay.io/jonhadfield/soba:latest
+	cd docker ; docker tag quay.io/jonhadfield/soba:$(BUILD_TAG) jonhadfield/soba:$(BUILD_TAG)
+	cd docker ; docker tag quay.io/jonhadfield/soba:$(BUILD_TAG) jonhadfield/soba:latest
 
 release-docker:
 	cd docker ; docker push quay.io/jonhadfield/soba:$(BUILD_TAG)
 	cd docker ; docker push quay.io/jonhadfield/soba:latest
+	cd docker ; docker push jonhadfield/soba:$(BUILD_TAG)
+	cd docker ; docker push jonhadfield/soba:latest
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
