@@ -78,7 +78,7 @@ func processBackup(repo repository, backupDIR string) error {
 		logger.Fatal(delErr)
 	}
 	// CLONE REPO
-	logger.Printf("cloning '%s'", repo.HTTPSUrl)
+	logger.Printf("cloning: %s", repo.HTTPSUrl)
 	var cloneURL string
 	if repo.URLWithToken != "" {
 		cloneURL = repo.URLWithToken
@@ -115,7 +115,7 @@ func processBackup(repo repository, backupDIR string) error {
 		if createErr != nil {
 			logger.Fatal(createErr)
 		}
-		logger.Printf("creating bundle for '%s'", repo.Name)
+		logger.Printf("creating bundle for: %s", repo.Name)
 		bundleCmd := exec.Command("git", "bundle", "create", backupFilePath, "--all")
 		bundleCmd.Dir = workingPath
 		var bundleOut bytes.Buffer
