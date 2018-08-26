@@ -12,6 +12,7 @@ run_soba
 /coverage.txt
 run_soba_*
 testing/backups
+/soba
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
