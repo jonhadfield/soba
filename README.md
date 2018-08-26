@@ -17,7 +17,7 @@ An unchanged git repository will create an identical bundle file so bundles will
 #### Supported OSes
 
 Tested on Windows 10, MacOS, and Linux (amd64).   
-Not tested, but should also work on builds for: Linux (arm 386 and amd64), FreeBSD, NetBSD, and OpenBSD.
+Not tested, but should also work on builds for: Linux (386, arm386 and arm64), FreeBSD, NetBSD, and OpenBSD.
 
 #### Supported Providers
 
