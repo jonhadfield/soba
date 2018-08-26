@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const pathSep = string(os.PathSeparator)
+
 func createDirIfAbsent(path string) error {
 	return os.MkdirAll(path, 0755)
 }

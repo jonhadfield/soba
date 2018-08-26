@@ -70,10 +70,10 @@ func createHost(input newHostInput) (gitProvider, error) {
 
 func processBackup(repo repository, backupDIR string) error {
 	// CREATE BACKUP PATH
-	workingPath := backupDIR + string(os.PathSeparator) + workingDIRName + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
-	backupPath := backupDIR + string(os.PathSeparator) + repo.Domain + string(os.PathSeparator) + repo.NameWithOwner
+	workingPath := backupDIR + pathSep + workingDIRName + pathSep + repo.Domain + pathSep + repo.NameWithOwner
+	backupPath := backupDIR + pathSep + repo.Domain + pathSep + repo.NameWithOwner
 	// DELETE EXISTING CLONE
-	delErr := os.RemoveAll(workingPath + string(os.PathSeparator))
+	delErr := os.RemoveAll(workingPath + pathSep)
 	if delErr != nil {
 		logger.Fatal(delErr)
 	}
@@ -99,18 +99,18 @@ func processBackup(repo repository, backupDIR string) error {
 		logger.Fatal(cloneErr)
 	}
 	// CREATE BUNDLE
-	objectsPath := workingPath + string(os.PathSeparator) + "objects"
+	objectsPath := workingPath + pathSep + "objects"
 	dirs, _ := ioutil.ReadDir(objectsPath)
-	emptyPack, checkEmptyErr := isEmpty(objectsPath + string(os.PathSeparator) + "pack")
+	emptyPack, checkEmptyErr := isEmpty(objectsPath + pathSep + "pack")
 	if checkEmptyErr != nil {
-		logger.Printf("failed to check if: '%s' is empty", objectsPath+string(os.PathSeparator)+"pack")
+		logger.Printf("failed to check if: '%s' is empty", objectsPath+pathSep+"pack")
 	}
 	if len(dirs) == 2 && emptyPack {
 		logger.Printf("%s is empty, so not creating bundle", repo.Name)
 	} else {
 
 		backupFile := repo.Name + "." + getTimestamp() + bundleExtension
-		backupFilePath := backupPath + string(os.PathSeparator) + backupFile
+		backupFilePath := backupPath + pathSep + backupFile
 		createErr := createDirIfAbsent(backupPath)
 		if createErr != nil {
 			logger.Fatal(createErr)
@@ -167,22 +167,22 @@ func removeBundleIfDuplicate(dir string) {
 	})
 
 	// check if file sizes are same
-	latestBundleSize := getFileSize(dir + string(os.PathSeparator) + ss[0].Key)
-	previousBundleSize := getFileSize(dir + string(os.PathSeparator) + ss[1].Key)
+	latestBundleSize := getFileSize(dir + pathSep + ss[0].Key)
+	previousBundleSize := getFileSize(dir + pathSep + ss[1].Key)
 	if latestBundleSize == previousBundleSize {
 		// check if hashes match
-		latestBundleHash, latestHashErr := getMD5Hash(dir + string(os.PathSeparator) + ss[0].Key)
+		latestBundleHash, latestHashErr := getMD5Hash(dir + pathSep + ss[0].Key)
 		if latestHashErr != nil {
-			logger.Printf("failed to get md5 hash for: %s", dir+string(os.PathSeparator)+ss[0].Key)
+			logger.Printf("failed to get md5 hash for: %s", dir+pathSep+ss[0].Key)
 		}
-		previousBundleHash, previousHashErr := getMD5Hash(dir + string(os.PathSeparator) + ss[1].Key)
+		previousBundleHash, previousHashErr := getMD5Hash(dir + pathSep + ss[1].Key)
 		if previousHashErr != nil {
-			logger.Printf("failed to get md5 hash for: %s", dir+string(os.PathSeparator)+ss[1].Key)
+			logger.Printf("failed to get md5 hash for: %s", dir+pathSep+ss[1].Key)
 		}
 		if reflect.DeepEqual(latestBundleHash, previousBundleHash) {
 			logger.Printf("no change since previous bundle: %s", ss[1].Key)
 			logger.Printf("deleting duplicate bundle: %s", ss[0].Key)
-			if deleteFile(dir+string(os.PathSeparator)+ss[0].Key) != nil {
+			if deleteFile(dir+pathSep+ss[0].Key) != nil {
 				logger.Println("failed to remove duplicate bundle")
 			}
 		}
