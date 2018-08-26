@@ -27,7 +27,7 @@ Not tested, but should also work on builds for: Linux (386, arm386 and arm64), F
 
 ## configuration
 
-soba can be run from the command line or as docker container. In both cases the only configuration required is an environment variable with the directory in which to create backups, and another to define credentials for each the providers. 
+soba can be run from the command line or as docker container. In both cases the only configuration required is an environment variable with the directory in which to create backups, and additional to define credentials for each the providers. 
 
 On Windows 10: 
 - search for 'environment variables' and choose 'Edit environment variables for your account'
