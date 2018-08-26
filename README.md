@@ -14,6 +14,11 @@ soba is tool for backing up private and public git repositories hosted on the mo
 
 An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been made and will not produce duplicates.
 
+#### Supported OSes
+
+Tested on Windows 10, MacOS, and Linux (amd64).   
+Not tested, but should also work on builds for: Linux (arm 386 and amd64), FreeBSD, NetBSD, and OpenBSD.
+
 #### Supported Providers
 
 - BitBucket
@@ -22,12 +27,13 @@ An unchanged git repository will create an identical bundle file so bundles will
 
 ## configuration
 
-soba can be run from the command line or as docker container. In both cases the only configuration required is an environment variable with the directory in which to create backups and one with a token for each of the providers. For example, the following would create a directory for each provider in existing directory /repo-backups/:
-``` bash
-GIT_BACKUP_DIR="/repo-backups/"
-```
+soba can be run from the command line or as docker container. In both cases the only configuration required is an environment variable with the directory in which to create backups, and another to define credentials for each the providers. 
 
-On Linux and MacOS you would set this using:
+On Windows 10: 
+- search for 'environment variables' and choose 'Edit environment variables for your account'
+- choose 'New...' under the top pane and enter the name/key and value for each of the settings
+
+On Linux and MacOS you would set these using:
 
 ```bash
 $ export GIT_BACKUP_DIR="/repo-backups/"
@@ -118,10 +124,6 @@ $ source /home/<your-user-id>/.bashrc
 | BitBucket| BITBUCKET_USER<br/>BITBUCKET_APP_PASSWORD | <a href="https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html#Apppasswords-Createanapppassword" target="_blank">instructions</a>
 | GitHub   | GITHUB_TOKEN   | <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">instructions</a>
 | GitLab   | GITLAB_TOKEN   | <a href="https://gitlab.com/profile/personal_access_tokens" target="_blank">instructions</a>
-
-
-_additional providers coming soon_  
-
 
 ### run on Synology NAS
 _Tested on DS916+_
