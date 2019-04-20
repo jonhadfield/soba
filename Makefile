@@ -63,6 +63,9 @@ build-all: fmt
 critic:
 	gocritic check-package github.com/jonhadfield/soba
 
+mac-install: build
+	install .local_dist/soba_darwin_amd64 /usr/local/bin/soba
+
 install:
 	go install ./cmd/...
 

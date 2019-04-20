@@ -5,6 +5,8 @@ import (
 	"os"
 	"strings"
 
+	githosts "github.com/jonhadfield/githosts-utils"
+
 	"strconv"
 
 	"time"
@@ -14,7 +16,6 @@ import (
 	"runtime"
 
 	"github.com/carlescere/scheduler"
-	"github.com/jonhadfield/githosts-utils"
 	"github.com/pkg/errors"
 )
 
@@ -75,7 +76,7 @@ func checkProviderFactory(provider string) func() {
 				val, exists := os.LookupEnv(param)
 				if exists {
 					if strings.Trim(val, " ") == "" {
-						fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
 					} else {
 						numUserDefinedProviders++
 					}
@@ -89,12 +90,12 @@ func checkProviderFactory(provider string) func() {
 			for _, param := range enabledProviderAuth[provider] {
 				val, exists := os.LookupEnv(param)
 				if firstParamFound && !exists {
-					fmt.Fprintf(&outputErrs, "both parameters for '%s' are required.\n", provider)
+					_, _ = fmt.Fprintf(&outputErrs, "both parameters for '%s' are required.\n", provider)
 				}
 				if exists {
 					firstParamFound = true
 					if val == "" {
-						fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
 					} else {
 						numUserDefinedProviders++
 					}
