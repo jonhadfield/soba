@@ -10,6 +10,7 @@
 run_soba
 .local_dist/
 /coverage.txt
+/coverage.tmp
 run_soba_*
 testing/backups
 /soba
