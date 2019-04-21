@@ -27,14 +27,14 @@ func backupEnvironmentVariables() map[string]string {
 
 func restoreEnvironmentVariables(input map[string]string) {
 	for key, val := range input {
-		os.Setenv(key, val)
+		_ = os.Setenv(key, val)
 	}
 }
 
 func unsetEnvVars(exceptionList []string) {
 	for _, sobaVar := range sobaEnvVarKeys {
 		if !stringInStrings(sobaVar, exceptionList) {
-			os.Unsetenv(sobaVar)
+			_ = os.Unsetenv(sobaVar)
 		}
 	}
 }
@@ -42,6 +42,7 @@ func unsetEnvVars(exceptionList []string) {
 func TestPublicGithubRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
+	// Unset Env Vars but exclude those defined
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN"})
 	err := run()
 	restoreEnvironmentVariables(envBackup)
@@ -87,7 +88,7 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
-	os.Setenv("GITHUB_TOKEN", "ABCD1234")
+	_ = os.Setenv("GITHUB_TOKEN", "ABCD1234")
 	err := run()
 	restoreEnvironmentVariables(envBackup)
 	if err == nil {
