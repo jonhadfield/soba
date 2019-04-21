@@ -168,7 +168,7 @@ func run() error {
 		}
 		logger.Printf("scheduling to run every %d %s", backupInterval, hourOutput)
 
-		_, schedulerErr := scheduler.Every(time.Duration(backupInterval)).Hours().Run(execProviderBackups)
+		_, schedulerErr := scheduler.Every(int(time.Duration(backupInterval))).Hours().Run(execProviderBackups)
 		if schedulerErr != nil {
 			return schedulerErr
 		}
