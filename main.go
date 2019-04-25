@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	githosts "github.com/jonhadfield/githosts-utils"
+	"github.com/jonhadfield/githosts-utils"
 
 	"strconv"
 
