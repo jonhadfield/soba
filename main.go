@@ -167,10 +167,9 @@ func run() error {
 			hourOutput = "hours"
 		}
 		logger.Printf("scheduling to run every %d %s", backupInterval, hourOutput)
-
-		_, schedulerErr := scheduler.Every(int(time.Duration(backupInterval))).Hours().Run(execProviderBackups)
-		if schedulerErr != nil {
-			return schedulerErr
+		_, err = scheduler.Every(int(time.Duration(backupInterval))).Hours().Run(execProviderBackups)
+		if err != nil {
+			return err
 		}
 		runtime.Goexit()
 	} else {
@@ -180,21 +179,31 @@ func run() error {
 }
 
 func execProviderBackups() {
+	var err error
 	startTime := time.Now()
 	backupDIR := os.Getenv("GIT_BACKUP_DIR")
 	if os.Getenv("BITBUCKET_USER") != "" {
 		logger.Println("backing up BitBucket repos")
-		githosts.Backup("bitbucket", backupDIR)
+		err = githosts.Backup("bitbucket", backupDIR)
+		if err != nil {
+			logger.Fatal(err)
+		}
 	}
 
 	if os.Getenv("GITLAB_TOKEN") != "" {
 		logger.Println("backing up GitLab repos")
-		githosts.Backup("gitlab", backupDIR)
+		err = githosts.Backup("gitlab", backupDIR)
+		if err != nil {
+			logger.Fatal(err)
+		}
 	}
 
 	if os.Getenv("GITHUB_TOKEN") != "" {
 		logger.Println("backing up GitHub repos")
-		githosts.Backup("github", backupDIR)
+		err = githosts.Backup("github", backupDIR)
+		if err != nil {
+			logger.Fatal(err)
+		}
 	}
 
 	logger.Println("cleaning up")
