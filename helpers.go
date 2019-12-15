@@ -13,6 +13,7 @@ func stringInStrings(single string, group []string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -20,5 +21,6 @@ func stripTrailingLineBreak(input string) string {
 	if strings.HasSuffix(input, "\n") {
 		return input[:len(input)-2]
 	}
+
 	return input
 }
