@@ -19,27 +19,7 @@ fmt:
 	find . -name '*.go' -not -wholename './vendor/*' | while read -r file; do gofmt -w -s "$$file"; goimports -w "$$file"; done
 
 lint:
-	gometalinter -e testing.go -e validation_test.go --vendor --disable-all \
-		--enable=deadcode \
-		--enable=gocyclo \
-		--enable=errcheck \
-		--enable=gofmt \
-		--enable=goimports \
-		--enable=golint \
-		--enable=gosimple \
-		--enable=ineffassign \
-		--enable=misspell \
-		--enable=unconvert \
-		--enable=varcheck \
-		--enable=staticcheck \
-		--enable=unparam\
-		--enable=varcheck \
-		--enable=dupl \
-		--enable=structcheck \
-		--enable=vetshadow \
-		--deadline=10m \
-		./...
-
+	golangci-lint run --tests=false --enable-all --disable lll --disable interfacer --disable gochecknoglobals
 ci: lint test
 
 BUILD_TAG := $(shell git describe --tags 2>/dev/null)
@@ -68,6 +48,9 @@ mac-install: build
 
 install:
 	go install ./cmd/...
+
+find-updates:
+	go list -u -m -json all | go-mod-outdated -update -direct
 
 bintray:
 	curl -X PUT -0 -T .local_dist/soba_darwin_amd64 -ujonhadfield:$(BINTRAY_APIKEY) "https://api.bintray.com/content/jonhadfield/soba/soba/$(BUILD_TAG)/soba_darwin_amd64;bt_package=soba;bt_version=$(BUILD_TAG);publish=1"
