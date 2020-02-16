@@ -121,7 +121,7 @@ $ source /home/<your-user-id>/.bashrc
 
 | Provider | Environment Variable(s) | Generating token |
 |:---------|:---------------|:----------------------------------------------------------------------------------------------------------------------------------|
-| BitBucket| BITBUCKET_USER<br/>BITBUCKET_APP_PASSWORD | <a href="https://confluence.atlassian.com/bitbucket/app-passwords-828781300.html#Apppasswords-Createanapppassword" target="_blank">instructions</a>
+| BitBucket| BITBUCKET_USER<br/>BITBUCKET_KEY<br/>BITBUCKET_SECRET | <a href="https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html" target="_blank">instructions</a>
 | GitHub   | GITHUB_TOKEN   | <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">instructions</a>
 | GitLab   | GITLAB_TOKEN   | <a href="https://gitlab.com/profile/personal_access_tokens" target="_blank">instructions</a>
 
@@ -145,7 +145,8 @@ _Tested on DS916+_
   - **variable** GIT_BACKUP_INTERVAL **Value** [hours between backups]
 #### Provider Specific
   - **variable** BITBUCKET_USER **Value** [BitBucket User]   (if using BitBucket)
-  - **variable** BITBUCKET_APP_PASSWORD **Value** [BitBucket App Password]   (if using BitBucket)
+  - **variable** BITBUCKET_KEY **Value** [BitBucket Key]   (if using BitBucket)
+  - **variable** BITBUCKET_SECRET **Value** [BitBucket Secret]   (if using BitBucket)
   - **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
   - **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
 
