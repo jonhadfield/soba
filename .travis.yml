@@ -22,4 +22,3 @@ script:
 - base=$(echo $PWD | sed "s|$GOPATH/src/||") && go test -coverprofile=coverage.out -covermode=atomic -race -v $(go list ./... |
   grep -v vendor | sed "s|$base/|./|")
 - "$GOPATH/bin/goveralls -service=travis-ci"
-- "$GOPATH/bin/godacov -t $CODACY_TOKEN -r ./coverage.out -c $TRAVIS_COMMIT"
