@@ -1,17 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
-	"strings"
-
-	"strconv"
-
-	"time"
-
-	"fmt"
-
 	"runtime"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/carlescere/scheduler"
 	githosts "github.com/jonhadfield/githosts-utils"
@@ -74,7 +70,7 @@ func getBackupInterval() int {
 func checkProviderFactory(provider string) func() {
 	retFunc := func() {
 		var outputErrs strings.Builder
-		//tokenOnlyProviders
+		// tokenOnlyProviders
 		if stringInStrings(provider, justTokenProviders) {
 			for _, param := range enabledProviderAuth[provider] {
 				val, exists := os.LookupEnv(param)
@@ -87,7 +83,7 @@ func checkProviderFactory(provider string) func() {
 				}
 			}
 		}
-		//userAndPasswordProviders
+		// userAndPasswordProviders
 		if stringInStrings(provider, userAndPasswordProviders) {
 			var firstParamFound bool
 
@@ -172,7 +168,7 @@ func run() error {
 	workingDIR := backupDIR + pathSep + workingDIRName
 
 	logger.Println("creating working directory:", workingDIR)
-	createWorkingDIRErr := os.MkdirAll(workingDIR, 0755)
+	createWorkingDIRErr := os.MkdirAll(workingDIR, 0o755)
 
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
