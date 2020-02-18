@@ -7,7 +7,7 @@ import (
 )
 
 var sobaEnvVarKeys = []string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITLAB_TOKEN",
-	"BITBUCKET_USER", "BITBUCKET_APP_PASSWORD"}
+	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"}
 
 func resetGlobals() {
 	// reset global var
@@ -65,7 +65,7 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 func TestPublicBitBucketRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
-	unsetEnvVars([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_APP_PASSWORD"})
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"})
 	err := run()
 	restoreEnvironmentVariables(envBackup)
 	if err != nil {
