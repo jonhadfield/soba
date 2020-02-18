@@ -36,7 +36,8 @@ var (
 		},
 		"BitBucket": {
 			"BITBUCKET_USER",
-			"BITBUCKET_APP_PASSWORD",
+			"BITBUCKET_KEY",
+			"BITBUCKET_SECRET",
 		},
 	}
 	justTokenProviders = []string{
@@ -93,7 +94,7 @@ func checkProviderFactory(provider string) func() {
 			for _, param := range enabledProviderAuth[provider] {
 				val, exists := os.LookupEnv(param)
 				if firstParamFound && !exists {
-					_, _ = fmt.Fprintf(&outputErrs, "both parameters for '%s' are required.\n", provider)
+					_, _ = fmt.Fprintf(&outputErrs, "all parameters for '%s' are required.\n", provider)
 				}
 
 				if exists {
