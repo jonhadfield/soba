@@ -13,8 +13,6 @@ github.com/gorilla/pat v0.0.0-20180118222023-199c85a7f6d1/go.mod h1:YeAe0gNeiNT5
 github.com/gorilla/securecookie v1.1.1/go.mod h1:ra0sb63/xPlUeL+yeDciTfxMRAA+MP+HVt/4epWDjd4=
 github.com/gorilla/sessions v1.1.1/go.mod h1:8KCfur6+4Mqcc6S0FEfKuN15Vl5MgXW92AE8ovaJD0w=
 github.com/jarcoal/httpmock v0.0.0-20180424175123-9c70cfe4a1da/go.mod h1:ks+b9deReOc7jgqp+e7LuFiCBH6Rm5hL32cLcEAArb4=
-github.com/jonhadfield/githosts-utils v0.0.0-20200216215922-5c1dd91138fa h1:dKNINMaKGspKLmzZJS14j2dbFDmgFClRX6DbvHQzJlo=
-github.com/jonhadfield/githosts-utils v0.0.0-20200216215922-5c1dd91138fa/go.mod h1:zVUq8yZA5507qKn1dVgb+hXly6n1GlFpAt6VwYOas50=
 github.com/jonhadfield/githosts-utils v0.0.0-20200216223037-2fe75832ccb1 h1:ZL/Yxb6q+ntQtIq3Lu2pgVA6AZ53auVYzs1WK5iz9f0=
 github.com/jonhadfield/githosts-utils v0.0.0-20200216223037-2fe75832ccb1/go.mod h1:zVUq8yZA5507qKn1dVgb+hXly6n1GlFpAt6VwYOas50=
 github.com/lestrrat-go/jwx v0.9.0/go.mod h1:iEoxlYfZjvoGpuWwxUz+eR5e6KTJGsaRcy/YNA/UnBk=
