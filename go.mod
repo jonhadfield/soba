@@ -1,6 +1,6 @@
 module github.com/jonhadfield/soba
 
-go 1.12
+go 1.14
 
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
