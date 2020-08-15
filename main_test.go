@@ -6,8 +6,10 @@ import (
 	"testing"
 )
 
-var sobaEnvVarKeys = []string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITLAB_TOKEN",
-	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"}
+var sobaEnvVarKeys = []string{
+	"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITLAB_TOKEN",
+	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET",
+}
 
 func resetGlobals() {
 	// reset global var
