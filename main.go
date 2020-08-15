@@ -168,7 +168,7 @@ func run() error {
 	workingDIR := backupDIR + pathSep + workingDIRName
 
 	logger.Println("creating working directory:", workingDIR)
-	createWorkingDIRErr := os.MkdirAll(workingDIR, 0o755)
+	createWorkingDIRErr := os.MkdirAll(workingDIR, 0755)
 
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
