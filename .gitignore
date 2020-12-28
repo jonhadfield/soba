@@ -23,3 +23,7 @@ testing/backups
 
 # ide
 .idea
+
+# vscode env
+.env
+.vscode
