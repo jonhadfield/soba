@@ -1,14 +1,44 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
+	"path"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var sobaEnvVarKeys = []string{
-	"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITLAB_TOKEN",
-	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET",
+	"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITHUB_BACKUPS", "GITLAB_TOKEN", "GITLAB_BACKUPS",
+	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET", "BITBUCKET_BACKUPS",
+}
+
+func preflight() {
+	// create backup dir if defined but missing
+	bud := os.Getenv("GIT_BACKUP_DIR")
+	if bud == "" {
+		bud = os.TempDir()
+	}
+
+	_, err := os.Stat(bud)
+
+	if os.IsNotExist(err) {
+		errDir := os.MkdirAll(bud, 0o755)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+	}
+
+}
+
+func TestMain(m *testing.M) {
+	preflight()
+	code := m.Run()
+	os.Exit(code)
 }
 
 func resetGlobals() {
@@ -38,6 +68,75 @@ func unsetEnvVars(exceptionList []string) {
 		if !stringInStrings(sobaVar, exceptionList) {
 			_ = os.Unsetenv(sobaVar)
 		}
+	}
+}
+
+func resetBackups() {
+	os.RemoveAll(os.Getenv("GIT_BACKUP_DIR"))
+	if err := os.MkdirAll(os.Getenv("GIT_BACKUP_DIR"), 0o755); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
+	preflight()
+	resetGlobals()
+	defer resetBackups()
+	envBackup := backupEnvironmentVariables()
+	// Unset Env Vars but exclude those defined
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN"})
+	// create dummy bundle
+	backupDir := os.Getenv("GIT_BACKUP_DIR")
+	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
+	assert.NoError(t, os.MkdirAll(dfDir, 0o755))
+	dfName := "repo0.20200401111111.bundle"
+	dfPath := path.Join(dfDir, dfName)
+	os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
+	os.Setenv("GITHUB_BACKUPS", "1")
+	// run
+	err := run()
+	// check only one bundle remains
+	files, err := ioutil.ReadDir(dfDir)
+	assert.NoError(t, err)
+	var found int
+	for _, f := range files {
+		assert.NotEqual(t, f.Name(), dfName, fmt.Sprintf("unexpected bundle: %s", f.Name()))
+		found++
+	}
+	assert.Equal(t, found, 1)
+	// reset
+	restoreEnvironmentVariables(envBackup)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+}
+
+func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
+	preflight()
+	resetGlobals()
+	defer resetBackups()
+
+	envBackup := backupEnvironmentVariables()
+	// Unset Env Vars but exclude those defined
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN"})
+	// create dummy bundle
+	backupDir := os.Getenv("GIT_BACKUP_DIR")
+	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
+	assert.NoError(t, os.MkdirAll(dfDir, 0o755))
+	dfName := "repo0.20200401111111.bundle"
+	dfPath := path.Join(dfDir, dfName)
+	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
+	assert.NoError(t, err)
+	// run
+	err = run()
+	// check both bundles remain
+	files, err := ioutil.ReadDir(dfDir)
+	assert.NoError(t, err)
+	assert.Len(t, files, 2)
+	// reset
+	restoreEnvironmentVariables(envBackup)
+	if err != nil {
+		t.Errorf(err.Error())
 	}
 }
 

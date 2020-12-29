@@ -20,7 +20,7 @@ const (
 
 var (
 	logger *log.Logger
-	// overwritten at build time
+	// overwritten at build time.
 	version, tag, sha, buildDate string
 
 	enabledProviderAuth = map[string][]string{
@@ -147,14 +147,14 @@ func run() error {
 
 	backupDIR, backupDIRKeyExists = os.LookupEnv("GIT_BACKUP_DIR")
 	if !backupDIRKeyExists || backupDIR == "" {
-		return fmt.Errorf("environment variable GIT_BACKUP_DIR must be set")
+		return errors.New("environment variable GIT_BACKUP_DIR must be set")
 	}
 
 	backupDIR = stripTrailingLineBreak(backupDIR)
 
 	_, err := os.Stat(backupDIR)
 	if os.IsNotExist(err) {
-		return fmt.Errorf("specified backup directory \"%s\" does not exist", backupDIR)
+		return errors.Wrap(err, fmt.Sprintf("specified backup directory \"%s\" does not exist", backupDIR))
 	}
 
 	if checkProvidersDefined() != nil {
@@ -168,7 +168,7 @@ func run() error {
 	workingDIR := backupDIR + pathSep + workingDIRName
 
 	logger.Println("creating working directory:", workingDIR)
-	createWorkingDIRErr := os.MkdirAll(workingDIR, 0755)
+	createWorkingDIRErr := os.MkdirAll(workingDIR, 0o755)
 
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
@@ -186,7 +186,7 @@ func run() error {
 
 		_, err = scheduler.Every(int(time.Duration(backupInterval))).Hours().Run(execProviderBackups)
 		if err != nil {
-			return err
+			return errors.Wrapf(err, "scheduler failed")
 		}
 
 		runtime.Goexit()
