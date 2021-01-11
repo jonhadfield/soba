@@ -14,12 +14,17 @@ soba is tool for backing up private and public git repositories hosted on the mo
 
 An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been made and will not produce duplicates.
 
-#### Supported OSes
+## latest updates
+
+**0.0.15 released 2021-01-11**  
+[Support for backup rotation added](#rotating-backups)
+
+### Supported OSes
 
 Tested on Windows 10, MacOS, and Linux (amd64).   
 Not tested, but should also work on builds for: Linux (386, arm386 and arm64), FreeBSD, NetBSD, and OpenBSD.
 
-#### Supported Providers
+### supported providers
 
 - BitBucket
 - GitHub
@@ -99,6 +104,13 @@ if using docker then add:
 
 _Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the interval is greater than the duration of a backup._
 
+## rotating backups
+
+A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the following provider specific environment variables:
+- GITHUB_BACKUPS=_x_
+- GITLAB_BACKUPS=_x_
+- BITBUCKET_BACKUPS=_x_
+
 ## setting provider tokens
 
 On Linux and MacOS you can set environment variables manually before each time you run soba:
@@ -147,8 +159,12 @@ _Tested on DS916+_
   - **variable** BITBUCKET_USER **Value** [BitBucket User]   (if using BitBucket)
   - **variable** BITBUCKET_KEY **Value** [BitBucket Key]   (if using BitBucket)
   - **variable** BITBUCKET_SECRET **Value** [BitBucket Secret]   (if using BitBucket)
+  - **variable** BITBUCKET_BACKUPS **Value** [Number of backups to keep for each repo]
   - **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
+  - **variable** GITHUB_BACKUPS **Value** [Number of backups to keep for each repo]  
   - **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
+  - **variable** GITLAB_BACKUPS **Value** [Number of backups to keep for each repo]
+
 
 13. Click 'Apply'
 14. Leave settings as default and select 'Next'
