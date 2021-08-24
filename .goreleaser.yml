@@ -1,0 +1,32 @@
+env:
+  - GO111MODULE=on
+  - GOPROXY="https://proxy.golang.org,direct"
+
+before:
+  hooks:
+    - go mod tidy
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^docs:'
+    - '^test:'
+    - Merge pull request
+    - Merge branch
+builds:
+  - binary: soba
+    env:
+    - CGO_ENABLED=0
+
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm
+      - arm64
+
+archives:
+  - id: default
+    wrap_in_directory: true

@@ -1,10 +1,18 @@
-FROM alpine:3.8
+FROM alpine:3.14
 MAINTAINER Jon Hadfield <jon@lessknown.co.uk>
 
-ARG build_tag
+RUN apk add --update --no-cache ca-certificates bash curl git jq grep \
+    && rm -f "/var/cache/apk/*"
 
-RUN apk add --update --no-cache ca-certificates bash curl git \
-    && rm -f "/var/cache/apk/*" \
-    && curl -L https://dl.bintray.com/jonhadfield/soba/soba/$build_tag/soba_linux_amd64 -o /soba \
+ARG TAG
+
+RUN [ -z "$STATE" ] && echo "build-arg TAG is required" && exit 1;
+
+RUN cd /tmp &&  \
+    curl -L https://github.com/jonhadfield/soba/releases/download/$TAG/soba_${TAG}_linux_amd64.tar.gz -o soba.tar.gz \
+    && tar -xvzf soba.tar.gz \
+    && rm *.gz \
+    && mv *amd64/soba /soba \
+    && rm -rf /tmp/* \
     && chmod 755 /soba
 ENTRYPOINT ["/bin/bash", "-c", "/soba \"$@\"", "--"]
