@@ -91,10 +91,11 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	assert.NoError(t, os.MkdirAll(dfDir, 0o755))
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
-	os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
-	os.Setenv("GITHUB_BACKUPS", "1")
+	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
+	assert.NoError(t, err)
+	assert.NoError(t, os.Setenv("GITHUB_BACKUPS", "1"))
 	// run
-	err := run()
+	assert.NoError(t, run())
 	// check only one bundle remains
 	files, err := ioutil.ReadDir(dfDir)
 	assert.NoError(t, err)
@@ -106,9 +107,6 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	assert.Equal(t, found, 1)
 	// reset
 	restoreEnvironmentVariables(envBackup)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
@@ -128,16 +126,13 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
 	assert.NoError(t, err)
 	// run
-	err = run()
+	assert.NoError(t, run())
 	// check both bundles remain
 	files, err := ioutil.ReadDir(dfDir)
 	assert.NoError(t, err)
 	assert.Len(t, files, 2)
 	// reset
 	restoreEnvironmentVariables(envBackup)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
@@ -145,44 +140,32 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	// Unset Env Vars but exclude those defined
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN"})
-	err := run()
+	assert.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 }
 
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
-	err := run()
+	assert.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 }
 
 func TestPublicBitBucketRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"})
-	err := run()
+	assert.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 }
 
 func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
-	err := checkProvidersDefined()
+	assert.NoError(t, checkProvidersDefined(),"expected: no providers defined error" )
 	restoreEnvironmentVariables(envBackup)
-	if err == nil {
-		t.Errorf("expected: no providers defined error")
-	}
 }
 
 func TestFailureIfGitBackupDirUndefined(t *testing.T) {
@@ -190,9 +173,6 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
 	_ = os.Setenv("GITHUB_TOKEN", "ABCD1234")
-	err := run()
+	assert.NoError(t, run(), "expected: GIT_BACKUP_DIR undefined error")
 	restoreEnvironmentVariables(envBackup)
-	if err == nil {
-		t.Errorf("expected: GIT_BACKUP_DIR undefined error")
-	}
 }
