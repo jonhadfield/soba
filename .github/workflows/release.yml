@@ -61,4 +61,4 @@ jobs:
         file: ./docker/Dockerfile
         build-args: TAG=${{ env.TAG }}
         push: true
-        tags: ghcr.io/${{ github.repository }}:${{ env.TAG }}
+        tags: ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${{ env.TAG }}
