@@ -1,6 +1,6 @@
 env:
   - GO111MODULE=on
-  - GOPROXY="https://proxy.golang.org,direct"
+#  - GOPROXY="https://proxy.golang.org,direct"
 
 before:
   hooks:
