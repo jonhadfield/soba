@@ -164,7 +164,7 @@ func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
-	assert.NoError(t, checkProvidersDefined(),"expected: no providers defined error" )
+	assert.Error(t, checkProvidersDefined(),"expected: no providers defined error" )
 	restoreEnvironmentVariables(envBackup)
 }
 
@@ -173,6 +173,6 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
 	_ = os.Setenv("GITHUB_TOKEN", "ABCD1234")
-	assert.NoError(t, run(), "expected: GIT_BACKUP_DIR undefined error")
+	assert.Error(t, run(), "expected: GIT_BACKUP_DIR undefined error")
 	restoreEnvironmentVariables(envBackup)
 }
