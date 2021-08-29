@@ -46,6 +46,13 @@ jobs:
         password: ${{ github.token }}
 
     -
+      name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    -
       if: startsWith(github.ref, 'refs/heads/master')
       run: echo "TAG=latest" >> $GITHUB_ENV
 
@@ -61,4 +68,8 @@ jobs:
         file: ./docker/Dockerfile
         build-args: TAG=${{ env.TAG }}
         push: true
-        tags: ghcr.io/${{ github.repository }}:latest,ghcr.io/${{ github.repository }}:${{ env.TAG }}
+        tags: |
+          ${{ github.repository }}:latest
+          ${{ github.repository }}:${{ env.TAG }}
+          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${{ github.repository }}:${{ env.TAG }}
