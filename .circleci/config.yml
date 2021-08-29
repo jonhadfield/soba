@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.16
+    steps:
+      - checkout
+      - run:
+          name: make git backups dir
+          command: mkdir /home/circleci/project/backup
+      - run: go test -v -p 1 -parallel 1 -failfast ./...
