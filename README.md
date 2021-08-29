@@ -16,8 +16,11 @@ An unchanged git repository will create an identical bundle file so bundles will
 
 ## latest updates
 
-**0.0.15 released 2021-01-11**  
-[Support for backup rotation added](#rotating-backups)
+**0.0.19 released 2021-08-29**  
+[Resolve packaging issues](#run-using-docker)
+
+**0.0.18 released 2021-08-29**  
+Fix issue that limited bitbucket repository discovery to ten
 
 ### Supported OSes
 
@@ -73,7 +76,7 @@ $ docker run --rm -t \
              -e GIT_BACKUP_DIR='/backup' \
              -e GITHUB_TOKEN='MYGITHUBTOKEN' \
              -e GITLAB_TOKEN='MYGITLABTOKEN' \
-             quay.io/jonhadfield/soba
+             ghcr.io/jonhadfield/soba
 ```
 
 To hide credentials, you can instead use exported environment variables and specify using this syntax:
@@ -84,7 +87,7 @@ $ docker run --rm -t \
              -e GIT_BACKUP_DIR='/backup' \
              -e GITHUB_TOKEN=$GITHUB_TOKEN \
              -e GITLAB_TOKEN=$GITLAB_TOKEN \
-             quay.io/jonhadfield/soba
+             ghcr.io/jonhadfield/soba
 ```
 
 
