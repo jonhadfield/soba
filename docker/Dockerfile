@@ -6,7 +6,7 @@ RUN apk add --update --no-cache ca-certificates bash curl git jq grep \
 
 ARG TAG
 
-RUN [ -z "$STATE" ] && echo "build-arg TAG is required" && exit 1;
+RUN [ -z "$TAG" ] && echo "build-arg TAG is required" && exit 1;
 
 RUN cd /tmp &&  \
     curl -L https://github.com/jonhadfield/soba/releases/download/$TAG/soba_${TAG}_linux_amd64.tar.gz -o soba.tar.gz \
