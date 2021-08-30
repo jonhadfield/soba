@@ -1,5 +1,6 @@
 FROM alpine:3.14
-MAINTAINER Jon Hadfield <jon@lessknown.co.uk>
+
+LABEL maintainer="Jon Hadfield jon@lessknown.co.uk"
 
 RUN apk add --update --no-cache ca-certificates bash curl git jq grep \
     && rm -f "/var/cache/apk/*"
@@ -12,5 +13,6 @@ RUN cd /tmp &&  \
     && rm *.gz \
     && mv *amd64/soba /soba \
     && rm -rf /tmp/* \
-    && chmod 755 /soba
+    && chmod 755 /soba \
+
 ENTRYPOINT ["/bin/bash", "-c", "/soba \"$@\"", "--"]
