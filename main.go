@@ -132,8 +132,7 @@ func main() {
 		logger.Println(version)
 	}
 
-	err := run()
-	if err != nil {
+	if err := run(); err != nil {
 		logger.Fatal(err)
 	}
 }
