@@ -1,6 +1,6 @@
 
 # soba: backup hosted git repositories
-[![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8b6afc5274e84d50bd5345580d3a0405)](https://www.codacy.com/app/jonhadfield/soba?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonhadfield/soba&amp;utm_campaign=Badge_Grade) [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/8b6afc5274e84d50bd5345580d3a0405)](https://www.codacy.com/app/jonhadfield/soba?utm_source=github.com&utm_medium=referral&utm_content=jonhadfield/soba&utm_campaign=Badge_Coverage) [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
+[![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://www.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonhadfield/soba&amp;utm_campaign=Badge_Grade)  [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
 
 - [about](#about)
 - [configuration](#configuration)
