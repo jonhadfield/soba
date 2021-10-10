@@ -32,7 +32,6 @@ func preflight() {
 			log.Fatal(err)
 		}
 	}
-
 }
 
 func TestMain(m *testing.M) {
@@ -164,7 +163,7 @@ func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
-	assert.Error(t, checkProvidersDefined(),"expected: no providers defined error" )
+	assert.Error(t, checkProvidersDefined(), "expected: no providers defined error")
 	restoreEnvironmentVariables(envBackup)
 }
 
