@@ -1,4 +1,4 @@
-SOURCE_FILES?=$$(go list ./... | grep -v /vendor/ | grep -v /mocks/)
+SOURCE_FILES?=$$(go list ./...)
 TEST_PATTERN?=.
 TEST_OPTIONS?=-race -v
 
@@ -16,7 +16,7 @@ cover: test
 	go tool cover -html=coverage.txt
 
 fmt:
-	find . -name '*.go' -not -wholename './vendor/*' | while read -r file; do gofumpt -w -s "$$file"; gofumports -w "$$file"; done
+	find . -name '*.go' | while read -r file; do gofumpt -w -s "$$file"; gofumports -w "$$file"; done
 lint:
 	golangci-lint run --tests=false --enable-all --disable lll --disable interfacer --disable gochecknoglobals
 ci: lint test
