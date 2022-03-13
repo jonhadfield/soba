@@ -19,11 +19,11 @@ made and will not produce duplicates.
 
 ## latest updates
 
-**0.0.19 released 2021-08-29**  
-[Resolve packaging issues](#run-using-docker)
+**1.1.1 released 2022-03-13**  
+[Add feature](https://github.com/jonhadfield/soba/issues/7) to enable backup of GitHub organisations' repositories
 
-**0.0.18 released 2021-08-29**  
-Fix issue that limited bitbucket repository discovery to ten
+**1.1.0 released 2021-10-27**  
+Resolve exit on backup failure issue
 
 ### Supported OSes
 
@@ -33,7 +33,7 @@ Not tested, but should also work on builds for: Linux (386, arm386 and arm64), F
 ### supported providers
 
 - BitBucket
-- GitHub
+- GitHub (including organisations)
 - GitLab
 
 ## configuration
@@ -114,7 +114,7 @@ if using docker then add:
 ```
 
 _Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the
-interval is greater than the duration of a backup._
+interval is greater than the duration of a backup._  
 
 ## rotating backups
 
@@ -153,6 +153,9 @@ $ source /home/<your-user-id>/.bashrc
 | GitHub    | GITHUB_TOKEN                                          | <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">instructions</a> |
 | GitLab    | GITLAB_TOKEN                                          | <a href="https://gitlab.com/profile/personal_access_tokens" target="_blank">instructions</a>                                       |
 
+Note: Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated list of organisations in the environment variable: GITHUB_ORGS. 
+
+
 ### run on Synology NAS
 
 _Tested on DS916+_
@@ -180,10 +183,10 @@ _Tested on DS916+_
 - **variable** BITBUCKET_SECRET **Value** [BitBucket Secret]   (if using BitBucket)
 - **variable** BITBUCKET_BACKUPS **Value** [Number of backups to keep for each repo]
 - **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
+- **variable** GITHUB_ORGS **Value** [Comma separated list of organisations]  _*optional when using GitHub_
 - **variable** GITHUB_BACKUPS **Value** [Number of backups to keep for each repo]
 - **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
 - **variable** GITLAB_BACKUPS **Value** [Number of backups to keep for each repo]
-
 
 13. Click 'Apply'
 14. Leave settings as default and select 'Next'
@@ -191,5 +194,3 @@ _Tested on DS916+_
 
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
-  
-
