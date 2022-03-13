@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/carlescere/scheduler"
-	githosts "github.com/jonhadfield/githosts-utils"
+	"github.com/jonhadfield/githosts-utils"
 	"github.com/pkg/errors"
 )
 
@@ -147,6 +147,12 @@ func run() error {
 	backupDIR, backupDIRKeyExists = os.LookupEnv("GIT_BACKUP_DIR")
 	if !backupDIRKeyExists || backupDIR == "" {
 		return errors.New("environment variable GIT_BACKUP_DIR must be set")
+	}
+
+	if _, githubOrgsKeyExists := os.LookupEnv("GITHUB_ORGS"); githubOrgsKeyExists {
+		if _, githubTokenExists := os.LookupEnv("GITHUB_TOKEN"); !githubTokenExists {
+			return errors.New("environment variable GITHUB_TOKEN must be set if GITHUB_ORGS is set")
+		}
 	}
 
 	backupDIR = stripTrailingLineBreak(backupDIR)
