@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var sobaEnvVarKeys = []string{
@@ -71,7 +71,7 @@ func unsetEnvVars(exceptionList []string) {
 }
 
 func resetBackups() {
-	os.RemoveAll(os.Getenv("GIT_BACKUP_DIR"))
+	_ = os.RemoveAll(os.Getenv("GIT_BACKUP_DIR"))
 	if err := os.MkdirAll(os.Getenv("GIT_BACKUP_DIR"), 0o755); err != nil {
 		log.Fatal(err)
 	}
@@ -87,23 +87,23 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	// create dummy bundle
 	backupDir := os.Getenv("GIT_BACKUP_DIR")
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
-	assert.NoError(t, os.MkdirAll(dfDir, 0o755))
+	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
 	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
-	assert.NoError(t, err)
-	assert.NoError(t, os.Setenv("GITHUB_BACKUPS", "1"))
+	require.NoError(t, err)
+	require.NoError(t, os.Setenv("GITHUB_BACKUPS", "1"))
 	// run
-	assert.NoError(t, run())
+	require.NoError(t, run())
 	// check only one bundle remains
 	files, err := ioutil.ReadDir(dfDir)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	var found int
 	for _, f := range files {
-		assert.NotEqual(t, f.Name(), dfName, fmt.Sprintf("unexpected bundle: %s", f.Name()))
+		require.NotEqual(t, f.Name(), dfName, fmt.Sprintf("unexpected bundle: %s", f.Name()))
 		found++
 	}
-	assert.Equal(t, found, 1)
+	require.Equal(t, found, 1)
 	// reset
 	restoreEnvironmentVariables(envBackup)
 }
@@ -119,17 +119,17 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	// create dummy bundle
 	backupDir := os.Getenv("GIT_BACKUP_DIR")
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
-	assert.NoError(t, os.MkdirAll(dfDir, 0o755))
+	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
 	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	// run
-	assert.NoError(t, run())
+	require.NoError(t, run())
 	// check both bundles remain
 	files, err := ioutil.ReadDir(dfDir)
-	assert.NoError(t, err)
-	assert.Len(t, files, 2)
+	require.NoError(t, err)
+	require.Len(t, files, 2)
 	// reset
 	restoreEnvironmentVariables(envBackup)
 }
@@ -139,7 +139,7 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	// Unset Env Vars but exclude those defined
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN"})
-	assert.NoError(t, run())
+	require.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
 }
 
@@ -147,7 +147,7 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
-	assert.NoError(t, run())
+	require.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
 }
 
@@ -155,7 +155,7 @@ func TestPublicBitBucketRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"})
-	assert.NoError(t, run())
+	require.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
 }
 
@@ -163,7 +163,7 @@ func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
-	assert.Error(t, checkProvidersDefined(), "expected: no providers defined error")
+	require.Error(t, checkProvidersDefined(), "expected: no providers defined error")
 	restoreEnvironmentVariables(envBackup)
 }
 
@@ -172,6 +172,6 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{})
 	_ = os.Setenv("GITHUB_TOKEN", "ABCD1234")
-	assert.Error(t, run(), "expected: GIT_BACKUP_DIR undefined error")
+	require.Error(t, run(), "expected: GIT_BACKUP_DIR undefined error")
 	restoreEnvironmentVariables(envBackup)
 }
