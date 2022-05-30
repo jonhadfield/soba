@@ -78,6 +78,9 @@ func resetBackups() {
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
+	if os.Getenv("GITHUB_TOKEN") == "" {
+		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
+	}
 	preflight()
 	resetGlobals()
 	defer resetBackups()
@@ -109,6 +112,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
+	if os.Getenv("GITHUB_TOKEN") == "" {
+		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
+	}
 	preflight()
 	resetGlobals()
 	defer resetBackups()
@@ -135,6 +141,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
+	if os.Getenv("GITHUB_TOKEN") == "" {
+		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
+	}
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	// Unset Env Vars but exclude those defined
@@ -144,6 +153,9 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 }
 
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
+	if os.Getenv("GITLAB_TOKEN") == "" {
+		t.Skip("Skipping GitLab test as GITLAB_TOKEN is missing")
+	}
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
@@ -152,6 +164,9 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 }
 
 func TestPublicBitBucketRepositoryBackup(t *testing.T) {
+	if os.Getenv("BITBUCKET_USER") == "" {
+		t.Skip("Skipping BitBucket test as BITBUCKET_USER is missing")
+	}
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVars([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"})

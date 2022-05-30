@@ -117,7 +117,6 @@ func checkProvidersDefined() error {
 	for provider := range enabledProviderAuth {
 		checkProviderFactory(provider)()
 	}
-
 	if numUserDefinedProviders == 0 {
 		return errors.New("no providers defined")
 	}
@@ -162,7 +161,8 @@ func run() error {
 		return errors.Wrap(err, fmt.Sprintf("specified backup directory \"%s\" does not exist", backupDIR))
 	}
 
-	if checkProvidersDefined() != nil {
+	if err = checkProvidersDefined(); err != nil {
+		fmt.Printf("err: %+v\n", err)
 		logger.Fatal("no providers defined")
 	}
 
