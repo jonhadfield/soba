@@ -19,6 +19,10 @@ made and will not produce duplicates.
 
 ## latest updates
 
+
+**1.1.2 released 2022-06-03**  
+[Add feature](https://github.com/jonhadfield/soba/issues/9) to enable backup of project repos in GitLab groups
+
 **1.1.1 released 2022-03-13**  
 [Add feature](https://github.com/jonhadfield/soba/issues/7) to enable backup of GitHub organisations' repositories
 
