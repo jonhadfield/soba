@@ -211,7 +211,7 @@ func execProviderBackups() {
 	if os.Getenv("BITBUCKET_USER") != "" {
 		logger.Println("backing up BitBucket repos")
 
-		err = githosts.Backup("bitbucket", backupDIR)
+		err = githosts.Backup("bitbucket", backupDIR, os.Getenv("BITBUCKET_APIURL"))
 		if err != nil {
 			logger.Fatal(err)
 		}
@@ -220,7 +220,7 @@ func execProviderBackups() {
 	if os.Getenv("GITLAB_TOKEN") != "" {
 		logger.Println("backing up GitLab repos")
 
-		err = githosts.Backup("gitlab", backupDIR)
+		err = githosts.Backup("gitlab", backupDIR, os.Getenv("GITLAB_APIURL"))
 		if err != nil {
 			logger.Fatal(err)
 		}
@@ -229,7 +229,7 @@ func execProviderBackups() {
 	if os.Getenv("GITHUB_TOKEN") != "" {
 		logger.Println("backing up GitHub repos")
 
-		err = githosts.Backup("github", backupDIR)
+		err = githosts.Backup("github", backupDIR, os.Getenv("GITHUB_APIURL"))
 		if err != nil {
 			logger.Fatal(err)
 		}
