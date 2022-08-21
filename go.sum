@@ -4,8 +4,8 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/jonhadfield/githosts-utils v0.0.0-20220818193144-0075915532b7 h1:4p8CKbpH6C/VVN2/Kqh6Fs2EQiNo7Wta7caSS5a1wo8=
-github.com/jonhadfield/githosts-utils v0.0.0-20220818193144-0075915532b7/go.mod h1:v6wgdz/EhWvXy67qhMgXeCuiwAMfUt86nx3xGZQ5Yj8=
+github.com/jonhadfield/githosts-utils v0.0.0-20220821205933-8d4069df37b4 h1:1W5s69GAzCv65S8RBYUQmpgc1R98C1mKCbcgVjYGzHY=
+github.com/jonhadfield/githosts-utils v0.0.0-20220821205933-8d4069df37b4/go.mod h1:v6wgdz/EhWvXy67qhMgXeCuiwAMfUt86nx3xGZQ5Yj8=
 github.com/kr/pretty v0.1.0 h1:L/CwN0zerZDmRFUapSPitk6f+Q3+0za1rQkzVuMiMFI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
