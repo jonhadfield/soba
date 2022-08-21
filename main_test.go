@@ -13,7 +13,7 @@ import (
 )
 
 var sobaEnvVarKeys = []string{
-	"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITHUB_BACKUPS", "GITLAB_TOKEN", "GITLAB_BACKUPS",
+	"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITHUB_BACKUPS", "GITLAB_TOKEN", "GITLAB_BACKUPS", "GITLAB_APIURL",
 	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET", "BITBUCKET_BACKUPS",
 }
 
@@ -153,6 +153,17 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 }
 
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
+	if os.Getenv("GITLAB_TOKEN") == "" {
+		t.Skip("Skipping GitLab test as GITLAB_TOKEN is missing")
+	}
+	resetGlobals()
+	envBackup := backupEnvironmentVariables()
+	unsetEnvVars([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
+	require.NoError(t, run())
+	restoreEnvironmentVariables(envBackup)
+}
+
+func TestPublicGitLabRepositoryBackup2(t *testing.T) {
 	if os.Getenv("GITLAB_TOKEN") == "" {
 		t.Skip("Skipping GitLab test as GITLAB_TOKEN is missing")
 	}
