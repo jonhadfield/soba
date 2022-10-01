@@ -12,11 +12,14 @@ import (
 	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/githosts-utils"
 	"github.com/pkg/errors"
+	"golang.org/x/exp/slices"
 )
 
 const (
 	workingDIRName = ".working"
 	workingDIRMode = 0o755
+
+	pathSep = string(os.PathSeparator)
 )
 
 var (
@@ -72,7 +75,7 @@ func checkProviderFactory(provider string) func() {
 	retFunc := func() {
 		var outputErrs strings.Builder
 		// tokenOnlyProviders
-		if stringInStrings(provider, justTokenProviders) {
+		if slices.Contains(justTokenProviders, provider) {
 			for _, param := range enabledProviderAuth[provider] {
 				val, exists := os.LookupEnv(param)
 				if exists {
@@ -86,7 +89,7 @@ func checkProviderFactory(provider string) func() {
 		}
 
 		// userAndPasswordProviders
-		if stringInStrings(provider, userAndPasswordProviders) {
+		if slices.Contains(userAndPasswordProviders, provider) {
 			var firstParamFound bool
 
 			for _, param := range enabledProviderAuth[provider] {
@@ -256,4 +259,12 @@ func execProviderBackups() {
 
 		logger.Printf("next run scheduled for: %v", nextBackupTime)
 	}
+}
+
+func stripTrailingLineBreak(input string) string {
+	if strings.HasSuffix(input, "\n") {
+		return input[:len(input)-2]
+	}
+
+	return input
 }

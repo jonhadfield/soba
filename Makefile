@@ -16,7 +16,8 @@ cover: test
 	go tool cover -html=coverage.txt
 
 fmt:
-	find . -name '*.go' | while read -r file; do gofumpt -w -s "$$file"; gofumports -w "$$file"; done
+	goimports -w . && gofumpt -l -w .
+
 lint:
 	golangci-lint run --tests=false --enable-all --disable lll --disable interfacer --disable gochecknoglobals
 ci: lint test
