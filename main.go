@@ -16,6 +16,7 @@ import (
 
 const (
 	workingDIRName = ".working"
+	workingDIRMode = 0o755
 )
 
 var (
@@ -83,6 +84,7 @@ func checkProviderFactory(provider string) func() {
 				}
 			}
 		}
+
 		// userAndPasswordProviders
 		if stringInStrings(provider, userAndPasswordProviders) {
 			var firstParamFound bool
@@ -117,6 +119,7 @@ func checkProvidersDefined() error {
 	for provider := range enabledProviderAuth {
 		checkProviderFactory(provider)()
 	}
+
 	if numUserDefinedProviders == 0 {
 		return errors.New("no providers defined")
 	}
@@ -173,7 +176,7 @@ func run() error {
 	workingDIR := backupDIR + pathSep + workingDIRName
 
 	logger.Println("creating working directory:", workingDIR)
-	createWorkingDIRErr := os.MkdirAll(workingDIR, 0o755)
+	createWorkingDIRErr := os.MkdirAll(workingDIR, workingDIRMode)
 
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
