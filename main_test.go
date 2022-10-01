@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"golang.org/x/exp/slices"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -64,7 +66,7 @@ func restoreEnvironmentVariables(input map[string]string) {
 
 func unsetEnvVars(exceptionList []string) {
 	for _, sobaVar := range sobaEnvVarKeys {
-		if !stringInStrings(sobaVar, exceptionList) {
+		if !slices.Contains(exceptionList, sobaVar) {
 			_ = os.Unsetenv(sobaVar)
 		}
 	}
