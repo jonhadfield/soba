@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -101,7 +100,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	// run
 	require.NoError(t, run())
 	// check only one bundle remains
-	files, err := ioutil.ReadDir(dfDir)
+	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
 	var found int
 	for _, f := range files {
@@ -135,7 +134,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	// run
 	require.NoError(t, run())
 	// check both bundles remain
-	files, err := ioutil.ReadDir(dfDir)
+	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
 	require.Len(t, files, 2)
 	// reset
