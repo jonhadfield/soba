@@ -6,6 +6,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/jonhadfield/githosts-utils v0.0.0-20221002110647-bbd9e109c7b9 h1:4lbwnHLVPDw5N6bVieEyFDWt6rYZgRt6foiDbz0Ly6Q=
 github.com/jonhadfield/githosts-utils v0.0.0-20221002110647-bbd9e109c7b9/go.mod h1:Gk1091TDicWW2wTnbA4Qjdc8Yr/fEpfXmYxLU5X03pw=
+github.com/jonhadfield/githosts-utils v0.0.0-20221002145049-b44edbd0250d h1:sx76yuQt5sl571tD0LFTifZ+aaO11Wa8Rzkxxj1ATZ4=
+github.com/jonhadfield/githosts-utils v0.0.0-20221002145049-b44edbd0250d/go.mod h1:Gk1091TDicWW2wTnbA4Qjdc8Yr/fEpfXmYxLU5X03pw=
 github.com/kr/pretty v0.3.0 h1:WgNl7dwNpEZ6jJ9k1snq4pZsg7DOEN8hP9Xw0Tsjwk0=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
