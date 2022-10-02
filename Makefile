@@ -19,7 +19,7 @@ fmt:
 	goimports -w . && gofumpt -l -w .
 
 lint:
-	golangci-lint run --tests=false --enable-all --disable lll --disable interfacer --disable gochecknoglobals
+	golangci-lint run --disable lll --disable interfacer --disable gochecknoglobals
 ci: lint test
 
 BUILD_TAG := $(shell git describe --tags 2>/dev/null)
