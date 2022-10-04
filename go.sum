@@ -8,9 +8,13 @@ github.com/jonhadfield/githosts-utils v0.0.0-20221002110647-bbd9e109c7b9 h1:4lbw
 github.com/jonhadfield/githosts-utils v0.0.0-20221002110647-bbd9e109c7b9/go.mod h1:Gk1091TDicWW2wTnbA4Qjdc8Yr/fEpfXmYxLU5X03pw=
 github.com/jonhadfield/githosts-utils v0.0.0-20221002145049-b44edbd0250d h1:sx76yuQt5sl571tD0LFTifZ+aaO11Wa8Rzkxxj1ATZ4=
 github.com/jonhadfield/githosts-utils v0.0.0-20221002145049-b44edbd0250d/go.mod h1:Gk1091TDicWW2wTnbA4Qjdc8Yr/fEpfXmYxLU5X03pw=
+github.com/jonhadfield/githosts-utils v0.0.0-20221004190701-414e932254e8 h1:VOcyyFLGq2WExTDQw1zX09AyDfKD4p8rd/pUYGqO5gs=
+github.com/jonhadfield/githosts-utils v0.0.0-20221004190701-414e932254e8/go.mod h1:UrTfeSbsDB1ko22hEsMsHRbT7/pwMrQouJziiOFBDQM=
 github.com/kr/pretty v0.3.0 h1:WgNl7dwNpEZ6jJ9k1snq4pZsg7DOEN8hP9Xw0Tsjwk0=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
+github.com/peterhellberg/link v1.1.0 h1:s2+RH8EGuI/mI4QwrWGSYQCRz7uNgip9BaM04HKu5kc=
+github.com/peterhellberg/link v1.1.0/go.mod h1:gtSlOT4jmkY8P47hbTc8PTgiDDWpdPbFYl75keYyBB8=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
