@@ -4,10 +4,6 @@ github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ3
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/jonhadfield/githosts-utils v0.0.0-20221002110647-bbd9e109c7b9 h1:4lbwnHLVPDw5N6bVieEyFDWt6rYZgRt6foiDbz0Ly6Q=
-github.com/jonhadfield/githosts-utils v0.0.0-20221002110647-bbd9e109c7b9/go.mod h1:Gk1091TDicWW2wTnbA4Qjdc8Yr/fEpfXmYxLU5X03pw=
-github.com/jonhadfield/githosts-utils v0.0.0-20221002145049-b44edbd0250d h1:sx76yuQt5sl571tD0LFTifZ+aaO11Wa8Rzkxxj1ATZ4=
-github.com/jonhadfield/githosts-utils v0.0.0-20221002145049-b44edbd0250d/go.mod h1:Gk1091TDicWW2wTnbA4Qjdc8Yr/fEpfXmYxLU5X03pw=
 github.com/jonhadfield/githosts-utils v0.0.0-20221004190701-414e932254e8 h1:VOcyyFLGq2WExTDQw1zX09AyDfKD4p8rd/pUYGqO5gs=
 github.com/jonhadfield/githosts-utils v0.0.0-20221004190701-414e932254e8/go.mod h1:UrTfeSbsDB1ko22hEsMsHRbT7/pwMrQouJziiOFBDQM=
 github.com/kr/pretty v0.3.0 h1:WgNl7dwNpEZ6jJ9k1snq4pZsg7DOEN8hP9Xw0Tsjwk0=
@@ -25,8 +21,8 @@ github.com/stretchr/objx v0.4.0/go.mod h1:YvHI0jy2hoMjB+UWwv71VJQ9isScKT/TqJzVSS
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.0 h1:pSgiaMZlXftHpm5L7V1+rVB+AZJydKsMxsQBIJw4PKk=
 github.com/stretchr/testify v1.8.0/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
-golang.org/x/exp v0.0.0-20221002003631-540bb7301a08 h1:LtBIgSqNhkuC9gA3BFjGy5obHQT1lnmNsMDFSqWzQ5w=
-golang.org/x/exp v0.0.0-20221002003631-540bb7301a08/go.mod h1:cyybsKvd6eL0RnXn6p/Grxp8F5bW7iYuBgsNCOHpMYE=
+golang.org/x/exp v0.0.0-20221006183845-316c7553db56 h1:BrYbdKcCNjLyrN6aKqXy4hPw9qGI8IATkj4EWv9Q+kQ=
+golang.org/x/exp v0.0.0-20221006183845-316c7553db56/go.mod h1:cyybsKvd6eL0RnXn6p/Grxp8F5bW7iYuBgsNCOHpMYE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 h1:YR8cESwS4TdDjEe65xsg0ogRM/Nc3DYOhEAlW+xobZo=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
