@@ -19,7 +19,6 @@ made and will not produce duplicates.
 
 ## latest updates
 
-
 **1.1.2 released 2022-06-03**  
 [Add feature](https://github.com/jonhadfield/soba/issues/9) to enable backup of project repos in GitLab groups
 
@@ -31,7 +30,7 @@ Resolve exit on backup failure issue
 
 ### Supported OSes
 
-Tested on Windows 10, MacOS, and Linux (amd64).   
+Tested on Windows 10, MacOS, and Linux (amd64).  
 Not tested, but should also work on builds for: Linux (386, arm386 and arm64), FreeBSD, NetBSD, and OpenBSD.
 
 ### supported providers
@@ -54,7 +53,7 @@ On Windows 10:
 On Linux and MacOS you would set these using:
 
 ```bash
-$ export GIT_BACKUP_DIR="/repo-backups/"
+export GIT_BACKUP_DIR="/repo-backups/"
 ```
 
 To set provider tokens see [below](#setting-provider-tokens).
@@ -63,8 +62,8 @@ To set provider tokens see [below](#setting-provider-tokens).
 
 Download the latest release [here](https://github.com/jonhadfield/soba/releases) and then install:
 
-```
-$ install <soba binary> /usr/local/bin/soba
+```bash
+install <soba binary> /usr/local/bin/soba
 ```
 
 After setting GIT_BACKUP_DIR, set your provider token(s) as detailed [here](#setting-provider-tokens).
@@ -72,7 +71,7 @@ After setting GIT_BACKUP_DIR, set your provider token(s) as detailed [here](#set
 and then run:
 
 ```bash
-$ soba
+soba
 ```
 
 ### run using docker
@@ -83,7 +82,7 @@ Docker requires you pass environment variables to the container using the '-e' o
 backup directory. For example:
 
 ```bash
-$ docker run --rm -t \
+docker run --rm -t \
              -v <your backup dir>:/backup \
              -e GIT_BACKUP_DIR='/backup' \
              -e GITHUB_TOKEN='MYGITHUBTOKEN' \
@@ -94,7 +93,7 @@ $ docker run --rm -t \
 To hide credentials, you can instead use exported environment variables and specify using this syntax:
 
 ```bash
-$ docker run --rm -t \
+docker run --rm -t \
              -v <your backup dir>:/backup \
              -e GIT_BACKUP_DIR='/backup' \
              -e GITHUB_TOKEN=$GITHUB_TOKEN \
@@ -108,7 +107,7 @@ Backups can be scheduled to run by setting an additional environment variable: G
 number of hours between backups. For example, this will run the backup daily:
 
 ```bash
-$ export GIT_BACKUP_INTERVAL=24
+export GIT_BACKUP_INTERVAL=24
 ```
 
 if using docker then add:
@@ -118,7 +117,7 @@ if using docker then add:
 ```
 
 _Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the
-interval is greater than the duration of a backup._  
+interval is greater than the duration of a backup._
 
 ## rotating backups
 
@@ -134,35 +133,37 @@ following provider specific environment variables:
 On Linux and MacOS you can set environment variables manually before each time you run soba:
 
 ```bash
-$ export NAME='VALUE'
+export NAME='VALUE'
 ```
 
 or by defining in a startup file for your shell so they are automatically set and available when you need them. For
 example, if using the bash shell and running soba as your user, add the relevant export statements to the following
 file:
 
-```
+```bash
 /home/<your-user-id>/.bashrc
 ```
 
 and run:
 
 ```bash
-$ source /home/<your-user-id>/.bashrc
+source /home/<your-user-id>/.bashrc
 ```
 
-| Provider  | Environment Variable(s)                               | Generating token                                                                                                                   |
-|:----------|:------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------|
-| BitBucket | BITBUCKET_USER<br/>BITBUCKET_KEY<br/>BITBUCKET_SECRET | <a href="https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html" target="_blank">instructions</a>      |
-| GitHub    | GITHUB_TOKEN                                          | <a href="https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/" target="_blank">instructions</a> |
-| GitLab    | GITLAB_TOKEN                                          | <a href="https://gitlab.com/profile/personal_access_tokens" target="_blank">instructions</a>                                       |
+| Provider  | Environment Variable(s) | Generating token                                                                                         |
+|:----------|:------------------------|:---------------------------------------------------------------------------------------------------------|
+| BitBucket | BITBUCKET_USER          | [instructions](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html")      |
+|           | BITBUCKET_KEY           |                                                                                                          |
+|           | BITBUCKET_SECRET        |                                                                                                          |                                                                                          |
+| GitHub    | GITHUB_TOKEN            | [instructions](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/") |
+| GitLab    | GITLAB_TOKEN            | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
 
-Note: Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated list of organisations in the environment variable: GITHUB_ORGS. 
-
+Note: Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
+list of organisations in the environment variable: GITHUB_ORGS.
 
 ### run on Synology NAS
 
-_Tested on DS916+_
+#### _The following was tested on DS916+_
 
 1. Create a directory on your NAS for backing up Git repositories to
 2. Install Docker from the Synology Package Center
@@ -175,26 +176,22 @@ _Tested on DS916+_
 9. Check 'Enable auto-restart'
 10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'
 11. Under 'Network' check 'Use the same network as Docker Host'
-12. Under 'Environment' click '+' to add each of the following:
-
-- **variable** GIT_BACKUP_DIR **Value** /backup
-- **variable** GIT_BACKUP_INTERVAL **Value** [hours between backups]
-
-#### Provider Specific
-
-- **variable** BITBUCKET_USER **Value** [BitBucket User]   (if using BitBucket)
-- **variable** BITBUCKET_KEY **Value** [BitBucket Key]   (if using BitBucket)
-- **variable** BITBUCKET_SECRET **Value** [BitBucket Secret]   (if using BitBucket)
-- **variable** BITBUCKET_BACKUPS **Value** [Number of backups to keep for each repo]
-- **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
-- **variable** GITHUB_ORGS **Value** [Comma separated list of organisations]  _*optional when using GitHub_
-- **variable** GITHUB_BACKUPS **Value** [Number of backups to keep for each repo]
-- **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
-- **variable** GITLAB_BACKUPS **Value** [Number of backups to keep for each repo]
-
-13. Click 'Apply'
-14. Leave settings as default and select 'Next'
-15. Check 'Run this container after the wizard is finished' and click 'Apply'
+12. Under 'Environment' click '+' to add the common configuration:
+    - **variable** GIT_BACKUP_DIR **Value** /backup
+    - **variable** GIT_BACKUP_INTERVAL **Value** [hours between backups]
+13. Also under 'Environment' click '+' to add the relevant provider specific configuration:
+    - **variable** BITBUCKET_USER **Value** [BitBucket User]   (if using BitBucket)
+    - **variable** BITBUCKET_KEY **Value** [BitBucket Key]   (if using BitBucket)
+    - **variable** BITBUCKET_SECRET **Value** [BitBucket Secret]   (if using BitBucket)
+    - **variable** BITBUCKET_BACKUPS **Value** [Number of backups to keep for each repo]
+    - **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
+    - **variable** GITHUB_ORGS **Value** [Comma separated list of organisations]  _*optional when using GitHub_
+    - **variable** GITHUB_BACKUPS **Value** [Number of backups to keep for each repo]
+    - **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
+    - **variable** GITLAB_BACKUPS **Value** [Number of backups to keep for each repo]
+14. Click 'Apply'
+15. Leave settings as default and select 'Next'
+16. Check 'Run this container after the wizard is finished' and click 'Apply'
 
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
