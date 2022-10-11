@@ -163,33 +163,33 @@ list of organisations in the environment variable: GITHUB_ORGS.
 
 #### _The following was tested on DS916+_
 
-1. Create a directory on your NAS for backing up Git repositories to
-2. Install Docker from the Synology Package Center
-3. Open Docker and select 'Image'
-4. Select 'Add' from the top menu and choose 'Add From URL'
-5. In 'Repository URL' enter 'jonhadfield/soba', leave other options as default and click 'Add'
-6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'
-7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu
-8. Set 'Container Name' to 'soba' and select 'Advanced Settings'
-9. Check 'Enable auto-restart'
-10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'
-11. Under 'Network' check 'Use the same network as Docker Host'
-12. Under 'Environment' click '+' to add the common configuration:
-    - **variable** GIT_BACKUP_DIR **Value** /backup
-    - **variable** GIT_BACKUP_INTERVAL **Value** (hours between backups)
-13. Also under 'Environment' click '+' to add the relevant provider specific configuration:
-    - **variable** BITBUCKET_USER **Value** 
-    - **variable** BITBUCKET_KEY **Value** 
-    - **variable** BITBUCKET_SECRET **Value** 
-    - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
-    - **variable** GITHUB_TOKEN **Value**
-    - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
-    - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
-    - **variable** GITLAB_TOKEN **Value**   
-    - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
-14. Click 'Apply'
-15. Leave settings as default and select 'Next'
-16. Check 'Run this container after the wizard is finished' and click 'Apply'
+ 1. Create a directory on your NAS for backing up Git repositories to  
+ 2. Install Docker from the Synology Package Center  
+ 3. Open Docker and select 'Image'  
+ 4. Select 'Add' from the top menu and choose 'Add From URL'  
+ 5. In 'Repository URL' enter 'jonhadfield/soba', leave other options as default and click 'Add'  
+ 6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'  
+ 7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu  
+ 8. Set 'Container Name' to 'soba' and select 'Advanced Settings'  
+ 9. Check 'Enable auto-restart'
+ 10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'  
+ 11. Under 'Network' check 'Use the same network as Docker Host'  
+ 12. Under 'Environment' click '+' to add the common configuration:  
+     - **variable** GIT_BACKUP_DIR **Value** /backup  
+     - **variable** GIT_BACKUP_INTERVAL **Value** (hours between backups)  
+ 13. Also under 'Environment' click '+' to add the relevant provider specific configuration:  
+     - **variable** BITBUCKET_USER **Value**  
+     - **variable** BITBUCKET_KEY **Value**  
+     - **variable** BITBUCKET_SECRET **Value** 
+     - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
+     - **variable** GITHUB_TOKEN **Value**
+     - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
+     - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
+     - **variable** GITLAB_TOKEN **Value**   
+     - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
+ 14. Click 'Apply'  
+ 15. Leave settings as default and select 'Next'  
+ 16. Check 'Run this container after the wizard is finished' and click 'Apply'
 
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
