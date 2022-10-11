@@ -123,13 +123,11 @@ interval is greater than the duration of a backup._
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
 following provider specific environment variables:
-
 - GITHUB_BACKUPS=_x_
 - GITLAB_BACKUPS=_x_
 - BITBUCKET_BACKUPS=_x_
 
 ## setting provider tokens
-
 On Linux and MacOS you can set environment variables manually before each time you run soba:
 
 ```bash
@@ -178,17 +176,17 @@ list of organisations in the environment variable: GITHUB_ORGS.
 11. Under 'Network' check 'Use the same network as Docker Host'
 12. Under 'Environment' click '+' to add the common configuration:
     - **variable** GIT_BACKUP_DIR **Value** /backup
-    - **variable** GIT_BACKUP_INTERVAL **Value** [hours between backups]
+    - **variable** GIT_BACKUP_INTERVAL **Value** (hours between backups)
 13. Also under 'Environment' click '+' to add the relevant provider specific configuration:
-    - **variable** BITBUCKET_USER **Value** [BitBucket User]   (if using BitBucket)
-    - **variable** BITBUCKET_KEY **Value** [BitBucket Key]   (if using BitBucket)
-    - **variable** BITBUCKET_SECRET **Value** [BitBucket Secret]   (if using BitBucket)
-    - **variable** BITBUCKET_BACKUPS **Value** [Number of backups to keep for each repo]
-    - **variable** GITHUB_TOKEN **Value** [GitHub token]   (if using GitHub)
-    - **variable** GITHUB_ORGS **Value** [Comma separated list of organisations]  _*optional when using GitHub_
-    - **variable** GITHUB_BACKUPS **Value** [Number of backups to keep for each repo]
-    - **variable** GITLAB_TOKEN **Value** [GitLab token]   (if using GitLab)
-    - **variable** GITLAB_BACKUPS **Value** [Number of backups to keep for each repo]
+    - **variable** BITBUCKET_USER **Value** 
+    - **variable** BITBUCKET_KEY **Value** 
+    - **variable** BITBUCKET_SECRET **Value** 
+    - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** GITHUB_TOKEN **Value**
+    - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
+    - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** GITLAB_TOKEN **Value**   
+    - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
 14. Click 'Apply'
 15. Leave settings as default and select 'Next'
 16. Check 'Run this container after the wizard is finished' and click 'Apply'
