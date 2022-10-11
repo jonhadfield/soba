@@ -12,7 +12,7 @@
 
 soba is tool for backing up private and public git repositories hosted on the most popular hosting providers. It
 generates a [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling) that stores a backup of each repository as a
-single file.
+single file.  
 
 An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been
 made and will not produce duplicates.
@@ -171,7 +171,7 @@ list of organisations in the environment variable: GITHUB_ORGS.
  6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'  
  7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu  
  8. Set 'Container Name' to 'soba' and select 'Advanced Settings'  
- 9. Check 'Enable auto-restart'
+ 9. Check 'Enable auto-restart'  
  10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'  
  11. Under 'Network' check 'Use the same network as Docker Host'  
  12. Under 'Environment' click '+' to add the common configuration:  
@@ -189,7 +189,7 @@ list of organisations in the environment variable: GITHUB_ORGS.
      - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
  14. Click 'Apply'  
  15. Leave settings as default and select 'Next'  
- 16. Check 'Run this container after the wizard is finished' and click 'Apply'
+ 16. Check 'Run this container after the wizard is finished' and click 'Apply'  
 
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
