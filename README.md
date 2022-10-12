@@ -1,7 +1,7 @@
 # soba: backup hosted git repositories
-
-[![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://www.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonhadfield/soba&amp;utm_campaign=Badge_Grade)  [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
-
+[![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://www.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonhadfield/soba&amp;utm_campaign=Badge_Grade)
+[![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
 - [about](#about)
 - [configuration](#configuration)
 - [run using command line](#run-using-command-line)
@@ -10,14 +10,20 @@
 
 ## about
 
-soba is tool for backing up private and public git repositories hosted on the most popular hosting providers. It
-generates a [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling) that stores a backup of each repository as a
+soba is tool for backing up private and public git repositories hosted on the
+most popular hosting providers. It generates a [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling) that stores a backup of each repository as a
 single file.  
 
 An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been
 made and will not produce duplicates.
 
 ## latest updates
+
+**1.1.3 released 2022-10-12**  
+Fixes issues that resulted in only a subset of GitLab Projects being backed up.  
+All Projects across GitLab will now be returned, based on the user's minimum access level. The default level is 'Reporter' and can be overriden by setting environment variable:
+`GITLAB_PROJECT_MIN_ACCESS_LEVEL` to the numeric value associated with the level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels).  
+Thanks to [@drummingdemon](https://github.com/drummingdemon) for all their help in testing this release.
 
 **1.1.2 released 2022-06-03**  
 [Add feature](https://github.com/jonhadfield/soba/issues/9) to enable backup of project repos in GitLab groups
@@ -123,7 +129,7 @@ interval is greater than the duration of a backup._
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
 following provider specific environment variables:
-- GITHUB_BACKUPS=_x_
+  - GITHUB_BACKUPS=_x_
 - GITLAB_BACKUPS=_x_
 - BITBUCKET_BACKUPS=_x_
 
@@ -148,48 +154,69 @@ and run:
 source /home/<your-user-id>/.bashrc
 ```
 
-| Provider  | Environment Variable(s) | Generating token                                                                                         |
-|:----------|:------------------------|:---------------------------------------------------------------------------------------------------------|
-| BitBucket | BITBUCKET_USER          | [instructions](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html")      |
-|           | BITBUCKET_KEY           |                                                                                                          |
-|           | BITBUCKET_SECRET        |                                                                                                          |                                                                                          |
-| GitHub    | GITHUB_TOKEN            | [instructions](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/") |
-| GitLab    | GITLAB_TOKEN            | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
+| Provider  | Environment Variable(s)         | Generating token                                                                                         |
+|:----------|:--------------------------------|:---------------------------------------------------------------------------------------------------------|
+| BitBucket | BITBUCKET_USER                  | [instructions](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html")      |
+|           | BITBUCKET_KEY                   |                                                                                                          |
+|           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
+| GitHub    | GITHUB_TOKEN                    | [instructions](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/") |
+| GitLab    | GITLAB_TOKEN                    | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
+|           | GITLAB_PROJECT_MIN_ACCESS_LEVEL | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
 
-Note: Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
+### additional options
+
+#### GitHub - Returning Organisations' repositories
+
+Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
 list of organisations in the environment variable: GITHUB_ORGS.
+
+#### GitLab - filtering Projects by access level
+
+Release 1.1.3 modified the way in which a user's GitLab Projects are returned. By default, every Project a user has at
+least `Reporter` access to will be returned. New environment variable GITLAB_PROJECT_MIN_ACCESS_LEVEL can be set to
+override this, by specifying the number matching the desired access level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels) and here:  
+
+| Access Level | Value |
+|:-------------|:------|
+| Guest        | 10    |
+| Reporter     | 20    |
+| Developer    | 30    |                                                                                          |
+| Maintainer   | 40    |
+| Owner        | 50    |
 
 ### run on Synology NAS
 
 #### _The following was tested on DS916+_
 
- 1. Create a directory on your NAS for backing up Git repositories to  
- 2. Install Docker from the Synology Package Center  
- 3. Open Docker and select 'Image'  
- 4. Select 'Add' from the top menu and choose 'Add From URL'  
- 5. In 'Repository URL' enter 'jonhadfield/soba', leave other options as default and click 'Add'  
- 6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'  
- 7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu  
- 8. Set 'Container Name' to 'soba' and select 'Advanced Settings'  
- 9. Check 'Enable auto-restart'  
- 10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'  
- 11. Under 'Network' check 'Use the same network as Docker Host'  
- 12. Under 'Environment' click '+' to add the common configuration:  
-     - **variable** GIT_BACKUP_DIR **Value** /backup  
-     - **variable** GIT_BACKUP_INTERVAL **Value** (hours between backups)  
- 13. Also under 'Environment' click '+' to add the relevant provider specific configuration:  
-     - **variable** BITBUCKET_USER **Value**  
-     - **variable** BITBUCKET_KEY **Value**  
-     - **variable** BITBUCKET_SECRET **Value** 
-     - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
-     - **variable** GITHUB_TOKEN **Value**
-     - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
-     - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
-     - **variable** GITLAB_TOKEN **Value**   
-     - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
- 14. Click 'Apply'  
- 15. Leave settings as default and select 'Next'  
- 16. Check 'Run this container after the wizard is finished' and click 'Apply'  
+1. Create a directory on your NAS for backing up Git repositories to
+2. Install Docker from the Synology Package Center
+3. Open Docker and select 'Image'
+4. Select 'Add' from the top menu and choose 'Add From URL'
+5. In 'Repository URL' enter 'jonhadfield/soba', leave other options as default and click 'Add'
+6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'
+7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu  
+8. Set 'Container Name' to 'soba' and select 'Advanced Settings'
+9. Check 'Enable auto-restart'
+10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'
+11. Under 'Network' check 'Use the same network as Docker Host'
+12. Under 'Environment' click '+' to add the common configuration:
+    - **variable** GIT_BACKUP_DIR **Value** /backup
+    - **variable** GIT_BACKUP_INTERVAL **Value** (hours between backups)
+13. Also under 'Environment' click '+' to add the relevant provider specific configuration:
+    - **variable** BITBUCKET_USER **Value**
+    - **variable** BITBUCKET_KEY **Value**
+    - **variable** BITBUCKET_SECRET **Value**
+    - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** GITHUB_TOKEN **Value**
+    - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
+    - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** GITLAB_TOKEN **Value**
+    - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
+14. Click 'Apply'
+15. Leave settings as default and select 'Next'
+16. Check 'Run this container after the wizard is finished' and click 'Apply'
 
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
+
+[travis_badge]: https://travis-ci.org/jonhadfield/soba.svg?branch=master[https://travis-ci.org/jonhadfield/soba]
