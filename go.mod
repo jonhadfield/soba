@@ -7,7 +7,7 @@ require (
 	github.com/jonhadfield/githosts-utils v0.0.0-20221004190701-414e932254e8
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0
-	golang.org/x/exp v0.0.0-20221006183845-316c7553db56
+	golang.org/x/exp v0.0.0-20221012211006-4de253d81b95
 )
 
 require (

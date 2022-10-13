@@ -41,7 +41,7 @@ build-all: fmt
 	GOOS=windows CGO_ENABLED=0 GOARCH=amd64 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba_windows_amd64.exe"
 
 critic:
-	gocritic check-package github.com/jonhadfield/soba
+	gocritic check  ./...
 
 mac-install: build
 	install .local_dist/soba_darwin_amd64 /usr/local/bin/soba
