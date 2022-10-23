@@ -7,6 +7,7 @@
 - [run using command line](#run-using-command-line)
 - [run using docker](#run-using-docker)
 - [run on Synology NAS](#run-on-synology-nas)
+- [restore](#restore)
 
 ## about
 
@@ -220,3 +221,11 @@ The container should launch in a few seconds. You can view progress by choosing 
 select 'soba', choose 'details' and then click on 'Log'
 
 [travis_badge]: https://travis-ci.org/jonhadfield/soba.svg?branch=master[https://travis-ci.org/jonhadfield/soba]
+
+## restore
+
+A Git bundle is an archive of a Git repository. The simplest way to restore is to clone it like a remote repository.
+
+```bash
+git clone soba.20180708153107.bundle soba.
+```
