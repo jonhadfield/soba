@@ -227,5 +227,5 @@ select 'soba', choose 'details' and then click on 'Log'
 A Git bundle is an archive of a Git repository. The simplest way to restore is to clone it like a remote repository.
 
 ```bash
-git clone soba.20180708153107.bundle soba.
+git clone soba.20180708153107.bundle soba
 ```
