@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
-	github.com/jonhadfield/githosts-utils v0.0.0-20221004190701-414e932254e8
+	github.com/jonhadfield/githosts-utils v0.0.0-20221030165522-4c952bf58b47
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.0
 	golang.org/x/exp v0.0.0-20221012211006-4de253d81b95
