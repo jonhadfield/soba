@@ -168,7 +168,6 @@ func run() error {
 	}
 
 	if err = checkProvidersDefined(); err != nil {
-		fmt.Printf("err: %+v\n", err)
 		logger.Fatal("no providers defined")
 	}
 
