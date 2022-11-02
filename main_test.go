@@ -202,6 +202,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	require.NoError(t, run())
 	// check only one bundle exists
 	files, err = os.ReadDir(dfDir)
+	require.NoError(t, err)
 	require.Len(t, files, 1)
 	require.Equal(t, firstBackupFileName, files[0].Name())
 }
