@@ -85,7 +85,7 @@ func getBackupInterval() int {
 	if backupIntervalEnv != "" {
 		backupInterval, intervalConversionErr = strconv.Atoi(backupIntervalEnv)
 		if intervalConversionErr != nil {
-			logger.Fatal(fmt.Sprintf("%s must be a number.", envGitBackupInterval))
+			logger.Fatalf("%s must be a number.", envGitBackupInterval)
 		}
 	}
 
