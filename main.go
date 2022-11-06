@@ -16,10 +16,31 @@ import (
 )
 
 const (
+	appName        = "soba"
 	workingDIRName = ".working"
 	workingDIRMode = 0o755
 
 	pathSep = string(os.PathSeparator)
+
+	// env vars
+	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
+	envGitBackupDir      = "GIT_BACKUP_DIR"
+	envGitHubToken       = "GITHUB_TOKEN"
+	envGitHubOrgs        = "GITHUB_ORGS"
+	envGitHubCompare     = "GITHUB_COMPARE"
+	envGitLabToken       = "GITLAB_TOKEN"
+	envGitLabAPIURL      = "GITLAB_APIURL"
+	envGitLabCompare     = "GITLAB_COMPARE"
+	envBitBucketUser     = "BITBUCKET_USER"
+	envBitBucketKey      = "BITBUCKET_KEY"
+	envBitBucketSecret   = "BITBUCKET_SECRET"
+	envBitBucketAPIURL   = "BITBUCKET_APIURL"
+	envBitBucketCompare  = "BITBUCKET_COMPARE"
+
+	// provider names
+	providerNameGitHub    = "GitHub"
+	providerNameGitLab    = "GitLab"
+	providerNameBitBucket = "BitBucket"
 )
 
 var (
@@ -28,34 +49,34 @@ var (
 	version, tag, sha, buildDate string
 
 	enabledProviderAuth = map[string][]string{
-		"GitHub": {
-			"GITHUB_TOKEN",
+		providerNameGitHub: {
+			envGitHubToken,
 		},
-		"GitLab": {
-			"GITLAB_TOKEN",
+		providerNameGitLab: {
+			envGitLabToken,
 		},
-		"BitBucket": {
-			"BITBUCKET_USER",
-			"BITBUCKET_KEY",
-			"BITBUCKET_SECRET",
+		providerNameBitBucket: {
+			envBitBucketUser,
+			envBitBucketKey,
+			envBitBucketSecret,
 		},
 	}
 	justTokenProviders = []string{
-		"GitHub",
-		"GitLab",
+		providerNameGitHub,
+		providerNameGitLab,
 	}
 	userAndPasswordProviders = []string{
-		"BitBucket",
+		providerNameBitBucket,
 	}
 	numUserDefinedProviders int64
 )
 
 func init() {
-	logger = log.New(os.Stdout, "soba: ", log.Lshortfile|log.LstdFlags)
+	logger = log.New(os.Stdout, fmt.Sprintf("%s: ", appName), log.Lshortfile|log.LstdFlags)
 }
 
 func getBackupInterval() int {
-	backupIntervalEnv := os.Getenv("GIT_BACKUP_INTERVAL")
+	backupIntervalEnv := os.Getenv(envGitBackupInterval)
 
 	var backupInterval int
 
@@ -64,7 +85,7 @@ func getBackupInterval() int {
 	if backupIntervalEnv != "" {
 		backupInterval, intervalConversionErr = strconv.Atoi(backupIntervalEnv)
 		if intervalConversionErr != nil {
-			logger.Fatal("GIT_BACKUP_INTERVAL must be a number.")
+			logger.Fatal(fmt.Sprintf("%s must be a number.", envGitBackupInterval))
 		}
 	}
 
@@ -149,14 +170,14 @@ func run() error {
 
 	var backupDIRKeyExists bool
 
-	backupDIR, backupDIRKeyExists = os.LookupEnv("GIT_BACKUP_DIR")
+	backupDIR, backupDIRKeyExists = os.LookupEnv(envGitBackupDir)
 	if !backupDIRKeyExists || backupDIR == "" {
 		return errors.New("environment variable GIT_BACKUP_DIR must be set")
 	}
 
-	if _, githubOrgsKeyExists := os.LookupEnv("GITHUB_ORGS"); githubOrgsKeyExists {
-		if _, githubTokenExists := os.LookupEnv("GITHUB_TOKEN"); !githubTokenExists {
-			return errors.New("environment variable GITHUB_TOKEN must be set if GITHUB_ORGS is set")
+	if _, githubOrgsKeyExists := os.LookupEnv(envGitHubOrgs); githubOrgsKeyExists {
+		if _, githubTokenExists := os.LookupEnv(envGitHubToken); !githubTokenExists {
+			return fmt.Errorf("environment variable %s must be set if %s is set", envGitHubToken, envGitHubOrgs)
 		}
 	}
 
@@ -211,30 +232,29 @@ func execProviderBackups() {
 	var err error
 
 	startTime := time.Now()
-	backupDIR := os.Getenv("GIT_BACKUP_DIR")
+	backupDIR := os.Getenv(envGitBackupDir)
 
-	if os.Getenv("BITBUCKET_USER") != "" {
+	if os.Getenv(envBitBucketUser) != "" {
 		logger.Println("backing up BitBucket repos")
 
-		err = githosts.Backup("bitbucket", backupDIR, os.Getenv("BITBUCKET_APIURL"))
+		err = githosts.Backup("bitbucket", backupDIR, os.Getenv(envBitBucketAPIURL), os.Getenv(envBitBucketCompare))
 		if err != nil {
 			logger.Fatal(err)
 		}
 	}
 
-	if os.Getenv("GITLAB_TOKEN") != "" {
+	if os.Getenv(envGitLabToken) != "" {
 		logger.Println("backing up GitLab repos")
 
-		err = githosts.Backup("gitlab", backupDIR, os.Getenv("GITLAB_APIURL"))
+		err = githosts.Backup("gitlab", backupDIR, os.Getenv(envGitLabAPIURL), os.Getenv(envGitLabCompare))
 		if err != nil {
 			logger.Fatal(err)
 		}
 	}
 
-	if os.Getenv("GITHUB_TOKEN") != "" {
+	if os.Getenv(envGitHubToken) != "" {
 		logger.Println("backing up GitHub repos")
-
-		err = githosts.Backup("github", backupDIR, os.Getenv("GITHUB_APIURL"))
+		err = githosts.Backup("github", backupDIR, os.Getenv("GITHUB_APIURL"), os.Getenv(envGitHubCompare))
 		if err != nil {
 			logger.Fatal(err)
 		}

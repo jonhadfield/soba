@@ -14,8 +14,9 @@ import (
 )
 
 var sobaEnvVarKeys = []string{
-	"GIT_BACKUP_DIR", "GITHUB_TOKEN", "GITHUB_BACKUPS", "GITLAB_TOKEN", "GITLAB_BACKUPS", "GITLAB_APIURL", "SOBA_DEV",
-	"BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET", "BITBUCKET_BACKUPS",
+	envGitBackupDir, envGitHubToken, "GITHUB_BACKUPS", envGitLabToken, "GITLAB_BACKUPS", envGitLabAPIURL,
+	envGitHubCompare, envGitLabCompare, envBitBucketCompare,
+	envBitBucketUser, envBitBucketKey, envBitBucketSecret, "BITBUCKET_BACKUPS",
 }
 
 func removeContents(dir string) error {
@@ -45,7 +46,7 @@ func preflight() {
 	var err error
 
 	// prepare clean backup directory
-	bud := os.Getenv("GIT_BACKUP_DIR")
+	bud := os.Getenv(envGitBackupDir)
 
 	// if path not provided, create one
 	if bud == "" {
@@ -54,7 +55,7 @@ func preflight() {
 			panic(err)
 		}
 
-		_ = os.Setenv("GIT_BACKUP_DIR", bud)
+		_ = os.Setenv(envGitBackupDir, bud)
 
 		return
 	}
@@ -102,7 +103,7 @@ func unsetEnvVarsExcept(exceptionList []string) {
 }
 
 func resetBackups() {
-	backupDir := os.Getenv("GIT_BACKUP_DIR")
+	backupDir := os.Getenv(envGitBackupDir)
 	if backupDir == "" {
 
 		return
@@ -116,17 +117,20 @@ func resetBackups() {
 func TestGitHubEnvs(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
-	require.NoError(t, os.Unsetenv("GITHUB_TOKEN"))
-	require.NoError(t, os.Unsetenv("GITLAB_TOKEN"))
-	require.NoError(t, os.Setenv("GITHUB_ORGS", "example,example2"))
+	require.NoError(t, os.Unsetenv(envGitHubToken))
+	require.NoError(t, os.Unsetenv(envGitLabToken))
+	require.NoError(t, os.Setenv(envGitHubOrgs, "example,example2"))
 	err := run()
-	require.NoError(t, os.Unsetenv("GITHUB_ORGS"))
+	require.NoError(t, os.Unsetenv(envGitHubOrgs))
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "GITHUB_TOKEN must be set if GITHUB_ORGS is set")
 }
 
-func TestInvalidBundleIsMoved(t *testing.T) {
-	if os.Getenv("GITHUB_TOKEN") == "" {
+func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
+	// set comparison to use refs, rather than bundle
+	require.NoError(t, os.Setenv(envGitHubCompare, "refs"))
+
+	if os.Getenv(envGitHubToken) == "" {
 		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
 	}
 
@@ -138,9 +142,9 @@ func TestInvalidBundleIsMoved(t *testing.T) {
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "SOBA_DEV"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
 	// create invalid bundle
-	backupDir := os.Getenv("GIT_BACKUP_DIR")
+	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	dfName := "repo0.20200401111111.bundle"
@@ -169,11 +173,11 @@ func TestInvalidBundleIsMoved(t *testing.T) {
 
 	}
 	require.Zero(t, originalFound)
-	require.Equal(t, renamedFound, 1)
+	require.Equal(t, 1, renamedFound)
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
-	if os.Getenv("GITHUB_TOKEN") == "" {
+	if os.Getenv(envGitHubToken) == "" {
 		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
 	}
 
@@ -185,9 +189,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "SOBA_DEV"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
 	// create dummy bundle
-	backupDir := os.Getenv("GIT_BACKUP_DIR")
+	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	require.NoError(t, os.Setenv("GITHUB_BACKUPS", "1"))
@@ -208,7 +212,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
-	if os.Getenv("GITHUB_TOKEN") == "" {
+	if os.Getenv(envGitHubToken) == "" {
 		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
 	}
 
@@ -220,9 +224,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "SOBA_DEV"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
 	// create dummy bundle
-	backupDir := os.Getenv("GIT_BACKUP_DIR")
+	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	dfName := "repo0.20200401111111.bundle"
@@ -238,7 +242,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
-	if os.Getenv("GITHUB_TOKEN") == "" {
+	if os.Getenv(envGitHubToken) == "" {
 		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
 	}
 
@@ -250,12 +254,12 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "SOBA_DEV"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
 	require.NoError(t, run())
 }
 
 func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
-	if os.Getenv("GITHUB_TOKEN") == "" {
+	if os.Getenv(envGitHubToken) == "" {
 		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
 	}
 
@@ -267,14 +271,33 @@ func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITHUB_TOKEN", "SOBA_DEV"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
+	require.NoError(t, run())
+	// run for second time now we have existing bundles
+	require.NoError(t, run())
+}
+
+func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) {
+	if os.Getenv(envGitHubToken) == "" {
+		t.Skip("Skipping GitHub test as GITHUB_TOKEN is missing")
+	}
+
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	preflight()
+	resetGlobals()
+	defer resetBackups()
+
+	// Unset Env Vars but exclude those defined
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
 	require.NoError(t, run())
 	// run for second time now we have existing bundles
 	require.NoError(t, run())
 }
 
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
-	if os.Getenv("GITLAB_TOKEN") == "" {
+	if os.Getenv(envGitLabToken) == "" {
 		t.Skip("Skipping GitLab test as GITLAB_TOKEN is missing")
 	}
 
@@ -285,12 +308,12 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	defer resetBackups()
 
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitLabToken})
 	require.NoError(t, run())
 }
 
 func TestPublicGitLabRepositoryBackup2(t *testing.T) {
-	if os.Getenv("GITLAB_TOKEN") == "" {
+	if os.Getenv(envGitLabToken) == "" {
 		t.Skip("Skipping GitLab test as GITLAB_TOKEN is missing")
 	}
 
@@ -301,26 +324,26 @@ func TestPublicGitLabRepositoryBackup2(t *testing.T) {
 	resetGlobals()
 	defer resetBackups()
 
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "GITLAB_TOKEN"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitLabToken})
 	require.NoError(t, run())
 }
 
 func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
-	if os.Getenv("BITBUCKET_USER") == "" {
+	if os.Getenv(envBitBucketUser) == "" {
 		t.Skip("Skipping BitBucket test as BITBUCKET_USER is missing")
 	}
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"})
-	defer os.Unsetenv("SOBA_DEV")
-	os.Setenv("SOBA_DEV", "true")
+	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
+	defer os.Unsetenv(envBitBucketCompare)
+	os.Setenv(envBitBucketCompare, "true")
 	require.NoError(t, run())
 	require.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
 }
 
 func TestPublicBitBucketRepositoryBackup(t *testing.T) {
-	if os.Getenv("BITBUCKET_USER") == "" {
+	if os.Getenv(envBitBucketUser) == "" {
 		t.Skip("Skipping BitBucket test as BITBUCKET_USER is missing")
 	}
 
@@ -331,7 +354,7 @@ func TestPublicBitBucketRepositoryBackup(t *testing.T) {
 	resetGlobals()
 	defer resetBackups()
 
-	unsetEnvVarsExcept([]string{"GIT_BACKUP_DIR", "BITBUCKET_USER", "BITBUCKET_KEY", "BITBUCKET_SECRET"})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
 	require.NoError(t, run())
 }
 
@@ -358,6 +381,6 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{})
-	_ = os.Setenv("GITHUB_TOKEN", "ABCD1234")
+	_ = os.Setenv(envGitHubToken, "ABCD1234")
 	require.Error(t, run(), "expected: GIT_BACKUP_DIR undefined error")
 }
