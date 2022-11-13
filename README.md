@@ -20,6 +20,10 @@ made and will not produce duplicates.
 
 ## latest updates
 
+**1.1.4 released 2022-11-12**  
+- Adds new feature to prevent having to clone a repository before comparing with the latest local backup.
+- Some minor tweaks and output improvements.
+
 **1.1.3 released 2022-10-12**  
 Fixes issues that resulted in only a subset of GitLab Projects being backed up.  
 All Projects across GitLab will now be returned, based on the user's minimum access level. The default level is 'Reporter' and can be overriden by setting environment variable:
@@ -164,16 +168,40 @@ source /home/<your-user-id>/.bashrc
 | GitLab    | GITLAB_TOKEN                    | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
 |           | GITLAB_PROJECT_MIN_ACCESS_LEVEL | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
 
-### additional options
+## additional options
 
-#### GitHub - Returning Organisations' repositories
+### BitBucket  
+#### Comparing remote repository with local backup
+Environment variabke: BITBUCKET_COMPARE
+
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |                                                                |
+|:----------------|:---------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle                     |
+| refs            | Compare refs without downloading (available since soba 1.1.4)  |
+
+### GitHub
+#### Returning Organisations' repositories
 
 Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
 list of organisations in the environment variable: GITHUB_ORGS.
 
-#### GitLab - filtering Projects by access level
+#### Comparing remote repository with local backup
+Environment variabke: GITHUB_COMPARE
 
-Release 1.1.3 modified the way in which a user's GitLab Projects are returned. By default, every Project a user has at
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |                                                               |
+|:----------------|:--------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle                    |
+| refs            | Compare refs without downloading (available since soba 1.1.4) |
+
+
+### GitLab
+#### filtering Projects by access level (available since soba 1.1.3)
+
+The way in which a user's GitLab Projects are returned. By default, every Project a user has at
 least `Reporter` access to will be returned. New environment variable GITLAB_PROJECT_MIN_ACCESS_LEVEL can be set to
 override this, by specifying the number matching the desired access level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels) and here:  
 
@@ -184,6 +212,23 @@ override this, by specifying the number matching the desired access level shown 
 | Developer    | 30    |                                                                                          |
 | Maintainer   | 40    |
 | Owner        | 50    |
+
+#### Comparing remote repository with local backup
+Environment variabke: GITLAB_COMPARE
+
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |                                                               |
+|:----------------|:--------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle                    |
+| refs            | Compare refs without downloading (available since soba 1.1.4) |
+
+### Comparing remote repository with local backup
+
+By default, each repository will be cloned, bundled, and that bundle compared with the latest local bundle to check if it should be kept or discarded. 
+When processing many large repositories, this can be a lengthy process.     
+Alternatively, you can now compare the Git refs of the latest local bundle with the remote repository without having to clone. This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`. This process is far quicker than cloning but should only be used if the following is understood: Comparing refs means comparing the tips of, and not the entire history of, the repository. [This post on Stack Overflow](https://stackoverflow.com/questions/74281792/git-comparing-local-bundle-with-remote-repository-using-refs-only) goes into additional detail.
+
 
 ### run on Synology NAS
 
