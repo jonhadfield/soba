@@ -171,7 +171,7 @@ source /home/<your-user-id>/.bashrc
 ## additional options
 
 ### BitBucket  
-#### Comparing remote repository with local backup
+#### Repo/Bundle comparison method
 Environment variabke: BITBUCKET_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
@@ -187,7 +187,7 @@ Environment variabke: BITBUCKET_COMPARE
 Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
 list of organisations in the environment variable: GITHUB_ORGS.
 
-#### Comparing remote repository with local backup
+#### Repo/Bundle comparison method
 Environment variabke: GITHUB_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
@@ -213,7 +213,7 @@ override this, by specifying the number matching the desired access level shown 
 | Maintainer   | 40    |
 | Owner        | 50    |
 
-#### Comparing remote repository with local backup
+#### Repo/Bundle comparison method 
 Environment variabke: GITLAB_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
@@ -227,7 +227,9 @@ Environment variabke: GITLAB_COMPARE
 
 By default, each repository will be cloned, bundled, and that bundle compared with the latest local bundle to check if it should be kept or discarded. 
 When processing many large repositories, this can be a lengthy process.     
-Alternatively, you can now compare the Git refs of the latest local bundle with the remote repository without having to clone. This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`. This process is far quicker than cloning but should only be used if the following is understood: Comparing refs means comparing the tips of, and not the entire history of, the repository. [This post on Stack Overflow](https://stackoverflow.com/questions/74281792/git-comparing-local-bundle-with-remote-repository-using-refs-only) goes into additional detail.
+Alternatively, you can now compare the Git refs of the latest local bundle with the remote repository without having to clone.
+This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`. 
+This process is far quicker than cloning but should only be used if the following is understood: Comparing refs means comparing the tips of, and not the entire history of, the repository. [This post on Stack Overflow](https://stackoverflow.com/questions/74281792/git-comparing-local-bundle-with-remote-repository-using-refs-only) goes into additional detail.
 
 
 ### run on Synology NAS
