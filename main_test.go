@@ -344,8 +344,12 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	resetGlobals()
 	envBackup := backupEnvironmentVariables()
 	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
-	defer os.Unsetenv(envBitBucketCompare)
-	os.Setenv(envBitBucketCompare, "true")
+	defer func() {
+		if err := os.Unsetenv(envBitBucketCompare); err != nil {
+			panic(fmt.Sprintf("failed to unset envvar: %s", err.Error()))
+		}
+	}()
+	_ = os.Setenv(envBitBucketCompare, "true")
 	require.NoError(t, run())
 	require.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
