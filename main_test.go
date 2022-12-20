@@ -47,12 +47,6 @@ func preflight() {
 
 	// prepare clean backup directory
 	bud := os.Getenv(envGitBackupDir)
-	_, err = os.Stat(bud)
-	if os.IsNotExist(err) {
-		if err = os.MkdirAll(bud, 0700); err != nil {
-			panic(err)
-		}
-	}
 
 	// if path not provided, create one
 	if bud == "" {
@@ -62,6 +56,15 @@ func preflight() {
 		}
 
 		_ = os.Setenv(envGitBackupDir, bud)
+
+		return
+	}
+
+	_, err = os.Stat(bud)
+	if os.IsNotExist(err) {
+		if err = os.MkdirAll(bud, 0700); err != nil {
+			panic(err)
+		}
 
 		return
 	}
