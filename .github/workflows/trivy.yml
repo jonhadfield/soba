@@ -2,7 +2,7 @@ name: trivy-scanning
 
 on:
   push:
-    branches: [ "readme_updates" ]
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
   schedule:
