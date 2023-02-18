@@ -61,7 +61,28 @@ jobs:
       run: echo "TAG=$(git describe --tags)" >> $GITHUB_ENV
 
     -
-      name: build and push
+      name: build image
+      uses: docker/build-push-action@v4
+      with:
+        context: ./docker
+        file: ./docker/Dockerfile
+        build-args: TAG=${{ env.TAG }}
+        push: false
+        tags: |
+          ${{ github.repository }}:latest
+          ${{ github.repository }}:${{ env.TAG }}
+          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${{ github.repository }}:${{ env.TAG }}
+
+    - name: trivy image scan
+      uses: aquasecurity/trivy-action@0.0.7
+      with:
+        image-ref: ${{ github.repository }}:latest
+        exit-code: 0
+        severity: UNKNOWN,LOW,MEDIUM
+
+    -
+      name: push image
       uses: docker/build-push-action@v4
       with:
         context: ./docker
