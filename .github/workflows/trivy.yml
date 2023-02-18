@@ -1,0 +1,46 @@
+name: trivy-scanning
+
+on:
+  push:
+    branches: [ "readme_updates" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '41 16 * * 0'
+
+permissions: write-all
+
+jobs:
+  trivy-scanning-job:
+    name: trivy-sec-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          ignore-unfixed: true
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: Build an image from Dockerfile
+        run: |
+          cd docker && docker build -t ${{ github.repository }}:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+
+          image-ref: '${{ github.repository }}:${{ github.sha }}'
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
