@@ -16,9 +16,16 @@ most popular hosting providers. It generates a [git bundle](https://git-scm.com/
 single file.  
 
 An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been
-made and will not produce duplicates.
+made and will not produce duplicates. Since version 1.1.4 you can now [check for changes without cloning](#comparing-remote-repository-with-local-backup).
 
 ## latest updates
+
+**1.1.6 released 2022-12-20**
+- Fixes bug where only first 100 GitHub Organisation repositories are backed up
+- Introduce retries for BitBucket API calls and cloning
+
+**1.1.5 released 2022-12-20**
+- Maintenance release
 
 **1.1.4 released 2022-11-12**  
 - Adds new feature to prevent having to clone a repository before comparing with the latest local backup.
@@ -134,7 +141,7 @@ interval is greater than the duration of a backup._
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
 following provider specific environment variables:
-  - GITHUB_BACKUPS=_x_
+- GITHUB_BACKUPS=_x_
 - GITLAB_BACKUPS=_x_
 - BITBUCKET_BACKUPS=_x_
 
@@ -161,12 +168,12 @@ source /home/<your-user-id>/.bashrc
 
 | Provider  | Environment Variable(s)         | Generating token                                                                                         |
 |:----------|:--------------------------------|:---------------------------------------------------------------------------------------------------------|
-| BitBucket | BITBUCKET_USER                  | [instructions](https://confluence.atlassian.com/bitbucket/oauth-on-bitbucket-cloud-238027431.html")      |
+| BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)       |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
-| GitHub    | GITHUB_TOKEN                    | [instructions](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/") |
-| GitLab    | GITLAB_TOKEN                    | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
-|           | GITLAB_PROJECT_MIN_ACCESS_LEVEL | [instructions](https://gitlab.com/profile/personal_access_tokens")                                       |
+| GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
+| GitLab    | GITLAB_TOKEN                    | [instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)                                       |
+|           | GITLAB_PROJECT_MIN_ACCESS_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
 
 ## additional options
 
@@ -230,7 +237,6 @@ When processing many large repositories, this can be a lengthy process.
 Alternatively, you can now compare the Git refs of the latest local bundle with the remote repository without having to clone.
 This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`. 
 This process is far quicker than cloning but should only be used if the following is understood: Comparing refs means comparing the tips of, and not the entire history of, the repository. [This post on Stack Overflow](https://stackoverflow.com/questions/74281792/git-comparing-local-bundle-with-remote-repository-using-refs-only) goes into additional detail.
-
 
 ### run on Synology NAS
 
