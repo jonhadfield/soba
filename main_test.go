@@ -62,7 +62,7 @@ func preflight() {
 
 	_, err = os.Stat(bud)
 	if os.IsNotExist(err) {
-		if err = os.MkdirAll(bud, 0700); err != nil {
+		if err = os.MkdirAll(bud, 0o700); err != nil {
 			panic(err)
 		}
 
@@ -114,7 +114,6 @@ func unsetEnvVarsExcept(exceptionList []string) {
 func resetBackups() {
 	backupDir := os.Getenv(envGitBackupDir)
 	if backupDir == "" {
-
 		return
 	}
 
