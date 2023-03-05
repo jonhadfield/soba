@@ -1,10 +1,17 @@
 # soba: backup hosted git repositories
+
 [![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://www.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonhadfield/soba&amp;utm_campaign=Badge_Grade)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
+
 - [about](#about)
 - [configuration](#configuration)
 - [run using command line](#run-using-command-line)
+- [scheduling backups](#scheduling-backups)
+- [rotating backups](#rotating-backups)
+- [logging](#logging)
+- [setting provider credentials](#setting-provider-credentials)
+- [additional options](#additional-options)
 - [run using docker](#run-using-docker)
 - [run on Synology NAS](#run-on-synology-nas)
 - [restore](#restore)
@@ -20,38 +27,45 @@ made and will not produce duplicates. Since version 1.1.4 you can now [check for
 
 ## latest updates
 
-**1.1.6 released 2022-12-20**
+### 1.1.6 released 2022-03-05
+
 - Fixes bug where only first 100 GitHub Organisation repositories are backed up
 - Introduce retries for BitBucket API calls and cloning
 
-**1.1.5 released 2022-12-20**
+### 1.1.5 released 2022-12-20
+
 - Maintenance release
 
-**1.1.4 released 2022-11-12**  
+### 1.1.4 released 2022-11-12
+
 - Adds new feature to prevent having to clone a repository before comparing with the latest local backup.
 - Some minor tweaks and output improvements.
 
-**1.1.3 released 2022-10-12**  
+### 1.1.3 released 2022-10-12
+
 Fixes issues that resulted in only a subset of GitLab Projects being backed up.  
 All Projects across GitLab will now be returned, based on the user's minimum access level. The default level is 'Reporter' and can be overriden by setting environment variable:
 `GITLAB_PROJECT_MIN_ACCESS_LEVEL` to the numeric value associated with the level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels).  
 Thanks to [@drummingdemon](https://github.com/drummingdemon) for all their help in testing this release.
 
-**1.1.2 released 2022-06-03**  
+### 1.1.2 released 2022-06-03
+
 [Add feature](https://github.com/jonhadfield/soba/issues/9) to enable backup of project repos in GitLab groups
 
-**1.1.1 released 2022-03-13**  
+### 1.1.1 released 2022-03-13
+
 [Add feature](https://github.com/jonhadfield/soba/issues/7) to enable backup of GitHub organisations' repositories
 
-**1.1.0 released 2021-10-27**  
+### 1.1.0 released 2021-10-27
+
 Resolve exit on backup failure issue
 
-### Supported OSes
+## supported OSes
 
 Tested on Windows 10, MacOS, and Linux (amd64).  
 Not tested, but should also work on builds for: Linux (386, arm386 and arm64), FreeBSD, NetBSD, and OpenBSD.
 
-### supported providers
+## supported providers
 
 - BitBucket
 - GitHub (including organisations)
@@ -74,9 +88,9 @@ On Linux and MacOS you would set these using:
 export GIT_BACKUP_DIR="/repo-backups/"
 ```
 
-To set provider tokens see [below](#setting-provider-tokens).
+To set provider credentials see [below](#setting-provider-credentials).
 
-### run using command line
+## run using command line
 
 Download the latest release [here](https://github.com/jonhadfield/soba/releases) and then install:
 
@@ -84,7 +98,7 @@ Download the latest release [here](https://github.com/jonhadfield/soba/releases)
 install <soba binary> /usr/local/bin/soba
 ```
 
-After setting GIT_BACKUP_DIR, set your provider token(s) as detailed [here](#setting-provider-tokens).
+After setting `GIT_BACKUP_DIR`, set your provider token(s) as detailed [here](#setting-provider-credentials).
 
 and then run:
 
@@ -92,7 +106,7 @@ and then run:
 soba
 ```
 
-### run using docker
+## run using docker
 
 Using docker enables you to run soba without anything else installed.
 
@@ -134,18 +148,78 @@ if using docker then add:
 -e GIT_BACKUP_INTERVAL=24
 ```
 
-_Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the
-interval is greater than the duration of a backup._
+_Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the interval is greater than the duration of a backup._
 
 ## rotating backups
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
-following provider specific environment variables:
-- GITHUB_BACKUPS=_x_
-- GITLAB_BACKUPS=_x_
-- BITBUCKET_BACKUPS=_x_
+following provider specific environment variables:  
+`GITHUB_BACKUPS=x`  
+`GITLAB_BACKUPS=x`  
+`BITBUCKET_BACKUPS=x`  
 
-## setting provider tokens
+## logging
+
+### persistence
+
+Messages are written to stdout and can be persisted by directing to a file, e.g.  
+`soba > soba.log`  
+
+#### logging to /var/log/soba
+
+create a user called soba:  
+`sudo adduser soba`  
+create a log directory:  
+`sudo mkdir /var/log/soba`  
+set user permissions:  
+`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`  
+switch to soba user:  
+`sudo su - soba`  
+run soba and direct output:  
+`soba > /var/log/soba/soba.log`
+
+### rotation
+
+[Logrotate](https://linux.die.net/man/8/logrotate) is a utility that comes with most Linux distributions and removes and/or compresses messages older than a certain number of hours or days.  
+This example assumes you persist the log file to /var/log/soba/soba.log  
+create a file in /etc/logrotate.d/soba with the following content:  
+
+    /var/log/soba/soba.log {
+      rotate 7      # remove backups older than seven days
+      daily         # process log file each day
+      compress      # compress the backup
+      copytruncate  # don't delete the file after backup, but instread truncate
+    }
+
+Each day, this copy the latest logs to a new file that is then compressed. The existing log file is then truncated. Any backups older than seven days are then removed.
+
+### keep running after reboot
+
+In case the computer is rebooted or the process ends for another reason, you can ensure it automatically restarts with a simple script and cron job.
+
+#### script
+
+For example:  
+
+    #!/bin/bash -e
+    export GIT_BACKUP_DIR=/backup-dir
+    export GITHUB_TOKEN=xxxxxxx   # avoid hard-coding if possible
+    export GITHUB_BACKUPS=7
+    export GIT_BACKUP_INTERVAL=12
+    export GITHUB_COMPARE=refs
+    /usr/local/bin/soba
+
+#### cron job
+
+ensure the user running soba has an entry in `/etc/cron.allow`. 
+
+run `crontab -e`
+
+add the following (assuming you have a user called soba with a script to run it called backup in their home directory):
+`* * * * * /usr/bin/flock -n /tmp/soba.lockfile /home/soba/backup >> /var/log/soba/soba.log 2>&1`
+
+## setting provider credentials
+
 On Linux and MacOS you can set environment variables manually before each time you run soba:
 
 ```bash
@@ -178,7 +252,9 @@ source /home/<your-user-id>/.bashrc
 ## additional options
 
 ### BitBucket  
+
 #### Repo/Bundle comparison method
+
 Environment variabke: BITBUCKET_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
@@ -189,12 +265,14 @@ Environment variabke: BITBUCKET_COMPARE
 | refs            | Compare refs without downloading (available since soba 1.1.4)  |
 
 ### GitHub
+
 #### Returning Organisations' repositories
 
 Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
 list of organisations in the environment variable: GITHUB_ORGS.
 
-#### Repo/Bundle comparison method
+#### GitHub Repo/Bundle comparison method
+
 Environment variabke: GITHUB_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
@@ -204,8 +282,8 @@ Environment variabke: GITHUB_COMPARE
 | clone (default) | Clone the remote and compare latest bundle                    |
 | refs            | Compare refs without downloading (available since soba 1.1.4) |
 
-
 ### GitLab
+
 #### filtering Projects by access level (available since soba 1.1.3)
 
 The way in which a user's GitLab Projects are returned. By default, every Project a user has at
@@ -220,7 +298,8 @@ override this, by specifying the number matching the desired access level shown 
 | Maintainer   | 40    |
 | Owner        | 50    |
 
-#### Repo/Bundle comparison method 
+#### GitLab Repo/Bundle comparison method
+
 Environment variabke: GITLAB_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
@@ -232,10 +311,10 @@ Environment variabke: GITLAB_COMPARE
 
 ### Comparing remote repository with local backup
 
-By default, each repository will be cloned, bundled, and that bundle compared with the latest local bundle to check if it should be kept or discarded. 
-When processing many large repositories, this can be a lengthy process.     
+By default, each repository will be cloned, bundled, and that bundle compared with the latest local bundle to check if it should be kept or discarded.  
+When processing many large repositories, this can be a lengthy process.  
 Alternatively, you can now compare the Git refs of the latest local bundle with the remote repository without having to clone.
-This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`. 
+This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`.  
 This process is far quicker than cloning but should only be used if the following is understood: Comparing refs means comparing the tips of, and not the entire history of, the repository. [This post on Stack Overflow](https://stackoverflow.com/questions/74281792/git-comparing-local-bundle-with-remote-repository-using-refs-only) goes into additional detail.
 
 ### run on Synology NAS
@@ -272,8 +351,6 @@ This process is far quicker than cloning but should only be used if the followin
 
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
-
-[travis_badge]: https://travis-ci.org/jonhadfield/soba.svg?branch=master[https://travis-ci.org/jonhadfield/soba]
 
 ## restore
 
