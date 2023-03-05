@@ -27,7 +27,7 @@ made and will not produce duplicates. Since version 1.1.4 you can now [check for
 
 ## latest updates
 
-### 1.1.6 released 2022-03-05
+### 1.1.6 released 2023-03-05
 
 - Fixes bug where only first 100 GitHub Organisation repositories are backed up
 - Introduce retries for BitBucket API calls and cloning
