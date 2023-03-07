@@ -163,8 +163,62 @@ func main() {
 	}
 }
 
+func displayStartupConfig() {
+	if backupDIR := os.Getenv("GIT_BACKUP_DIR"); backupDIR != "" {
+		logger.Printf("git backup directory: %s", backupDIR)
+	}
+	if backupInterval := os.Getenv("GIT_BACKUP_INTERVAL"); backupInterval != "" {
+		logger.Printf("git backup interval: %s hours", backupInterval)
+	}
+
+	// output github config
+	if ghToken := os.Getenv("GITHUB_TOKEN"); ghToken != "" {
+		if ghOrgs := strings.ToLower(os.Getenv("GITHUB_ORGS")); ghOrgs != "" {
+			logger.Printf("GitHub Organistations: %s", ghOrgs)
+		}
+		if ghBackups := os.Getenv("GITHUB_BACKUPS"); ghBackups != "" {
+			logger.Printf("GitHub backups to keep: %s", ghBackups)
+		}
+		if strings.ToLower(os.Getenv("GITHUB_COMPARE")) == "refs" {
+			logger.Print("GitHub compare method: refs")
+		} else {
+			logger.Print("GitHub compare method: clone")
+		}
+	}
+
+	// output gitlab config
+	if glToken := os.Getenv("GITLAB_TOKEN"); glToken != "" {
+		if glProjectMinAccessLevel := os.Getenv("GITLAB_PROJECT_MIN_ACCESS_LEVEL"); glProjectMinAccessLevel != "" {
+			logger.Printf("GitLab Project Minimum Access Level: %s", glProjectMinAccessLevel)
+		} else {
+			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.DefaultMinimumProjectAccessLevel)
+
+		}
+		if glBackups := os.Getenv("GITLAB_BACKUPS"); glBackups != "" {
+			logger.Printf("GitLab backups to keep: %s", glBackups)
+		}
+		if strings.ToLower(os.Getenv("GITLAB_COMPARE")) == "refs" {
+			logger.Print("GitLab compare method: refs")
+		} else {
+			logger.Print("GitLab compare method: clone")
+		}
+	}
+
+	// output bitbucket config
+	if bbUser := os.Getenv("BITBUCKET_USER"); bbUser != "" {
+		if bbBackups := os.Getenv("BITBUCKET_BACKUPS"); bbBackups != "" {
+			logger.Printf("BitBucket backups to keep: %s", bbBackups)
+		}
+		if strings.ToLower(os.Getenv("BITBUCKET_COMPARE")) == "refs" {
+			logger.Print("BitBucket compare method: refs")
+		} else {
+			logger.Print("BitBucket compare method: clone")
+		}
+	}
+}
+
 func run() error {
-	logger.Println("starting")
+	displayStartupConfig()
 
 	var backupDIR string
 
