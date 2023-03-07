@@ -247,7 +247,7 @@ source /home/<your-user-id>/.bashrc
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
 | GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
 | GitLab    | GITLAB_TOKEN                    | [instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)                                       |
-|           | GITLAB_PROJECT_MIN_ACCESS_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
+|           | GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
 
 ## additional options
 
@@ -287,7 +287,7 @@ Environment variabke: GITHUB_COMPARE
 #### filtering Projects by access level (available since soba 1.1.3)
 
 The way in which a user's GitLab Projects are returned. By default, every Project a user has at
-least `Reporter` access to will be returned. New environment variable GITLAB_PROJECT_MIN_ACCESS_LEVEL can be set to
+least `Reporter` access to will be returned. New environment variable GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL can be set to
 override this, by specifying the number matching the desired access level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels) and here:  
 
 | Access Level | Value |
@@ -333,8 +333,8 @@ This process is far quicker than cloning but should only be used if the followin
 10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'
 11. Under 'Network' check 'Use the same network as Docker Host'
 12. Under 'Environment' click '+' to add the common configuration:
-    - **variable** GIT_BACKUP_DIR **Value** /backup
-    - **variable** GIT_BACKUP_INTERVAL **Value** (hours between backups)
+    - **variable** GIT\_BACKUP\_DIR **Value** /backup
+    - **variable** GIT\_BACKUP\_INTERVAL **Value** (hours between backups)
 13. Also under 'Environment' click '+' to add the relevant provider specific configuration:
     - **variable** BITBUCKET_USER **Value**
     - **variable** BITBUCKET_KEY **Value**
@@ -345,6 +345,7 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
     - **variable** GITLAB_TOKEN **Value**
     - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL **Value** (Optional - scope of repos to backup)
 14. Click 'Apply'
 15. Leave settings as default and select 'Next'
 16. Check 'Run this container after the wizard is finished' and click 'Apply'
