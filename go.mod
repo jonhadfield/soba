@@ -4,10 +4,10 @@ go 1.19
 
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
-	github.com/jonhadfield/githosts-utils v0.0.0-20230307225025-c1f3212cf438
+	github.com/jonhadfield/githosts-utils v0.0.0-20230310195800-f0e7f1a099ae
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.2
-	golang.org/x/exp v0.0.0-20230307190834-24139beb5833
+	golang.org/x/exp v0.0.0-20230310171629-522b1b587ee0
 )
 
 require (
