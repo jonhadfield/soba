@@ -155,7 +155,7 @@ func main() {
 	if tag != "" && buildDate != "" {
 		logger.Printf("[%s-%s] %s UTC", tag, sha, buildDate)
 	} else if version != "" {
-		logger.Println(version)
+		logger.Println("version", version)
 	}
 
 	if err := run(); err != nil {
