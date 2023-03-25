@@ -1,32 +1,129 @@
+project_name: soba
+
 env:
   - GO111MODULE=on
-#  - GOPROXY="https://proxy.golang.org,direct"
+  - GOPROXY=https://proxy.golang.org
+  - CGO_ENABLED=0
 
 before:
   hooks:
+    - make clean
     - go mod tidy
+
+builds:
+  - id: soba-macos
+    binary: soba
+    goos:
+      - darwin
+    goarch:
+      - amd64
+    flags:
+      - -trimpath
+    ldflags:
+      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+    hooks:
+      post: |
+        sh -c '
+        cat > /tmp/soba-gon-amd64.hcl << EOF
+        source = ["./dist/soba-macos_darwin_amd64/soba"]
+        bundle_id = "uk.co.lessknown.soba"
+        apple_id {
+          username = "jon@lessknown.co.uk"
+          password = "@env:AC_PASSWORD"
+        }
+        sign {
+          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+        }
+        zip {
+          output_path = "./dist/soba_Darwin_amd64.zip"
+        }
+        EOF
+        gon /tmp/soba-gon-amd64.hcl
+        '
+
+  - id: soba-macos-arm
+    binary: soba
+    goos:
+      - darwin
+    goarch:
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+    hooks:
+      post: |
+        sh -c '
+        cat > /tmp/soba-gon-arm64.hcl << EOF
+        source = ["./dist/soba-macos-arm_darwin_arm64/soba"]
+        bundle_id = "uk.co.lessknown.soba"
+        apple_id {
+          username = "jon@lessknown.co.uk"
+          password = "@env:AC_PASSWORD"
+        }
+        sign {
+          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+        }
+        zip {
+          output_path = "./dist/soba_Darwin_arm64.zip"
+        }
+        EOF
+        gon /tmp/soba-gon-arm64.hcl
+        '
+  - id: soba
+    binary: soba
+    goos:
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 6
+      - 7
+    flags:
+      - -trimpath
+    ldflags:
+      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+
+archives:
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    replacements:
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+    builds:
+      - soba
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - none*
+
+release:
+  github:
+    owner: jonhadfield
+    name: soba
+  prerelease: auto
+  name_template: '{{ .Tag }}'
+  extra_files:
+    - glob: ./dist/soba_Darwin*.zip
+
+announce:
+  skip: true
+
+snapshot:
+  name_template: "{{ .Tag }}-devel"
+
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
-    - Merge pull request
-    - Merge branch
-builds:
-  - binary: soba
-    env:
-    - CGO_ENABLED=0
+    - README
+    - test
+    - ignore
 
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-      - amd64
-      - arm
-      - arm64
-
-archives:
-  - id: default
-    wrap_in_directory: true
+checksum:
+  name_template: 'checksums.txt'
