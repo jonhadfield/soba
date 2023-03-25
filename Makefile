@@ -8,6 +8,9 @@ setup:
 	go get -u golang.org/x/tools/cmd/cover
 	gometalinter --install
 
+clean:
+	rm -rf ./dist
+
 # This requires credentials are set for all providers!!!
 test:
 	echo 'mode: atomic' > coverage.txt && go list ./... | xargs -n1 -I{} sh -c 'go test -v -timeout=600s -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
