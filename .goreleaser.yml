@@ -9,23 +9,54 @@ before:
   hooks:
     - make clean
     - go mod tidy
-
 builds:
-  - id: soba-macos
-    binary: soba
-    goos:
-      - darwin
-    goarch:
-      - amd64
-    flags:
-      - -trimpath
-    ldflags:
-      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
-    hooks:
-      post: |
+- id: soba
+  binary: soba
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - darwin
+    - linux
+    - windows
+    - freebsd
+  goarch:
+    - amd64
+    - arm
+    - arm64
+  goarm:
+    - 6
+    - 7
+  flags:
+    - -trimpath
+  ldflags:
+    - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+  ignore:
+    - goos: darwin
+      goarch: arm
+  hooks:
+    post:
+      - |
         sh -c '
-        cat > /tmp/soba-gon-amd64.hcl << EOF
-        source = ["./dist/soba-macos_darwin_amd64/soba"]
+        cat > /tmp/soba_gon_arm64.hcl << EOF
+        source = ["./dist/soba-darwin-arm64/soba"]
+        bundle_id = "uk.co.lessknown.soba"
+        apple_id {
+          username = "jon@lessknown.co.uk"
+          password = "@env:AC_PASSWORD"
+        }
+        sign {
+          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+         }
+        zip {
+          output_path = "./dist/soba_darwin_arm64.zip"
+        }
+        EOF
+        gon /tmp/soba_gon_arm64.hcl
+        '
+      - |
+        sh -c '
+        cat > /tmp/soba_gon_amd64.hcl << EOF
+        source = ["./dist/soba-darwin-amd64/soba"]
         bundle_id = "uk.co.lessknown.soba"
         apple_id {
           username = "jon@lessknown.co.uk"
@@ -35,72 +66,45 @@ builds:
           application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
         }
         zip {
-          output_path = "./dist/soba_Darwin_amd64.zip"
+          output_path = "./dist/soba_darwin_amd64.zip"
         }
         EOF
-        gon /tmp/soba-gon-amd64.hcl
+        gon /tmp/soba_gon_amd64.hcl
         '
-
-  - id: soba-macos-arm
-    binary: soba
-    goos:
-      - darwin
-    goarch:
-      - arm64
-    flags:
-      - -trimpath
-    ldflags:
-      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
-    hooks:
-      post: |
-        sh -c '
-        cat > /tmp/soba-gon-arm64.hcl << EOF
-        source = ["./dist/soba-macos-arm_darwin_arm64/soba"]
-        bundle_id = "uk.co.lessknown.soba"
-        apple_id {
-          username = "jon@lessknown.co.uk"
-          password = "@env:AC_PASSWORD"
-        }
-        sign {
-          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-        }
-        zip {
-          output_path = "./dist/soba_Darwin_arm64.zip"
-        }
-        EOF
-        gon /tmp/soba-gon-arm64.hcl
-        '
-  - id: soba
-    binary: soba
-    goos:
-      - linux
-      - windows
-    goarch:
-      - amd64
-      - arm64
-    goarm:
-      - 6
-      - 7
-    flags:
-      - -trimpath
-    ldflags:
-      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
-
 archives:
-  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-    replacements:
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    builds:
-      - soba
-    format: tar.gz
-    format_overrides:
-      - goos: windows
-        format: zip
-    files:
-      - none*
+- name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ end }}"
+  replacements:
+    linux: Linux
+    windows: Windows
+    amd64: x86_64
+  builds:
+    - soba
+  format: tar.gz
+  format_overrides:
+    - goos: windows
+      format: zip
+  files:
+    - none*
+
+#         sh -c '
+#         cat > /tmp/soba-gon-arm64.hcl << EOF
+#         source = ["./dist/soba_darwin_arm64/soba"]
+#         bundle_id = "uk.co.lessknown.soba"
+#         apple_id {
+#           username = "jon@lessknown.co.uk"
+#           password = "@env:AC_PASSWORD"
+#         }
+#         sign {
+#           application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+#         }
+#         zip {
+#           output_path = "./dist/soba_macos_arm64.zip"
+#         }
+#         EOF
+#         gon /tmp/soba-gon.hcl
+#         '
+#
+
 
 release:
   github:
@@ -109,7 +113,7 @@ release:
   prerelease: auto
   name_template: '{{ .Tag }}'
   extra_files:
-    - glob: ./dist/soba_Darwin*.zip
+   - glob: ./dist/soba_darwin*.zip
 
 announce:
   skip: true
