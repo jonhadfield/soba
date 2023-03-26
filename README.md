@@ -27,19 +27,22 @@ made and will not produce duplicates. Since version 1.1.4 you can now [check for
 
 ## latest updates
 
-### 1.1.7 released 2023-03-10
+### 1.1.11 released 2023-03-26
 
-- Fix for refs comparison for BitBucket
-- Minor logging improvements
+- Fix goreleaser to build and distribute docker release
 
-### 1.1.6 released 2023-03-05
+### 1.1.10 released 2023-03-26
 
-- Fixes bug where only first 100 GitHub Organisation repositories are backed up
-- Introduce retries for BitBucket API calls and cloning
+- Notarize binaries produced for MacOS to remove unknown developer warning
+- note: missing docker release
 
-### 1.1.5 released 2022-12-20
+### 1.1.9 released 2023-03-11
 
-- Maintenance release
+- Improve refs comparison mode
+
+### 1.1.8 released 2023-03-11
+
+- Fixes edge case where refs with spaces returned an error and forced clone in when in refs mode
 
 See full changelog [here](./CHANGELOG.md).
 

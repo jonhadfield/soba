@@ -1,3 +1,20 @@
+### 1.1.11 released 2023-03-26
+
+- Fix goreleaser to build and distribute docker release
+
+### 1.1.10 released 2023-03-26
+
+- Notarize binaries produced for MacOS to remove unknown developer warning
+- note: missing docker release
+
+### 1.1.9 released 2023-03-11
+
+- Improve refs comparison mode
+
+### 1.1.8 released 2023-03-11
+
+- Fixes edge case where refs with spaces returned an error and forced clone in when in refs mode
+
 ### 1.1.7 released 2023-03-10
 
 - Fix for refs comparison for BitBucket
