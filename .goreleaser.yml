@@ -83,17 +83,7 @@ builds:
     - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
 
 archives:
-# - name_template: >-
-#     {{ .ProjectName }}_
-#     {{- .Os }}_
-#     {{- if eq .Arch "amd64" }}x86_64
-#     {{- else if eq .Arch "386" }}i386
-#     {{- else }}{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ end }}
--
-  replacements:
-    linux: Linux
-    windows: Windows
-    amd64_1: x86_64
+- name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
   builds:
     - soba
   format: tar.gz
