@@ -10,12 +10,66 @@ before:
     - make clean
     - go mod tidy
 builds:
-- id: soba
+-
+  id: macos-soba
+  binary: soba
+  goos:
+    - darwin
+  goarch:
+    - amd64
+    - arm64
+  flags:
+    - -trimpath
+  ldflags:
+    - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+  hooks:
+    post:
+      - |
+        sh -c '
+        cat > /tmp/soba_gon_arm64.hcl << EOF
+        source = ["./dist/macos-soba_darwin_arm64/soba"]
+        bundle_id = "uk.co.lessknown.soba"
+        apple_id {
+          username = "jon@lessknown.co.uk"
+          password = "@env:AC_PASSWORD"
+        }
+        sign {
+          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+        }
+        zip {
+          output_path = "./dist/soba_darwin_arm64.zip"
+        }
+        EOF
+        gon /tmp/soba_gon_arm64.hcl
+        echo $?
+        '
+        echo $?
+      - |
+        sh -c '
+        cat > /tmp/soba_gon_amd64.hcl << EOF
+        source = ["./dist/macos-soba_darwin_amd64_v1/soba"]
+        bundle_id = "uk.co.lessknown.soba"
+        apple_id {
+          username = "jon@lessknown.co.uk"
+          password = "@env:AC_PASSWORD"
+        }
+        sign {
+          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+        }
+        zip {
+          output_path = "./dist/soba_darwin_amd64_v1.zip"
+        }
+        EOF
+        echo $?
+        gon /tmp/soba_gon_amd64.hcl
+        echo $?
+        '
+-
+  id: soba
   binary: soba
   env:
     - CGO_ENABLED=0
   goos:
-    - darwin
     - linux
     - windows
     - freebsd
@@ -23,60 +77,23 @@ builds:
     - amd64
     - arm
     - arm64
-  goarm:
-    - 6
-    - 7
   flags:
     - -trimpath
   ldflags:
     - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
-  ignore:
-    - goos: darwin
-      goarch: arm
-  hooks:
-    post:
-      - |
-        sh -c '
-        cat > /tmp/soba_gon_arm64.hcl << EOF
-        source = ["./dist/soba-darwin-arm64/soba"]
-        bundle_id = "uk.co.lessknown.soba"
-        apple_id {
-          username = "jon@lessknown.co.uk"
-          password = "@env:AC_PASSWORD"
-        }
-        sign {
-          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-         }
-        zip {
-          output_path = "./dist/soba_darwin_arm64.zip"
-        }
-        EOF
-        gon /tmp/soba_gon_arm64.hcl
-        '
-      - |
-        sh -c '
-        cat > /tmp/soba_gon_amd64.hcl << EOF
-        source = ["./dist/soba-darwin-amd64/soba"]
-        bundle_id = "uk.co.lessknown.soba"
-        apple_id {
-          username = "jon@lessknown.co.uk"
-          password = "@env:AC_PASSWORD"
-        }
-        sign {
-          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-        }
-        zip {
-          output_path = "./dist/soba_darwin_amd64.zip"
-        }
-        EOF
-        gon /tmp/soba_gon_amd64.hcl
-        '
+
 archives:
-- name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ end }}"
+# - name_template: >-
+#     {{ .ProjectName }}_
+#     {{- .Os }}_
+#     {{- if eq .Arch "amd64" }}x86_64
+#     {{- else if eq .Arch "386" }}i386
+#     {{- else }}{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ end }}
+-
   replacements:
     linux: Linux
     windows: Windows
-    amd64: x86_64
+    amd64_1: x86_64
   builds:
     - soba
   format: tar.gz
@@ -85,26 +102,6 @@ archives:
       format: zip
   files:
     - none*
-
-#         sh -c '
-#         cat > /tmp/soba-gon-arm64.hcl << EOF
-#         source = ["./dist/soba_darwin_arm64/soba"]
-#         bundle_id = "uk.co.lessknown.soba"
-#         apple_id {
-#           username = "jon@lessknown.co.uk"
-#           password = "@env:AC_PASSWORD"
-#         }
-#         sign {
-#           application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-#         }
-#         zip {
-#           output_path = "./dist/soba_macos_arm64.zip"
-#         }
-#         EOF
-#         gon /tmp/soba-gon.hcl
-#         '
-#
-
 
 release:
   github:
