@@ -6,8 +6,8 @@ require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
 	github.com/jonhadfield/githosts-utils v0.0.0-20230325203441-e84d607f9028
 	github.com/pkg/errors v0.9.1
-	github.com/stretchr/testify v1.8.2
-	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
+	github.com/stretchr/testify v1.8.3
+	golang.org/x/exp v0.0.0-20230519143937-03e91628a987
 )
 
 require (
