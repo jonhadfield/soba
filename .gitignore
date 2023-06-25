@@ -28,4 +28,5 @@ testing/backups
 .env
 .vscode
 
+.fleet/
 dist/

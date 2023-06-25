@@ -36,11 +36,15 @@ const (
 	envBitBucketSecret   = "BITBUCKET_SECRET"
 	envBitBucketAPIURL   = "BITBUCKET_APIURL"
 	envBitBucketCompare  = "BITBUCKET_COMPARE"
+	envGiteaToken        = "GITEA_TOKEN"
+	envGiteaAPIURL       = "GITEA_APIURL"
+	envGiteaCompare      = "GITEA_COMPARE"
 
 	// provider names
+	providerNameBitBucket = "BitBucket"
 	providerNameGitHub    = "GitHub"
 	providerNameGitLab    = "GitLab"
-	providerNameBitBucket = "BitBucket"
+	providerNameGitea     = "Gitea"
 )
 
 var (
@@ -60,10 +64,15 @@ var (
 			envBitBucketKey,
 			envBitBucketSecret,
 		},
+		providerNameGitea: {
+			envGiteaAPIURL,
+			envGiteaToken,
+		},
 	}
 	justTokenProviders = []string{
 		providerNameGitHub,
 		providerNameGitLab,
+		providerNameGitea,
 	}
 	userAndPasswordProviders = []string{
 		providerNameBitBucket,
@@ -183,6 +192,21 @@ func displayStartupConfig() {
 			logger.Print("GitHub compare method: refs")
 		} else {
 			logger.Print("GitHub compare method: clone")
+		}
+	}
+
+	// output gitea config
+	if giteaToken := os.Getenv("GITEA_TOKEN"); giteaToken != "" {
+		if giteaOrgs := strings.ToLower(os.Getenv("GITEA_ORGS")); giteaOrgs != "" {
+			logger.Printf("Gitea Organistations: %s", giteaOrgs)
+		}
+		if giteaBackups := os.Getenv("GITEA_BACKUPS"); giteaBackups != "" {
+			logger.Printf("Gitea backups to keep: %s", giteaBackups)
+		}
+		if strings.ToLower(os.Getenv("GITEA_COMPARE")) == "refs" {
+			logger.Print("Gitea compare method: refs")
+		} else {
+			logger.Print("Gitea compare method: clone")
 		}
 	}
 
@@ -309,6 +333,14 @@ func execProviderBackups() {
 	if os.Getenv(envGitHubToken) != "" {
 		logger.Println("backing up GitHub repos")
 		err = githosts.Backup("github", backupDIR, os.Getenv("GITHUB_APIURL"), os.Getenv(envGitHubCompare))
+		if err != nil {
+			logger.Fatal(err)
+		}
+	}
+
+	if os.Getenv(envGiteaToken) != "" {
+		logger.Println("backing up Gitea repos")
+		err = githosts.Backup("gitea", backupDIR, os.Getenv(envGiteaAPIURL), os.Getenv(envGiteaCompare))
 		if err != nil {
 			logger.Fatal(err)
 		}
