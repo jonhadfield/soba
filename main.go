@@ -215,8 +215,7 @@ func displayStartupConfig() {
 		if glProjectMinAccessLevel := os.Getenv("GITLAB_PROJECT_MIN_ACCESS_LEVEL"); glProjectMinAccessLevel != "" {
 			logger.Printf("GitLab Project Minimum Access Level: %s", glProjectMinAccessLevel)
 		} else {
-			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.DefaultMinimumProjectAccessLevel)
-
+			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.GitlabDefaultMinimumProjectAccessLevel)
 		}
 		if glBackups := os.Getenv("GITLAB_BACKUPS"); glBackups != "" {
 			logger.Printf("GitLab backups to keep: %s", glBackups)
