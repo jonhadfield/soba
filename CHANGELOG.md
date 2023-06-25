@@ -1,3 +1,7 @@
+### 1.1.12 released 2023-06-25
+
+- Add support for Gitea
+
 ### 1.1.11 released 2023-03-26
 
 - Fix goreleaser to build and distribute docker release
