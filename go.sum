@@ -13,6 +13,8 @@ github.com/jonhadfield/githosts-utils v0.0.0-20230625135022-a9f43caf4d5c h1:HDyp
 github.com/jonhadfield/githosts-utils v0.0.0-20230625135022-a9f43caf4d5c/go.mod h1:73HF3wpEZh53zRbOFmiTjy1xNDnyAKcVDTg25ueCjCc=
 github.com/jonhadfield/githosts-utils v0.0.0-20230625141953-c0213d98579f h1:lI0UTOF8nkYtMeA9A/M+1F3VJKjJf6Z8FHsL9XWuA/A=
 github.com/jonhadfield/githosts-utils v0.0.0-20230625141953-c0213d98579f/go.mod h1:tznTL41bW+RwQESdLCYdeR5gZNbR1DdaGw0ZwSJQ6JI=
+github.com/jonhadfield/githosts-utils v0.0.0-20230625155053-035bb069bc7f h1:NLbGK2e2SEC+kBHqj67WELwLo0ycb9qz3HZHENXDLfo=
+github.com/jonhadfield/githosts-utils v0.0.0-20230625155053-035bb069bc7f/go.mod h1:tznTL41bW+RwQESdLCYdeR5gZNbR1DdaGw0ZwSJQ6JI=
 github.com/kr/pretty v0.3.0 h1:WgNl7dwNpEZ6jJ9k1snq4pZsg7DOEN8hP9Xw0Tsjwk0=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
