@@ -17,6 +17,7 @@ var sobaEnvVarKeys = []string{
 	envGitBackupDir, envGitHubToken, "GITHUB_BACKUPS", envGitLabToken, "GITLAB_BACKUPS", envGitLabAPIURL,
 	envGitHubCompare, envGitLabCompare, envBitBucketCompare,
 	envBitBucketUser, envBitBucketKey, envBitBucketSecret, "BITBUCKET_BACKUPS",
+	envGiteaAPIURL, envGiteaToken, envGiteaCompare, "GITEA_BACKUPS",
 }
 
 func removeContents(dir string) error {
@@ -336,6 +337,26 @@ func TestPublicGitLabRepositoryBackup2(t *testing.T) {
 	require.NoError(t, run())
 }
 
+func TestGiteaRepositoryBackup(t *testing.T) {
+	if os.Getenv(envGiteaToken) == "" {
+		t.Skip("Skipping Gitea test as GITEA_TOKEN is missing")
+	}
+
+	if os.Getenv(envGiteaAPIURL) == "" {
+		t.Skip("Skipping Gitea test as GITEA_APIURL is missing")
+	}
+
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	preflight()
+	resetGlobals()
+	defer resetBackups()
+
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGiteaToken, envGiteaAPIURL})
+	require.NoError(t, run())
+}
+
 func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	if os.Getenv(envBitBucketUser) == "" {
 		t.Skip("Skipping BitBucket test as BITBUCKET_USER is missing")
@@ -352,22 +373,6 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	require.NoError(t, run())
 	require.NoError(t, run())
 	restoreEnvironmentVariables(envBackup)
-}
-
-func TestPublicBitBucketRepositoryBackup(t *testing.T) {
-	if os.Getenv(envBitBucketUser) == "" {
-		t.Skip("Skipping BitBucket test as BITBUCKET_USER is missing")
-	}
-
-	envBackup := backupEnvironmentVariables()
-	defer restoreEnvironmentVariables(envBackup)
-
-	preflight()
-	resetGlobals()
-	defer resetBackups()
-
-	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
-	require.NoError(t, run())
 }
 
 func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
