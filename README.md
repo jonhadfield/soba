@@ -20,12 +20,16 @@
 
 soba is tool for backing up private and public git repositories hosted on the
 most popular hosting providers. It generates a [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling) that stores a backup of each repository as a
-single file.  
+single file.
 
 An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been
 made and will not produce duplicates. Since version 1.1.4 you can now [check for changes without cloning](#comparing-remote-repository-with-local-backup).
 
 ## latest updates
+
+### 1.1.12 released 2023-06-25
+
+- Add support for Gitea
 
 ### 1.1.11 released 2023-03-26
 
@@ -48,13 +52,14 @@ See full changelog [here](./CHANGELOG.md).
 
 ## supported OSes
 
-Tested on Windows 10, MacOS, and Linux (amd64).  
+Tested on Windows 10, MacOS, and Linux (amd64).
 Not tested, but should also work on builds for: Linux (386, arm386 and arm64), FreeBSD, NetBSD, and OpenBSD.
 
 ## supported providers
 
 - BitBucket
-- GitHub (including organisations)
+- Gitea
+- GitHub
 - GitLab
 
 ## configuration
@@ -139,36 +144,37 @@ _Note: the interval is added to the start of the last backup and not the time it
 ## rotating backups
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
-following provider specific environment variables:  
-`GITHUB_BACKUPS=x`  
-`GITLAB_BACKUPS=x`  
-`BITBUCKET_BACKUPS=x`  
+following provider specific environment variables:
+`GITEA_BACKUPS=x`
+`GITHUB_BACKUPS=x`
+`GITLAB_BACKUPS=x`
+`BITBUCKET_BACKUPS=x`
 
 ## logging
 
 ### persistence
 
-Messages are written to stdout and can be persisted by directing to a file, e.g.  
-`soba > soba.log`  
+Messages are written to stdout and can be persisted by directing to a file, e.g.
+`soba > soba.log`
 
 #### logging to /var/log/soba
 
-create a user called soba:  
-`sudo adduser soba`  
-create a log directory:  
-`sudo mkdir /var/log/soba`  
-set user permissions:  
-`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`  
-switch to soba user:  
-`sudo su - soba`  
-run soba and direct output:  
+create a user called soba:
+`sudo adduser soba`
+create a log directory:
+`sudo mkdir /var/log/soba`
+set user permissions:
+`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`
+switch to soba user:
+`sudo su - soba`
+run soba and direct output:
 `soba > /var/log/soba/soba.log`
 
 ### rotation
 
-[Logrotate](https://linux.die.net/man/8/logrotate) is a utility that comes with most Linux distributions and removes and/or compresses messages older than a certain number of hours or days.  
-This example assumes you persist the log file to /var/log/soba/soba.log  
-create a file in /etc/logrotate.d/soba with the following content:  
+[Logrotate](https://linux.die.net/man/8/logrotate) is a utility that comes with most Linux distributions and removes and/or compresses messages older than a certain number of hours or days.
+This example assumes you persist the log file to /var/log/soba/soba.log
+create a file in /etc/logrotate.d/soba with the following content:
 
     /var/log/soba/soba.log {
       rotate 7      # remove backups older than seven days
@@ -185,7 +191,7 @@ In case the computer is rebooted or the process ends for another reason, you can
 
 #### script
 
-For example:  
+For example:
 
     #!/bin/bash -e
     export GIT_BACKUP_DIR=/backup-dir
@@ -197,7 +203,7 @@ For example:
 
 #### cron job
 
-ensure the user running soba has an entry in `/etc/cron.allow`. 
+ensure the user running soba has an entry in `/etc/cron.allow`.
 
 run `crontab -e`
 
@@ -231,17 +237,19 @@ source /home/<your-user-id>/.bashrc
 | BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)       |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
+| Gitea     | GITEA_APIURL                    | e.g. https://gitea.example.com/api/v1|
+|           | GITEA_TOKEN                     | [instructions](https://docs.gitea.com/development/api-usage#generating-and-listing-api-tokens)|
 | GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
 | GitLab    | GITLAB_TOKEN                    | [instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)                                       |
 |           | GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
 
 ## additional options
 
-### BitBucket  
+### BitBucket
 
 #### Repo/Bundle comparison method
 
-Environment variabke: BITBUCKET_COMPARE
+Environment variable: BITBUCKET_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
 
@@ -249,6 +257,25 @@ Environment variabke: BITBUCKET_COMPARE
 |:----------------|:---------------------------------------------------------------|
 | clone (default) | Clone the remote and compare latest bundle                     |
 | refs            | Compare refs without downloading (available since soba 1.1.4)  |
+
+### Gitea
+
+#### Returning Organisations' repositories
+
+Repositories in Gitea organisations are not backed up by default. To back these up, specify a comma separated
+list of organisations in the environment variable: GITEA_ORGS. To include "all" organisations, set to `*`.
+
+#### Gitea Repo/Bundle comparison method
+
+Environment variable: GITEA_COMPARE
+
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |                                                               |
+|:----------------|:--------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle                    |
+| refs            | Compare refs without downloading (available since soba 1.1.4) |
+
 
 ### GitHub
 
@@ -259,7 +286,7 @@ list of organisations in the environment variable: GITHUB_ORGS.
 
 #### GitHub Repo/Bundle comparison method
 
-Environment variabke: GITHUB_COMPARE
+Environment variable: GITHUB_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
 
@@ -274,7 +301,7 @@ Environment variabke: GITHUB_COMPARE
 
 The way in which a user's GitLab Projects are returned. By default, every Project a user has at
 least `Reporter` access to will be returned. New environment variable GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL can be set to
-override this, by specifying the number matching the desired access level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels) and here:  
+override this, by specifying the number matching the desired access level shown [here](https://docs.gitlab.com/ee/api/members.html#valid-access-levels) and here:
 
 | Access Level | Value |
 |:-------------|:------|
@@ -286,7 +313,7 @@ override this, by specifying the number matching the desired access level shown 
 
 #### GitLab Repo/Bundle comparison method
 
-Environment variabke: GITLAB_COMPARE
+Environment variable: GITLAB_COMPARE
 
 [See explanation below](#comparing-remote-repository-with-local-backup)
 
@@ -297,10 +324,10 @@ Environment variabke: GITLAB_COMPARE
 
 ### Comparing remote repository with local backup
 
-By default, each repository will be cloned, bundled, and that bundle compared with the latest local bundle to check if it should be kept or discarded.  
-When processing many large repositories, this can be a lengthy process.  
+By default, each repository will be cloned, bundled, and that bundle compared with the latest local bundle to check if it should be kept or discarded.
+When processing many large repositories, this can be a lengthy process.
 Alternatively, you can now compare the Git refs of the latest local bundle with the remote repository without having to clone.
-This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`.  
+This is carried out using native commands `git bundle list-heads <bundle file>` and `git ls-remote <remote repository>`.
 This process is far quicker than cloning but should only be used if the following is understood: Comparing refs means comparing the tips of, and not the entire history of, the repository. [This post on Stack Overflow](https://stackoverflow.com/questions/74281792/git-comparing-local-bundle-with-remote-repository-using-refs-only) goes into additional detail.
 
 ### run on Synology NAS
@@ -313,7 +340,7 @@ This process is far quicker than cloning but should only be used if the followin
 4. Select 'Add' from the top menu and choose 'Add From URL'
 5. In 'Repository URL' enter 'jonhadfield/soba', leave other options as default and click 'Add'
 6. When it asks to 'Choose Tag' accept the default 'latest' by pressing 'Select'
-7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu  
+7. Select image 'jonhadfield/soba:latest' from the list and click 'Launch' from the top menu
 8. Set 'Container Name' to 'soba' and select 'Advanced Settings'
 9. Check 'Enable auto-restart'
 10. Under 'Volume' select 'Add folder' and choose the directory created in step 1. Set the 'Mount Path' to '/backup'
@@ -326,6 +353,10 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** BITBUCKET_KEY **Value**
     - **variable** BITBUCKET_SECRET **Value**
     - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** GITEA_APIURL **Value**
+    - **variable** GITEA_TOKEN **Value**
+    - **variable** GITEA_ORGS **Value**
+    - **variable** GITEA_BACKUPS **Value**
     - **variable** GITHUB_TOKEN **Value**
     - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
     - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
