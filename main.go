@@ -16,29 +16,33 @@ import (
 )
 
 const (
-	appName        = "soba"
-	workingDIRName = ".working"
-	workingDIRMode = 0o755
-
-	pathSep = string(os.PathSeparator)
+	appName              = "soba"
+	workingDIRName       = ".working"
+	workingDIRMode       = 0o755
+	defaultBackupsToKeep = 2
+	pathSep              = string(os.PathSeparator)
 
 	// env vars
 	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
 	envGitBackupDir      = "GIT_BACKUP_DIR"
+	envGitHubAPIURL      = "GITHUB_APIURL"
 	envGitHubToken       = "GITHUB_TOKEN"
 	envGitHubOrgs        = "GITHUB_ORGS"
 	envGitHubCompare     = "GITHUB_COMPARE"
 	envGitLabToken       = "GITLAB_TOKEN"
 	envGitLabAPIURL      = "GITLAB_APIURL"
+	envGitLabUser        = "GITLAB_USER"
 	envGitLabCompare     = "GITLAB_COMPARE"
 	envBitBucketUser     = "BITBUCKET_USER"
 	envBitBucketKey      = "BITBUCKET_KEY"
 	envBitBucketSecret   = "BITBUCKET_SECRET"
 	envBitBucketAPIURL   = "BITBUCKET_APIURL"
 	envBitBucketCompare  = "BITBUCKET_COMPARE"
+	envBitBucketBackups  = "BITBUCKET_BACKUPS"
 	envGiteaToken        = "GITEA_TOKEN"
 	envGiteaAPIURL       = "GITEA_APIURL"
 	envGiteaCompare      = "GITEA_COMPARE"
+	envGiteaOrgs         = "GITEA_ORGS"
 
 	// provider names
 	providerNameBitBucket = "BitBucket"
@@ -305,53 +309,110 @@ func run() error {
 	return nil
 }
 
+func getOrgsListFromEnvVar(envVar string) []string {
+	orgsList := os.Getenv(envVar)
+
+	if orgsList == "" {
+		return []string{}
+	}
+
+	return strings.Split(orgsList, ",")
+}
+
 func execProviderBackups() {
 	var err error
 
 	startTime := time.Now()
-	backupDIR := os.Getenv(envGitBackupDir)
+
+	backupDir := os.Getenv(envGitBackupDir)
 
 	if os.Getenv(envBitBucketUser) != "" {
 		logger.Println("backing up BitBucket repos")
 
-		err = githosts.Backup("bitbucket", backupDIR, os.Getenv(envBitBucketAPIURL), os.Getenv(envBitBucketCompare))
+		var bitbucketHost *githosts.BitbucketHost
+
+		bitbucketHost, err = githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
+			APIURL:           os.Getenv(envBitBucketAPIURL),
+			DiffRemoteMethod: os.Getenv(envBitBucketCompare),
+			BackupDir:        backupDir,
+			User:             os.Getenv(envBitBucketUser),
+			Key:              os.Getenv(envBitBucketKey),
+			Secret:           os.Getenv(envBitBucketSecret),
+		})
 		if err != nil {
 			logger.Fatal(err)
 		}
+
+		bitbucketHost.Backup()
+	}
+
+	if os.Getenv(envGiteaToken) != "" {
+		logger.Println("backing up Gitea repos")
+
+		var giteaHost *githosts.GiteaHost
+
+		giteaHost, err = githosts.NewGiteaHost(githosts.NewGiteaHostInput{
+			APIURL:           os.Getenv(envGiteaAPIURL),
+			DiffRemoteMethod: os.Getenv(envGiteaCompare),
+			BackupDir:        backupDir,
+			Token:            os.Getenv(envGiteaToken),
+			Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
+		})
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		giteaHost.Backup()
+	}
+
+	if os.Getenv(envGitHubToken) != "" {
+		logger.Println("backing up GitHub repos")
+
+		var githubHost *githosts.GitHubHost
+
+		githubHost, err = githosts.NewGitHubHost(githosts.NewGitHubHostInput{
+			APIURL:           os.Getenv(envGitHubAPIURL),
+			DiffRemoteMethod: os.Getenv(envGitHubCompare),
+			BackupDir:        backupDir,
+			Token:            os.Getenv(envGitHubToken),
+			Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
+		})
+		if err != nil {
+			logger.Fatal(err)
+		}
+
+		githubHost.Backup()
 	}
 
 	if os.Getenv(envGitLabToken) != "" {
 		logger.Println("backing up GitLab repos")
 
-		err = githosts.Backup("gitlab", backupDIR, os.Getenv(envGitLabAPIURL), os.Getenv(envGitLabCompare))
-		if err != nil {
-			logger.Fatal(err)
-		}
-	}
+		var gitlabHost *githosts.GitlabHost
 
-	if os.Getenv(envGitHubToken) != "" {
-		logger.Println("backing up GitHub repos")
-		err = githosts.Backup("github", backupDIR, os.Getenv("GITHUB_APIURL"), os.Getenv(envGitHubCompare))
+		gitlabHost, err = githosts.NewGitlabHost(githosts.NewGitlabHostInput{
+			APIURL:           os.Getenv(envGitLabAPIURL),
+			DiffRemoteMethod: os.Getenv(envGitLabCompare),
+			BackupDir:        backupDir,
+			Token:            os.Getenv(envGitLabToken),
+		})
 		if err != nil {
 			logger.Fatal(err)
 		}
-	}
 
-	if os.Getenv(envGiteaToken) != "" {
-		logger.Println("backing up Gitea repos")
-		err = githosts.Backup("gitea", backupDIR, os.Getenv(envGiteaAPIURL), os.Getenv(envGiteaCompare))
-		if err != nil {
-			logger.Fatal(err)
-		}
+		gitlabHost.Backup()
 	}
 
 	logger.Println("cleaning up")
 
-	delErr := os.RemoveAll(backupDIR + pathSep + workingDIRName + pathSep)
+	// startFileRemovals := time.Now()
+	delErr := os.RemoveAll(backupDir + pathSep + workingDIRName + pathSep)
 	if delErr != nil {
 		logger.Printf("failed to delete working directory: %s",
-			backupDIR+pathSep+workingDIRName)
+			backupDir+pathSep+workingDIRName)
 	}
+
+	// TODO: use a debug flag to enable this
+	// logger.Printf("file removals took %s", time.Since(startFileRemovals).String())
 
 	logger.Println("backups complete")
 
