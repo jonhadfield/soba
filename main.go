@@ -23,26 +23,29 @@ const (
 	pathSep              = string(os.PathSeparator)
 
 	// env vars
-	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
-	envGitBackupDir      = "GIT_BACKUP_DIR"
-	envGitHubAPIURL      = "GITHUB_APIURL"
-	envGitHubToken       = "GITHUB_TOKEN"
-	envGitHubOrgs        = "GITHUB_ORGS"
-	envGitHubCompare     = "GITHUB_COMPARE"
-	envGitLabToken       = "GITLAB_TOKEN"
-	envGitLabAPIURL      = "GITLAB_APIURL"
-	envGitLabUser        = "GITLAB_USER"
-	envGitLabCompare     = "GITLAB_COMPARE"
-	envBitBucketUser     = "BITBUCKET_USER"
-	envBitBucketKey      = "BITBUCKET_KEY"
-	envBitBucketSecret   = "BITBUCKET_SECRET"
-	envBitBucketAPIURL   = "BITBUCKET_APIURL"
-	envBitBucketCompare  = "BITBUCKET_COMPARE"
-	envBitBucketBackups  = "BITBUCKET_BACKUPS"
-	envGiteaToken        = "GITEA_TOKEN"
-	envGiteaAPIURL       = "GITEA_APIURL"
-	envGiteaCompare      = "GITEA_COMPARE"
-	envGiteaOrgs         = "GITEA_ORGS"
+	envGitBackupInterval    = "GIT_BACKUP_INTERVAL"
+	envGitBackupDir         = "GIT_BACKUP_DIR"
+	envGitHubAPIURL         = "GITHUB_APIURL"
+	envGitHubBackups        = "GITHUB_BACKUPS"
+	envGitHubToken          = "GITHUB_TOKEN"
+	envGitHubOrgs           = "GITHUB_ORGS"
+	envGitHubCompare        = "GITHUB_COMPARE"
+	envGitLabBackups        = "GITLAB_BACKUPS"
+	envGitLabMinAccessLevel = "GITLAB_PROJECT_MIN_ACCESS_LEVEL"
+	envGitLabToken          = "GITLAB_TOKEN"
+	envGitLabAPIURL         = "GITLAB_APIURL"
+	envGitLabCompare        = "GITLAB_COMPARE"
+	envBitBucketUser        = "BITBUCKET_USER"
+	envBitBucketKey         = "BITBUCKET_KEY"
+	envBitBucketSecret      = "BITBUCKET_SECRET"
+	envBitBucketAPIURL      = "BITBUCKET_APIURL"
+	envBitBucketCompare     = "BITBUCKET_COMPARE"
+	envBitBucketBackups     = "BITBUCKET_BACKUPS"
+	envGiteaToken           = "GITEA_TOKEN"
+	envGiteaAPIURL          = "GITEA_APIURL"
+	envGiteaBackups         = "GITEA_BACKUPS"
+	envGiteaCompare         = "GITEA_COMPARE"
+	envGiteaOrgs            = "GITEA_ORGS"
 
 	// provider names
 	providerNameBitBucket = "BitBucket"
@@ -177,22 +180,22 @@ func main() {
 }
 
 func displayStartupConfig() {
-	if backupDIR := os.Getenv("GIT_BACKUP_DIR"); backupDIR != "" {
+	if backupDIR := os.Getenv(envGitBackupDir); backupDIR != "" {
 		logger.Printf("git backup directory: %s", backupDIR)
 	}
-	if backupInterval := os.Getenv("GIT_BACKUP_INTERVAL"); backupInterval != "" {
+	if backupInterval := os.Getenv(envGitBackupInterval); backupInterval != "" {
 		logger.Printf("git backup interval: %s hours", backupInterval)
 	}
 
 	// output github config
-	if ghToken := os.Getenv("GITHUB_TOKEN"); ghToken != "" {
-		if ghOrgs := strings.ToLower(os.Getenv("GITHUB_ORGS")); ghOrgs != "" {
+	if ghToken := os.Getenv(envGitHubToken); ghToken != "" {
+		if ghOrgs := strings.ToLower(os.Getenv(envGitHubOrgs)); ghOrgs != "" {
 			logger.Printf("GitHub Organistations: %s", ghOrgs)
 		}
-		if ghBackups := os.Getenv("GITHUB_BACKUPS"); ghBackups != "" {
+		if ghBackups := os.Getenv(envGitHubBackups); ghBackups != "" {
 			logger.Printf("GitHub backups to keep: %s", ghBackups)
 		}
-		if strings.ToLower(os.Getenv("GITHUB_COMPARE")) == "refs" {
+		if strings.ToLower(os.Getenv(envGitHubCompare)) == "refs" {
 			logger.Print("GitHub compare method: refs")
 		} else {
 			logger.Print("GitHub compare method: clone")
@@ -200,14 +203,14 @@ func displayStartupConfig() {
 	}
 
 	// output gitea config
-	if giteaToken := os.Getenv("GITEA_TOKEN"); giteaToken != "" {
-		if giteaOrgs := strings.ToLower(os.Getenv("GITEA_ORGS")); giteaOrgs != "" {
+	if giteaToken := os.Getenv(envGiteaToken); giteaToken != "" {
+		if giteaOrgs := strings.ToLower(os.Getenv(envGiteaOrgs)); giteaOrgs != "" {
 			logger.Printf("Gitea Organistations: %s", giteaOrgs)
 		}
-		if giteaBackups := os.Getenv("GITEA_BACKUPS"); giteaBackups != "" {
+		if giteaBackups := os.Getenv(envGiteaBackups); giteaBackups != "" {
 			logger.Printf("Gitea backups to keep: %s", giteaBackups)
 		}
-		if strings.ToLower(os.Getenv("GITEA_COMPARE")) == "refs" {
+		if strings.ToLower(os.Getenv(envGiteaCompare)) == "refs" {
 			logger.Print("Gitea compare method: refs")
 		} else {
 			logger.Print("Gitea compare method: clone")
@@ -215,16 +218,16 @@ func displayStartupConfig() {
 	}
 
 	// output gitlab config
-	if glToken := os.Getenv("GITLAB_TOKEN"); glToken != "" {
-		if glProjectMinAccessLevel := os.Getenv("GITLAB_PROJECT_MIN_ACCESS_LEVEL"); glProjectMinAccessLevel != "" {
+	if glToken := os.Getenv(envGitLabToken); glToken != "" {
+		if glProjectMinAccessLevel := os.Getenv(envGitLabMinAccessLevel); glProjectMinAccessLevel != "" {
 			logger.Printf("GitLab Project Minimum Access Level: %s", glProjectMinAccessLevel)
 		} else {
 			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.GitlabDefaultMinimumProjectAccessLevel)
 		}
-		if glBackups := os.Getenv("GITLAB_BACKUPS"); glBackups != "" {
+		if glBackups := os.Getenv(envGitLabBackups); glBackups != "" {
 			logger.Printf("GitLab backups to keep: %s", glBackups)
 		}
-		if strings.ToLower(os.Getenv("GITLAB_COMPARE")) == "refs" {
+		if strings.ToLower(os.Getenv(envGitLabCompare)) == "refs" {
 			logger.Print("GitLab compare method: refs")
 		} else {
 			logger.Print("GitLab compare method: clone")
@@ -232,11 +235,11 @@ func displayStartupConfig() {
 	}
 
 	// output bitbucket config
-	if bbUser := os.Getenv("BITBUCKET_USER"); bbUser != "" {
-		if bbBackups := os.Getenv("BITBUCKET_BACKUPS"); bbBackups != "" {
+	if bbUser := os.Getenv(envBitBucketUser); bbUser != "" {
+		if bbBackups := os.Getenv(envBitBucketBackups); bbBackups != "" {
 			logger.Printf("BitBucket backups to keep: %s", bbBackups)
 		}
-		if strings.ToLower(os.Getenv("BITBUCKET_COMPARE")) == "refs" {
+		if strings.ToLower(os.Getenv(envBitBucketCompare)) == "refs" {
 			logger.Print("BitBucket compare method: refs")
 		} else {
 			logger.Print("BitBucket compare method: clone")
@@ -253,7 +256,7 @@ func run() error {
 
 	backupDIR, backupDIRKeyExists = os.LookupEnv(envGitBackupDir)
 	if !backupDIRKeyExists || backupDIR == "" {
-		return errors.New("environment variable GIT_BACKUP_DIR must be set")
+		return fmt.Errorf("environment variable %s must be set", envGitBackupDir)
 	}
 
 	if _, githubOrgsKeyExists := os.LookupEnv(envGitHubOrgs); githubOrgsKeyExists {
