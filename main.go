@@ -16,17 +16,18 @@ import (
 )
 
 const (
-	appName              = "soba"
-	workingDIRName       = ".working"
-	workingDIRMode       = 0o755
-	defaultBackupsToKeep = 2
-	pathSep              = string(os.PathSeparator)
+	appName                = "soba"
+	workingDIRName         = ".working"
+	workingDIRMode         = 0o755
+	defaultBackupsToRetain = 2
+	pathSep                = string(os.PathSeparator)
 
 	// env vars
-	envGitBackupInterval    = "GIT_BACKUP_INTERVAL"
-	envGitBackupDir         = "GIT_BACKUP_DIR"
-	envGitHubAPIURL         = "GITHUB_APIURL"
-	envGitHubBackups        = "GITHUB_BACKUPS"
+	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
+	envGitBackupDir      = "GIT_BACKUP_DIR"
+	envGitHubAPIURL      = "GITHUB_APIURL"
+	envGitHubBackups     = "GITHUB_BACKUPS"
+	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
 	envGitHubCompare        = "GITHUB_COMPARE"
@@ -52,6 +53,10 @@ const (
 	providerNameGitHub    = "GitHub"
 	providerNameGitLab    = "GitLab"
 	providerNameGitea     = "Gitea"
+
+	// compare types
+	compareTypeRefs  = "refs"
+	compareTypeClone = "clone"
 )
 
 var (
@@ -183,6 +188,7 @@ func displayStartupConfig() {
 	if backupDIR := os.Getenv(envGitBackupDir); backupDIR != "" {
 		logger.Printf("git backup directory: %s", backupDIR)
 	}
+
 	if backupInterval := os.Getenv(envGitBackupInterval); backupInterval != "" {
 		logger.Printf("git backup interval: %s hours", backupInterval)
 	}
@@ -192,10 +198,8 @@ func displayStartupConfig() {
 		if ghOrgs := strings.ToLower(os.Getenv(envGitHubOrgs)); ghOrgs != "" {
 			logger.Printf("GitHub Organistations: %s", ghOrgs)
 		}
-		if ghBackups := os.Getenv(envGitHubBackups); ghBackups != "" {
-			logger.Printf("GitHub backups to keep: %s", ghBackups)
-		}
-		if strings.ToLower(os.Getenv(envGitHubCompare)) == "refs" {
+
+		if strings.ToLower(os.Getenv(envGitHubCompare)) == compareTypeRefs {
 			logger.Print("GitHub compare method: refs")
 		} else {
 			logger.Print("GitHub compare method: clone")
@@ -207,10 +211,12 @@ func displayStartupConfig() {
 		if giteaOrgs := strings.ToLower(os.Getenv(envGiteaOrgs)); giteaOrgs != "" {
 			logger.Printf("Gitea Organistations: %s", giteaOrgs)
 		}
+
 		if giteaBackups := os.Getenv(envGiteaBackups); giteaBackups != "" {
 			logger.Printf("Gitea backups to keep: %s", giteaBackups)
 		}
-		if strings.ToLower(os.Getenv(envGiteaCompare)) == "refs" {
+
+		if strings.ToLower(os.Getenv(envGiteaCompare)) == compareTypeRefs {
 			logger.Print("Gitea compare method: refs")
 		} else {
 			logger.Print("Gitea compare method: clone")
@@ -222,15 +228,17 @@ func displayStartupConfig() {
 		if glProjectMinAccessLevel := os.Getenv(envGitLabMinAccessLevel); glProjectMinAccessLevel != "" {
 			logger.Printf("GitLab Project Minimum Access Level: %s", glProjectMinAccessLevel)
 		} else {
-			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.GitlabDefaultMinimumProjectAccessLevel)
+			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.GitLabDefaultMinimumProjectAccessLevel)
 		}
+
 		if glBackups := os.Getenv(envGitLabBackups); glBackups != "" {
 			logger.Printf("GitLab backups to keep: %s", glBackups)
 		}
-		if strings.ToLower(os.Getenv(envGitLabCompare)) == "refs" {
-			logger.Print("GitLab compare method: refs")
+
+		if strings.ToLower(os.Getenv(envGitLabCompare)) == compareTypeRefs {
+			logger.Printf("GitLab compare method: %s", compareTypeRefs)
 		} else {
-			logger.Print("GitLab compare method: clone")
+			logger.Printf("GitLab compare method: %s", compareTypeClone)
 		}
 	}
 
@@ -239,10 +247,11 @@ func displayStartupConfig() {
 		if bbBackups := os.Getenv(envBitBucketBackups); bbBackups != "" {
 			logger.Printf("BitBucket backups to keep: %s", bbBackups)
 		}
-		if strings.ToLower(os.Getenv(envBitBucketCompare)) == "refs" {
-			logger.Print("BitBucket compare method: refs")
+
+		if strings.ToLower(os.Getenv(envBitBucketCompare)) == compareTypeRefs {
+			logger.Printf("BitBucket compare method: %s", compareTypeRefs)
 		} else {
-			logger.Print("BitBucket compare method: clone")
+			logger.Printf("BitBucket compare method: %s", compareTypeClone)
 		}
 	}
 }
@@ -341,6 +350,7 @@ func execProviderBackups() {
 			User:             os.Getenv(envBitBucketUser),
 			Key:              os.Getenv(envBitBucketKey),
 			Secret:           os.Getenv(envBitBucketSecret),
+			BackupsToRetain:  getBackupsToRetain(envBitBucketBackups),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -360,6 +370,7 @@ func execProviderBackups() {
 			BackupDir:        backupDir,
 			Token:            os.Getenv(envGiteaToken),
 			Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
+			BackupsToRetain:  getBackupsToRetain(envGiteaBackups),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -379,6 +390,8 @@ func execProviderBackups() {
 			BackupDir:        backupDir,
 			Token:            os.Getenv(envGitHubToken),
 			Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
+			BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
+			SkipUserRepos:    false,
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -390,13 +403,14 @@ func execProviderBackups() {
 	if os.Getenv(envGitLabToken) != "" {
 		logger.Println("backing up GitLab repos")
 
-		var gitlabHost *githosts.GitlabHost
+		var gitlabHost *githosts.GitLabHost
 
-		gitlabHost, err = githosts.NewGitlabHost(githosts.NewGitlabHostInput{
+		gitlabHost, err = githosts.NewGitLabHost(githosts.NewGitLabHostInput{
 			APIURL:           os.Getenv(envGitLabAPIURL),
 			DiffRemoteMethod: os.Getenv(envGitLabCompare),
 			BackupDir:        backupDir,
 			Token:            os.Getenv(envGitLabToken),
+			BackupsToRetain:  getBackupsToRetain(envGitLabBackups),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -435,4 +449,21 @@ func stripTrailingLineBreak(input string) string {
 	}
 
 	return input
+}
+
+func getBackupsToRetain(envVar string) int {
+	if os.Getenv(envVar) == "" {
+		logger.Printf("environment variable %s not set, using default of %d", envVar, defaultBackupsToRetain)
+
+		return defaultBackupsToRetain
+	}
+
+	backupsToKeep, err := strconv.Atoi(os.Getenv(envVar))
+	if err != nil {
+		logger.Printf("error converting environment variable %s to int so defaulting to: %d", envVar, defaultBackupsToRetain)
+
+		return defaultBackupsToRetain
+	}
+
+	return backupsToKeep
 }

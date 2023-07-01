@@ -2,14 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/jonhadfield/githosts-utils"
-	"log"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/jonhadfield/githosts-utils"
 
 	"golang.org/x/exp/slices"
 
@@ -26,23 +26,26 @@ var sobaEnvVarKeys = []string{
 func removeContents(dir string) error {
 	d, err := os.Open(dir)
 	if err != nil {
-		return err
+		return fmt.Errorf("removeContents: %w", err)
 	}
+
 	defer func() {
 		if err = d.Close(); err != nil {
 			panic(err)
 		}
 	}()
+
 	names, err := d.Readdirnames(-1)
 	if err != nil {
-		return err
+		return fmt.Errorf("removeContents %w", err)
 	}
+
 	for _, name := range names {
-		err = os.RemoveAll(filepath.Join(dir, name))
-		if err != nil {
-			return err
+		if err = os.RemoveAll(filepath.Join(dir, name)); err != nil {
+			return fmt.Errorf("removeContents %w", err)
 		}
 	}
+
 	return nil
 }
 
@@ -81,7 +84,9 @@ func preflight() {
 
 func TestMain(m *testing.M) {
 	preflight()
+
 	code := m.Run()
+
 	os.Exit(code)
 }
 
@@ -92,6 +97,7 @@ func resetGlobals() {
 
 func backupEnvironmentVariables() map[string]string {
 	m := make(map[string]string)
+
 	for _, e := range os.Environ() {
 		if i := strings.Index(e, "="); i >= 0 {
 			m[e[:i]] = e[i+1:]
@@ -132,15 +138,18 @@ func TestGitHubEnvs(t *testing.T) {
 	require.NoError(t, os.Unsetenv(envGitHubToken))
 	require.NoError(t, os.Unsetenv(envGitLabToken))
 	require.NoError(t, os.Setenv(envGitHubOrgs, "example,example2"))
+
 	err := run()
+
 	require.NoError(t, os.Unsetenv(envGitHubOrgs))
+
 	require.Error(t, err)
 	require.Contains(t, err.Error(), fmt.Sprintf("%s must be set if %s is set", envGitHubToken, envGitHubOrgs))
 }
 
 func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	// set comparison to use refs, rather than bundle
-	require.NoError(t, os.Setenv(envGitHubCompare, "refs"))
+	require.NoError(t, os.Setenv(envGitHubCompare, compareTypeRefs))
 
 	if os.Getenv(envGitHubToken) == "" {
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
@@ -151,6 +160,7 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -159,8 +169,10 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
+
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
+
 	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
 	require.NoError(t, err)
 	require.NoError(t, os.Setenv(envGitHubBackups, "1"))
@@ -169,12 +181,16 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	// check only one bundle remains
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
+
 	dfRenamed := "repo0.20200401111111.bundle.invalid"
 
 	var originalFound int
+
 	var renamedFound int
+
 	for _, f := range files {
 		require.NotEqual(t, f.Name(), dfName, fmt.Sprintf("unexpected bundle: %s", f.Name()))
+
 		if dfName == f.Name() {
 			originalFound++
 		}
@@ -182,9 +198,10 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 		if dfRenamed == f.Name() {
 			renamedFound++
 		}
-
 	}
+
 	require.Zero(t, originalFound)
+
 	require.Equal(t, 1, renamedFound)
 }
 
@@ -198,6 +215,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -232,7 +250,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	defer restoreEnvironmentVariables(envBackup)
 
 	preflight()
+
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -241,8 +261,10 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
+
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
+
 	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
 	require.NoError(t, err)
 	// run
@@ -263,6 +285,7 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -280,6 +303,7 @@ func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -299,6 +323,7 @@ func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) 
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -318,6 +343,7 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envGitBackupDir, envGitLabToken})
@@ -334,6 +360,7 @@ func TestPublicGitLabRepositoryBackup2(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envGitBackupDir, envGitLabToken})
@@ -354,6 +381,7 @@ func TestGiteaRepositoryBackup(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envGitBackupDir, envGiteaToken, envGiteaAPIURL})
@@ -374,6 +402,7 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envGitBackupDir, envGiteaToken, envGiteaAPIURL, envGiteaOrgs})
@@ -384,9 +413,7 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 	require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
 	entries, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-	if err != nil {
-		log.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	require.Len(t, entries, 2)
 
@@ -396,6 +423,7 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 		if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
 			foundOne = true
 		}
+
 		if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
 			foundTwo = true
 		}
@@ -408,17 +436,25 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	if os.Getenv(envBitBucketUser) == "" {
 		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketUser)
 	}
+
 	resetGlobals()
+
 	envBackup := backupEnvironmentVariables()
+
 	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
+
 	defer func() {
 		if err := os.Unsetenv(envBitBucketCompare); err != nil {
 			panic(fmt.Sprintf("failed to unset envvar: %s", err.Error()))
 		}
 	}()
-	_ = os.Setenv(envBitBucketCompare, "refs")
+
+	_ = os.Setenv(envBitBucketCompare, compareTypeRefs)
+
 	require.NoError(t, run())
+
 	require.NoError(t, run())
+
 	restoreEnvironmentVariables(envBackup)
 }
 
@@ -428,11 +464,14 @@ func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{})
+
 	err := checkProvidersDefined()
 	require.Error(t, err)
+
 	require.Contains(t, err.Error(), "no providers defined")
 }
 
@@ -442,10 +481,13 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{})
+
 	_ = os.Setenv(envGitHubToken, "ABCD1234")
+
 	require.Errorf(t, run(), "expected: %s undefined error", envGitBackupDir)
 }
 
@@ -459,6 +501,7 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -472,6 +515,7 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 		BackupDir:        backupDir,
 		Token:            os.Getenv(envGitHubToken),
 		SkipUserRepos:    true,
+		BackupsToRetain:  1,
 		Orgs:             []string{"Nudelmesse"},
 	})
 	if err != nil {
@@ -482,12 +526,11 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 
 	for _, repoName := range []string{"public1", "public2"} {
 		require.DirExists(t, path.Join(backupDir, "github.com", "Nudelmesse", repoName))
-		var entries []os.DirEntry
-		entries, err = os.ReadDir(path.Join(backupDir, "github.com", "Nudelmesse", repoName))
-		if err != nil {
-			log.Fatal(err)
-		}
 
+		var entries []os.DirEntry
+
+		entries, err = os.ReadDir(path.Join(backupDir, "github.com", "Nudelmesse", repoName))
+		require.NoError(t, err)
 		require.Len(t, entries, 1)
 		require.Regexp(t, regexp.MustCompile(`^public[1,2]\.\d{14}\.bundle$`), entries[0].Name())
 	}
@@ -503,6 +546,7 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 
 	preflight()
 	resetGlobals()
+
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
@@ -517,6 +561,7 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 		Token:            os.Getenv(envGitHubToken),
 		SkipUserRepos:    false,
 		Orgs:             []string{"*"},
+		BackupsToRetain:  1,
 	})
 	if err != nil {
 		logger.Fatal(err)
@@ -526,11 +571,11 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 
 	for _, repoName := range []string{"public1", "public2"} {
 		require.DirExists(t, path.Join(backupDir, "github.com", "Nudelmesse", repoName))
+
 		var entries []os.DirEntry
+
 		entries, err = os.ReadDir(path.Join(backupDir, "github.com", "Nudelmesse", repoName))
-		if err != nil {
-			log.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		require.Len(t, entries, 1)
 		require.Regexp(t, regexp.MustCompile(`^public[1,2]\.\d{14}\.bundle$`), entries[0].Name())
@@ -538,11 +583,11 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 
 	for _, repoName := range []string{"repo0", "repo1"} {
 		require.DirExists(t, path.Join(backupDir, "github.com", "go-soba", repoName))
+
 		var entries []os.DirEntry
+
 		entries, err = os.ReadDir(path.Join(backupDir, "github.com", "go-soba", repoName))
-		if err != nil {
-			log.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		// one bundle in each folder
 		require.Len(t, entries, 1)
