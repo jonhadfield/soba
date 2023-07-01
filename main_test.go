@@ -510,6 +510,8 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 	backupDir := os.Getenv(envGitBackupDir)
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
+		Caller:           appName,
+		LogLevel:         1,
 		APIURL:           os.Getenv(envGitHubAPIURL),
 		DiffRemoteMethod: os.Getenv(envGitHubCompare),
 		BackupDir:        backupDir,
@@ -555,6 +557,8 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 	backupDir := os.Getenv(envGitBackupDir)
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
+		Caller:           appName,
+		LogLevel:         1,
 		APIURL:           os.Getenv(envGitHubAPIURL),
 		DiffRemoteMethod: os.Getenv(envGitHubCompare),
 		BackupDir:        backupDir,
