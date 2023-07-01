@@ -16,13 +16,16 @@ import (
 )
 
 const (
-	appName                = "soba"
-	workingDIRName         = ".working"
-	workingDIRMode         = 0o755
-	defaultBackupsToRetain = 2
-	pathSep                = string(os.PathSeparator)
+	appName                                = "soba"
+	workingDIRName                         = ".working"
+	workingDIRMode                         = 0o755
+	defaultBackupsToRetain                 = 2
+	defaultGitLabMinimumProjectAccessLevel = 20
+
+	pathSep = string(os.PathSeparator)
 
 	// env vars
+	envSobaLogLevel      = "SOBA_LOG"
 	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
 	envGitBackupDir      = "GIT_BACKUP_DIR"
 	envGitHubAPIURL      = "GITHUB_APIURL"
@@ -111,6 +114,23 @@ func getBackupInterval() int {
 	}
 
 	return backupInterval
+}
+
+func getLogLevel() int {
+	sobaLogLevelEnv := os.Getenv(envSobaLogLevel)
+
+	var sobaLogLevel int
+
+	var intervalConversionErr error
+
+	if sobaLogLevelEnv != "" {
+		sobaLogLevel, intervalConversionErr = strconv.Atoi(sobaLogLevelEnv)
+		if intervalConversionErr != nil {
+			logger.Fatalf("%s must be a number.", envSobaLogLevel)
+		}
+	}
+
+	return sobaLogLevel
 }
 
 func checkProviderFactory(provider string) func() {
@@ -344,6 +364,7 @@ func execProviderBackups() {
 		var bitbucketHost *githosts.BitbucketHost
 
 		bitbucketHost, err = githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
+			Caller:           appName,
 			APIURL:           os.Getenv(envBitBucketAPIURL),
 			DiffRemoteMethod: os.Getenv(envBitBucketCompare),
 			BackupDir:        backupDir,
@@ -351,6 +372,7 @@ func execProviderBackups() {
 			Key:              os.Getenv(envBitBucketKey),
 			Secret:           os.Getenv(envBitBucketSecret),
 			BackupsToRetain:  getBackupsToRetain(envBitBucketBackups),
+			LogLevel:         getLogLevel(),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -365,12 +387,14 @@ func execProviderBackups() {
 		var giteaHost *githosts.GiteaHost
 
 		giteaHost, err = githosts.NewGiteaHost(githosts.NewGiteaHostInput{
+			Caller:           appName,
 			APIURL:           os.Getenv(envGiteaAPIURL),
 			DiffRemoteMethod: os.Getenv(envGiteaCompare),
 			BackupDir:        backupDir,
 			Token:            os.Getenv(envGiteaToken),
 			Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
 			BackupsToRetain:  getBackupsToRetain(envGiteaBackups),
+			LogLevel:         getLogLevel(),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -385,6 +409,7 @@ func execProviderBackups() {
 		var githubHost *githosts.GitHubHost
 
 		githubHost, err = githosts.NewGitHubHost(githosts.NewGitHubHostInput{
+			Caller:           appName,
 			APIURL:           os.Getenv(envGitHubAPIURL),
 			DiffRemoteMethod: os.Getenv(envGitHubCompare),
 			BackupDir:        backupDir,
@@ -392,6 +417,7 @@ func execProviderBackups() {
 			Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
 			BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
 			SkipUserRepos:    false,
+			LogLevel:         getLogLevel(),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -406,11 +432,14 @@ func execProviderBackups() {
 		var gitlabHost *githosts.GitLabHost
 
 		gitlabHost, err = githosts.NewGitLabHost(githosts.NewGitLabHostInput{
-			APIURL:           os.Getenv(envGitLabAPIURL),
-			DiffRemoteMethod: os.Getenv(envGitLabCompare),
-			BackupDir:        backupDir,
-			Token:            os.Getenv(envGitLabToken),
-			BackupsToRetain:  getBackupsToRetain(envGitLabBackups),
+			Caller:                appName,
+			APIURL:                os.Getenv(envGitLabAPIURL),
+			DiffRemoteMethod:      os.Getenv(envGitLabCompare),
+			BackupDir:             backupDir,
+			Token:                 os.Getenv(envGitLabToken),
+			BackupsToRetain:       getBackupsToRetain(envGitLabBackups),
+			ProjectMinAccessLevel: getProjectMinimumAccessLevel(),
+			LogLevel:              getLogLevel(),
 		})
 		if err != nil {
 			logger.Fatal(err)
@@ -449,6 +478,23 @@ func stripTrailingLineBreak(input string) string {
 	}
 
 	return input
+}
+
+func getProjectMinimumAccessLevel() int {
+	if os.Getenv(envGitLabMinAccessLevel) == "" {
+		logger.Printf("environment variable %s not set, using default of %d", envGitLabMinAccessLevel, defaultGitLabMinimumProjectAccessLevel)
+
+		return defaultGitLabMinimumProjectAccessLevel
+	}
+
+	minimumProjectAccessLevel, err := strconv.Atoi(os.Getenv(envGitLabMinAccessLevel))
+	if err != nil {
+		logger.Printf("error converting environment variable %s to int so defaulting to: %d", envGitLabMinAccessLevel, defaultGitLabMinimumProjectAccessLevel)
+
+		return defaultGitLabMinimumProjectAccessLevel
+	}
+
+	return minimumProjectAccessLevel
 }
 
 func getBackupsToRetain(envVar string) int {
