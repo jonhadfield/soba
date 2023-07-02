@@ -23,10 +23,10 @@ most popular [hosting providers](#supported-providers). It generates a [git bund
 
 As unchanged git repositories create identical bundle files, new bundles will only be stored if changes to the repository have been made. This can be done by re-cloning each repository every time soba runs, or by [comparing refs without cloning](#comparing-remote-repository-with-local-backup).
 
-soba includes its [own scheduler](#scheduling backups) that triggers it to run every specified number of hours, or it can be run with other schedulers such as cron.
+soba includes its [own scheduler](#scheduling-backups) that triggers it to run every specified number of hours, or it can be run with other schedulers such as cron.
 
 ## quick start
-soba can [run as the binary](#run-using-the-binary) or [using docker](#run-using-docker) with the prebuilt image distributed with each release.  
+soba can [run as the binary](#run-using-the-binary) or [using docker](#run-using-docker) with the prebuilt image distributed with each release.
 For example, the following will create git bundles of all repositories in your GitHub user's account in the soba-backups directory:
 
 ```
