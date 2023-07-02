@@ -6,7 +6,7 @@
 
 - [about](#about)
 - [configuration](#configuration)
-- [run using command line](#run-using-command-line)
+- [run using the binary](#run-using-the-binary)
 - [scheduling backups](#scheduling-backups)
 - [rotating backups](#rotating-backups)
 - [logging](#logging)
@@ -19,11 +19,20 @@
 ## about
 
 soba is tool for backing up private and public git repositories hosted on the
-most popular hosting providers. It generates a [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling) that stores a backup of each repository as a
-single file.
+most popular [hosting providers](#supported-providers). It generates a [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling) that stores a backup of each repository as a single file.
 
-An unchanged git repository will create an identical bundle file so bundles will only be stored if a change has been
-made and will not produce duplicates. Since version 1.1.4 you can now [check for changes without cloning](#comparing-remote-repository-with-local-backup).
+As unchanged git repositories create identical bundle files, new bundles will only be stored if changes to the repository have been made. This can be done by re-cloning each repository every time soba runs, or by [comparing refs without cloning](#comparing-remote-repository-with-local-backup).
+
+soba includes its [own scheduler](#scheduling-backups) that triggers it to run every specified number of hours, or it can be run with other schedulers such as cron.
+
+## quick start
+soba can [run as a binary](#run-using-the-binary) or [using docker](#run-using-docker) with the prebuilt image distributed with each release.
+For example, the following will create git bundles of all repositories in your GitHub user's account in the soba-backups directory:
+
+```
+$ mkdir soba-backups
+$ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT_BACKUP_DIR=/backups jonhadfield/soba:latest
+```
 
 ## latest updates
 
@@ -73,7 +82,7 @@ export GIT_BACKUP_DIR="/repo-backups/"
 
 To set provider credentials see [below](#setting-provider-credentials).
 
-## run using command line
+## run using the binary
 
 Download the latest release [here](https://github.com/jonhadfield/soba/releases) and then install:
 
