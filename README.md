@@ -26,7 +26,7 @@ As unchanged git repositories create identical bundle files, new bundles will on
 soba includes its [own scheduler](#scheduling-backups) that triggers it to run every specified number of hours, or it can be run with other schedulers such as cron.
 
 ## quick start
-soba can [run as the binary](#run-using-the-binary) or [using docker](#run-using-docker) with the prebuilt image distributed with each release.
+soba can [run as a binary](#run-using-the-binary) or [using docker](#run-using-docker) with the prebuilt image distributed with each release.
 For example, the following will create git bundles of all repositories in your GitHub user's account in the soba-backups directory:
 
 ```
