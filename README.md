@@ -27,6 +27,11 @@ made and will not produce duplicates. Since version 1.1.4 you can now [check for
 
 ## latest updates
 
+### 1.2.0 release 2023-07-02
+
+- All GitHub Organizations can now be backed up by specifying * instead of individual names
+- GitLab API calls will now be retried if they initially fail
+
 ### 1.1.12 released 2023-06-25
 
 - Add support for Gitea
@@ -34,19 +39,6 @@ made and will not produce duplicates. Since version 1.1.4 you can now [check for
 ### 1.1.11 released 2023-03-26
 
 - Fix goreleaser to build and distribute docker release
-
-### 1.1.10 released 2023-03-26
-
-- Notarize binaries produced for MacOS to remove unknown developer warning
-- note: missing docker release
-
-### 1.1.9 released 2023-03-11
-
-- Improve refs comparison mode
-
-### 1.1.8 released 2023-03-11
-
-- Fixes edge case where refs with spaces returned an error and forced clone in when in refs mode
 
 See full changelog [here](./CHANGELOG.md).
 

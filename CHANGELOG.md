@@ -1,3 +1,8 @@
+### 1.2.0 release 2023-07-02
+
+- All GitHub Organizations can now be backed up by specifying * instead of individual names
+- GitLab API calls will now be retried if they initially fail
+
 ### 1.1.12 released 2023-06-25
 
 - Add support for Gitea
