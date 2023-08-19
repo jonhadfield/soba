@@ -36,6 +36,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.1 release 2023-08-19
+
+- GitHub user repositories can now be skipped by setting GITHUB_SKIP_USER_REPOS=true
+
 ### 1.2.0 release 2023-07-02
 
 - All GitHub Organizations can now be backed up by specifying * instead of individual names
@@ -285,6 +289,11 @@ Environment variable: GITEA_COMPARE
 Repositories in GitHub organisations are not backed up by default. To back these up, specify a comma separated
 list of organisations in the environment variable: GITHUB_ORGS.
 
+#### Skipping User repository backups
+
+By default, all users' repositories will be backed up, even when specifying organisations.  
+To skip user repositories set environment variable: GITHUB\_SKIP\_USER_REPOS to true.
+
 #### GitHub Repo/Bundle comparison method
 
 Environment variable: GITHUB_COMPARE
@@ -360,6 +369,7 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** GITEA_BACKUPS **Value**
     - **variable** GITHUB_TOKEN **Value**
     - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
+    - **variable** GITHUB\_SKIP\_USER\_REPOS **Value** (Optional - defaults to false)
     - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
     - **variable** GITLAB_TOKEN **Value**
     - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
