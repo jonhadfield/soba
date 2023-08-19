@@ -216,7 +216,7 @@ func envTrue(envVar string) bool {
 
 func displayStartupConfig() {
 	if backupDIR := os.Getenv(envGitBackupDir); backupDIR != "" {
-		logger.Printf("git backup directory: %s", backupDIR)
+		logger.Printf("root backup directory: %s", backupDIR)
 	}
 
 	if backupInterval := os.Getenv(envGitBackupInterval); backupInterval != "" {
@@ -233,7 +233,7 @@ func displayStartupConfig() {
 			logger.Printf("GitHub skipping user repos: true")
 		}
 
-		if strings.ToLower(os.Getenv(envGitHubCompare)) == compareTypeRefs {
+		if strings.EqualFold(os.Getenv(envGitHubCompare), compareTypeRefs) {
 			logger.Print("GitHub compare method: refs")
 		} else {
 			logger.Print("GitHub compare method: clone")
@@ -250,7 +250,7 @@ func displayStartupConfig() {
 			logger.Printf("Gitea backups to keep: %s", giteaBackups)
 		}
 
-		if strings.ToLower(os.Getenv(envGiteaCompare)) == compareTypeRefs {
+		if strings.EqualFold(os.Getenv(envGiteaCompare), compareTypeRefs) {
 			logger.Print("Gitea compare method: refs")
 		} else {
 			logger.Print("Gitea compare method: clone")
@@ -269,10 +269,10 @@ func displayStartupConfig() {
 			logger.Printf("GitLab backups to keep: %s", glBackups)
 		}
 
-		if strings.ToLower(os.Getenv(envGitLabCompare)) == compareTypeRefs {
-			logger.Printf("GitLab compare method: %s", compareTypeRefs)
+		if strings.EqualFold(os.Getenv(envGitLabCompare), compareTypeRefs) {
+			logger.Print("GitLab compare method: refs")
 		} else {
-			logger.Printf("GitLab compare method: %s", compareTypeClone)
+			logger.Print("GitLab compare method: clone")
 		}
 	}
 
