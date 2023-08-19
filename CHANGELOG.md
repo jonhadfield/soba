@@ -1,3 +1,7 @@
+### 1.2.1 release 2023-08-19  
+
+- GitHub user repositories can now be skipped by setting GITHUB_SKIP_USER_REPOS=true  
+
 ### 1.2.0 release 2023-07-02
 
 - All GitHub Organizations can now be backed up by specifying * instead of individual names
