@@ -33,6 +33,7 @@ const (
 	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
+	envGitHubSkipUserRepos  = "GITHUB_SKIP_USER_REPOS"
 	envGitHubCompare        = "GITHUB_COMPARE"
 	envGitLabBackups        = "GITLAB_BACKUPS"
 	envGitLabMinAccessLevel = "GITLAB_PROJECT_MIN_ACCESS_LEVEL"
@@ -204,6 +205,15 @@ func main() {
 	}
 }
 
+func envTrue(envVar string) bool {
+	res, err := strconv.ParseBool(os.Getenv(envVar))
+	if err != nil {
+		return false
+	}
+
+	return res
+}
+
 func displayStartupConfig() {
 	if backupDIR := os.Getenv(envGitBackupDir); backupDIR != "" {
 		logger.Printf("git backup directory: %s", backupDIR)
@@ -217,6 +227,10 @@ func displayStartupConfig() {
 	if ghToken := os.Getenv(envGitHubToken); ghToken != "" {
 		if ghOrgs := strings.ToLower(os.Getenv(envGitHubOrgs)); ghOrgs != "" {
 			logger.Printf("GitHub Organistations: %s", ghOrgs)
+		}
+
+		if envTrue(envGitHubSkipUserRepos) {
+			logger.Printf("GitHub skipping user repos: true")
 		}
 
 		if strings.ToLower(os.Getenv(envGitHubCompare)) == compareTypeRefs {
@@ -246,9 +260,9 @@ func displayStartupConfig() {
 	// output gitlab config
 	if glToken := os.Getenv(envGitLabToken); glToken != "" {
 		if glProjectMinAccessLevel := os.Getenv(envGitLabMinAccessLevel); glProjectMinAccessLevel != "" {
-			logger.Printf("GitLab Project Minimum Access Level: %s", glProjectMinAccessLevel)
+			logger.Printf("GitLab project minimum access level: %s", glProjectMinAccessLevel)
 		} else {
-			logger.Printf("GitLab Project Minimum Access Level: %d", githosts.GitLabDefaultMinimumProjectAccessLevel)
+			logger.Printf("GitLab project minimum access level: %d", githosts.GitLabDefaultMinimumProjectAccessLevel)
 		}
 
 		if glBackups := os.Getenv(envGitLabBackups); glBackups != "" {
@@ -416,7 +430,7 @@ func execProviderBackups() {
 			Token:            os.Getenv(envGitHubToken),
 			Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
 			BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
-			SkipUserRepos:    false,
+			SkipUserRepos:    envTrue(envGitHubSkipUserRepos),
 			LogLevel:         getLogLevel(),
 		})
 		if err != nil {
