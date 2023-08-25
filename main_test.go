@@ -414,6 +414,7 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 		require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
 		entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
+		require.NoError(t, err)
 		entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
 		require.NoError(t, err)
 
