@@ -103,18 +103,27 @@ func init() {
 func getBackupInterval() int {
 	backupIntervalEnv := os.Getenv(envGitBackupInterval)
 
-	var backupInterval int
+	hours, isHour := isInt(backupIntervalEnv)
 
-	var intervalConversionErr error
-
-	if backupIntervalEnv != "" {
-		backupInterval, intervalConversionErr = strconv.Atoi(backupIntervalEnv)
-		if intervalConversionErr != nil {
-			logger.Fatalf("%s must be a number.", envGitBackupInterval)
+	switch {
+	case isHour:
+		// an int represents hours
+		return hours * 60
+	case strings.HasSuffix(backupIntervalEnv, "h"):
+		// a string ending in h represents hours
+		hours, isHour = isInt(backupIntervalEnv[:len(backupIntervalEnv)-1])
+		if isHour {
+			return hours * 60
+		}
+	case strings.HasSuffix(backupIntervalEnv, "m"):
+		// a string ending in m represents minutes
+		minutes, isMinute := isInt(backupIntervalEnv[:len(backupIntervalEnv)-1])
+		if isMinute {
+			return minutes
 		}
 	}
 
-	return backupInterval
+	return 0
 }
 
 func getLogLevel() int {
@@ -217,10 +226,6 @@ func envTrue(envVar string) bool {
 func displayStartupConfig() {
 	if backupDIR := os.Getenv(envGitBackupDir); backupDIR != "" {
 		logger.Printf("root backup directory: %s", backupDIR)
-	}
-
-	if backupInterval := os.Getenv(envGitBackupInterval); backupInterval != "" {
-		logger.Printf("git backup interval: %s hours", backupInterval)
 	}
 
 	// output github config
@@ -335,14 +340,9 @@ func run() error {
 	backupInterval := getBackupInterval()
 
 	if backupInterval != 0 {
-		hourOutput := "hour"
-		if backupInterval > 1 {
-			hourOutput = "hours"
-		}
+		logger.Printf("scheduling to run every %s", formatIntervalDuration(backupInterval))
 
-		logger.Printf("scheduling to run every %d %s", backupInterval, hourOutput)
-
-		_, err = scheduler.Every(int(time.Duration(backupInterval))).Hours().Run(execProviderBackups)
+		_, err = scheduler.Every(int(time.Duration(backupInterval))).Minutes().Run(execProviderBackups)
 		if err != nil {
 			return errors.Wrapf(err, "scheduler failed")
 		}
@@ -353,6 +353,18 @@ func run() error {
 	}
 
 	return nil
+}
+
+func formatIntervalDuration(m int) string {
+	if m == 0 {
+		return ""
+	}
+
+	if m%60 == 0 {
+		return fmt.Sprintf("%dh", m/60)
+	}
+
+	return time.Duration(int64(m) * int64(time.Minute)).String()
 }
 
 func getOrgsListFromEnvVar(envVar string) []string {
@@ -477,12 +489,12 @@ func execProviderBackups() {
 	logger.Println("backups complete")
 
 	if backupInterval := getBackupInterval(); backupInterval > 0 {
-		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Hour)
+		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Minute)
 		if nextBackupTime.Before(time.Now()) {
 			logger.Fatal("error: backup took longer than scheduled interval")
 		}
 
-		logger.Printf("next run scheduled for: %v", nextBackupTime)
+		logger.Printf("next run scheduled for: %s", nextBackupTime.Format("2006-01-02 15:04:05 -0700 MST"))
 	}
 }
 
@@ -526,4 +538,12 @@ func getBackupsToRetain(envVar string) int {
 	}
 
 	return backupsToKeep
+}
+
+func isInt(i string) (int, bool) {
+	if val, err := strconv.Atoi(i); err == nil {
+		return val, true
+	}
+
+	return 0, false
 }

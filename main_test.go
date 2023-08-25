@@ -388,6 +388,13 @@ func TestGiteaRepositoryBackup(t *testing.T) {
 	require.NoError(t, run())
 }
 
+func TestFormatIntervalDuration(t *testing.T) {
+	require.Equal(t, "", formatIntervalDuration(0))
+	require.Equal(t, "1h", formatIntervalDuration(60))
+	require.Equal(t, "1h1m0s", formatIntervalDuration(61))
+	require.Equal(t, "3m0s", formatIntervalDuration(3))
+}
+
 func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 	if os.Getenv(envGiteaToken) == "" {
 		t.Skipf("Skipping Gitea test as %s is missing", envGiteaToken)
@@ -405,45 +412,72 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 	defer resetBackups()
 
-	unsetEnvVarsExcept([]string{envGitBackupDir, envGiteaToken, envGiteaAPIURL, envGiteaOrgs})
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGiteaToken, envGiteaAPIURL})
 
 	for _, org := range []string{"soba-org-two", "*"} {
 		require.NoError(t, os.Setenv(envGiteaOrgs, org))
 
 		require.NoError(t, run())
 
-		require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-		entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
-		require.NoError(t, err)
-		entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-		require.NoError(t, err)
-
-		require.Len(t, entriesOrgTwo, 2)
-
-		var foundOne, foundTwo, foundThree bool
-
-		for _, entry := range entriesOrgOne {
-			if strings.HasPrefix(entry.Name(), "soba-org-one-repo-one") {
-				foundThree = true
-			}
-		}
-
-		for _, entry := range entriesOrgTwo {
-			if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
-				foundOne = true
-			}
-
-			if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
-				foundTwo = true
-			}
-		}
-
 		switch org {
 		case "soba-org-two":
-			require.True(t, foundOne && foundTwo)
-			require.False(t, foundThree)
+			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+			require.NoDirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
+			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+			require.NoError(t, err)
+
+			require.Len(t, entriesOrgTwo, 2)
+
+			var foundOne, foundTwo bool
+
+			for _, entry := range entriesOrgTwo {
+				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
+					foundOne = true
+				}
+
+				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
+					foundTwo = true
+				}
+			}
+
+			require.True(t, foundOne)
+			require.True(t, foundTwo)
+
+			resetBackups()
 		case "*":
-			require.True(t, foundOne && foundTwo && foundThree)
+			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
+			entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
+			require.NoError(t, err)
+			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+			require.NoError(t, err)
+
+			require.Len(t, entriesOrgOne, 1)
+			require.Len(t, entriesOrgTwo, 2)
+
+			var foundOne, foundTwo, foundThree bool
+
+			for _, entry := range entriesOrgOne {
+				if strings.HasPrefix(entry.Name(), "soba-org-one-repo-one") {
+					foundThree = true
+				}
+			}
+
+			for _, entry := range entriesOrgTwo {
+				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
+					foundOne = true
+				}
+
+				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
+					foundTwo = true
+				}
+			}
+
+			require.True(t, foundOne)
+			require.True(t, foundTwo)
+			require.True(t, foundThree)
+
+			resetBackups()
 		}
 
 		resetBackups()
@@ -616,4 +650,26 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 		// repo2 has no commits and bundle not created for empty repos
 		require.Regexp(t, regexp.MustCompile(`^repo[0,1]\.\d{14}\.bundle$`), entries[0].Name())
 	}
+}
+
+func TestGetBackupInterval(t *testing.T) {
+	_ = os.Setenv(envGitBackupInterval, "1h")
+
+	require.Equal(t, 60, getBackupInterval())
+
+	_ = os.Setenv(envGitBackupInterval, "1")
+
+	require.Equal(t, 60, getBackupInterval())
+
+	_ = os.Setenv(envGitBackupInterval, "100h")
+
+	require.Equal(t, 6000, getBackupInterval())
+
+	_ = os.Setenv(envGitBackupInterval, "100m")
+
+	require.Equal(t, 100, getBackupInterval())
+
+	_ = os.Setenv(envGitBackupInterval, "0")
+
+	require.Equal(t, 0, getBackupInterval())
 }
