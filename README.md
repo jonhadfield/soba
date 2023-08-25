@@ -242,8 +242,8 @@ source /home/<your-user-id>/.bashrc
 | BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)       |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
-| Gitea     | GITEA_APIURL                    | e.g. https://gitea.example.com/api/v1|
-|           | GITEA_TOKEN                     | [instructions](https://docs.gitea.com/development/api-usage#generating-and-listing-api-tokens)|
+| Gitea     | GITEA_APIURL                    | [instructions](#gitea-instructions) |
+|           | GITEA_TOKEN                     | |
 | GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
 | GitLab    | GITLAB_TOKEN                    | [instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)                                       |
 |           | GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
@@ -264,6 +264,23 @@ Environment variable: BITBUCKET_COMPARE
 | refs            | Compare refs without downloading (available since soba 1.1.4)  |
 
 ### Gitea
+
+#### Gitea instructions
+
+[Official documentation](https://docs.gitea.com/development/api-usage#generating-and-listing-api-tokens)
+
+The value for GITEA_APIURL needs to be in the format: https://<domain>/api/v1, where domain is something like gitea.example.com.
+
+GITEA_TOKEN is the secret you need to generate using the API (see official documentation above), or via the web GUI:
+
+- Login to Gitea
+- Select your user icon in the top right-hand corner and choose `Settings` from the dropdown
+- Select `Applications`
+- Enter a Token Name, e.g. "soba backups"
+- Select `Public only` or `All` depending on use-case
+- Expand the `Select permissions` menu
+- Select `read:organization` and `read:repository`.
+- Click on `Generate Token` and the value will appear at the top of the page
 
 #### Returning Organisations' repositories
 
@@ -291,7 +308,7 @@ list of organisations in the environment variable: GITHUB_ORGS.
 
 #### Skipping User repository backups
 
-By default, all users' repositories will be backed up, even when specifying organisations.  
+By default, all users' repositories will be backed up, even when specifying organisations.
 To skip user repositories set environment variable: GITHUB\_SKIP\_USER_REPOS to true.
 
 #### GitHub Repo/Bundle comparison method
