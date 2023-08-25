@@ -407,29 +407,46 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 	unsetEnvVarsExcept([]string{envGitBackupDir, envGiteaToken, envGiteaAPIURL, envGiteaOrgs})
 
-	require.NoError(t, os.Setenv(envGiteaOrgs, "soba-org-two"))
+	for _, org := range []string{"soba-org-two", "*"} {
+		require.NoError(t, os.Setenv(envGiteaOrgs, org))
 
-	require.NoError(t, run())
+		require.NoError(t, run())
 
-	require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-	entries, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-	require.NoError(t, err)
+		require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+		entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
+		entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+		require.NoError(t, err)
 
-	require.Len(t, entries, 2)
+		require.Len(t, entriesOrgTwo, 2)
 
-	var foundOne, foundTwo bool
+		var foundOne, foundTwo, foundThree bool
 
-	for _, entry := range entries {
-		if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
-			foundOne = true
+		for _, entry := range entriesOrgOne {
+			if strings.HasPrefix(entry.Name(), "soba-org-one-repo-one") {
+				foundThree = true
+			}
 		}
 
-		if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
-			foundTwo = true
+		for _, entry := range entriesOrgTwo {
+			if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
+				foundOne = true
+			}
+
+			if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
+				foundTwo = true
+			}
 		}
+
+		switch org {
+		case "soba-org-two":
+			require.True(t, foundOne && foundTwo)
+			require.False(t, foundThree)
+		case "*":
+			require.True(t, foundOne && foundTwo && foundThree)
+		}
+
+		resetBackups()
 	}
-
-	require.True(t, foundOne && foundTwo)
 }
 
 func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
