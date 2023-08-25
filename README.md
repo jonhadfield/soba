@@ -269,7 +269,7 @@ Environment variable: BITBUCKET_COMPARE
 
 [Official documentation](https://docs.gitea.com/development/api-usage#generating-and-listing-api-tokens)
 
-The value for GITEA_APIURL needs to be in the format: https://<domain>/api/v1, where domain is something like gitea.example.com.
+The value for GITEA_APIURL needs to be in the format: https://[domain]/api/v1, where domain is something like gitea.example.com.
 
 GITEA_TOKEN is the secret you need to generate using the API (see official documentation above), or via the web GUI:
 
