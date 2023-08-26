@@ -144,9 +144,9 @@ and this will run the backup every 45 minutes:
 export GIT_BACKUP_INTERVAL=45m
 ```
 
-_note:   
+note:   
 - if you don't specify the trailing 'm' or 'h' then hours are assumed.  
-- the interval is added to the start of the last backup and not the time it finished, therefore ensure the interval is greater than the duration of a backup._
+- the interval is added to the start of the last backup and not the time it finished, therefore ensure the interval is greater than the duration of a backup.
 
 ## rotating backups
 
