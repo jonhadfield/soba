@@ -166,16 +166,16 @@ Messages are written to stdout and can be persisted by directing to a file, e.g.
 
 #### logging to /var/log/soba
 
-create a user called soba:
-`sudo adduser soba`
-create a log directory:
-`sudo mkdir /var/log/soba`
-set user permissions:
-`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`
-switch to soba user:
-`sudo su - soba`
-run soba and direct output:
-`soba > /var/log/soba/soba.log`
+create a user called soba:  
+`sudo adduser soba`  
+create a log directory:   
+`sudo mkdir /var/log/soba`  
+set user permissions:   
+`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`  
+switch to soba user:  
+`sudo su - soba`  
+run soba and direct output:  
+`soba > /var/log/soba/soba.log`  
 
 ### rotation
 
