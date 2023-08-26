@@ -1,3 +1,11 @@
+### 1.2.3 release 2023-08-25
+
+- Backup interval can now be specified in minutes
+
+### 1.2.2 release 2023-08-19
+
+- Minor output improvements
+
 ### 1.2.1 release 2023-08-19  
 
 - GitHub user repositories can now be skipped by setting GITHUB_SKIP_USER_REPOS=true  

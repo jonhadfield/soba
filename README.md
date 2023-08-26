@@ -36,6 +36,14 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.3 release 2023-08-25
+
+- Backup interval can now be specified in minutes
+
+### 1.2.2 release 2023-08-19
+
+- Minor output improvements
+
 ### 1.2.1 release 2023-08-19
 
 - GitHub user repositories can now be skipped by setting GITHUB_SKIP_USER_REPOS=true
@@ -45,13 +53,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 - All GitHub Organizations can now be backed up by specifying * instead of individual names
 - GitLab API calls will now be retried if they initially fail
 
-### 1.1.12 released 2023-06-25
-
-- Add support for Gitea
-
-### 1.1.11 released 2023-03-26
-
-- Fix goreleaser to build and distribute docker release
 
 See full changelog [here](./CHANGELOG.md).
 
@@ -131,20 +132,21 @@ docker run --rm -t \
 
 ## scheduling backups
 
-Backups can be scheduled to run by setting an additional environment variable: GIT_BACKUP_INTERVAL. The value is the
-number of hours between backups. For example, this will run the backup daily:
+Backups can be scheduled to run by setting an additional environment variable: GIT_BACKUP_INTERVAL. The value is the can be specified in hours (default) or minutes. For example, this will run the backup daily:
 
 ```bash
-export GIT_BACKUP_INTERVAL=24
+export GIT_BACKUP_INTERVAL=24h
 ```
 
-if using docker then add:
+and this will run the backup every 45 minutes:
 
 ```bash
--e GIT_BACKUP_INTERVAL=24
+export GIT_BACKUP_INTERVAL=45m
 ```
 
-_Note: the interval is added to the start of the last backup and not the time it finished. Therefore, ensure the interval is greater than the duration of a backup._
+_note:   
+- if you don't specify the trailing 'm' or 'h' then hours are assumed.  
+- the interval is added to the start of the last backup and not the time it finished, therefore ensure the interval is greater than the duration of a backup._
 
 ## rotating backups
 
