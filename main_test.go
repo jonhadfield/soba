@@ -2,16 +2,14 @@ package main
 
 import (
 	"fmt"
+	"github.com/jonhadfield/githosts-utils"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
-
-	"github.com/jonhadfield/githosts-utils"
-
-	"golang.org/x/exp/slices"
 
 	"github.com/stretchr/testify/require"
 )

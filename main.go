@@ -12,7 +12,7 @@ import (
 	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/githosts-utils"
 	"github.com/pkg/errors"
-	"golang.org/x/exp/slices"
+	"slices"
 )
 
 const (

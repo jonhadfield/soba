@@ -9,7 +9,6 @@ require (
 	github.com/jonhadfield/githosts-utils v0.0.0-20231105155625-72ad84dfe6ef
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20231108232855-2478ac86f678
 )
 
 require (
