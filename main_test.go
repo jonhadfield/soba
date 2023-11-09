@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/jonhadfield/githosts-utils"
 	"os"
 	"path"
 	"path/filepath"
@@ -10,6 +9,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"github.com/jonhadfield/githosts-utils"
 
 	"github.com/stretchr/testify/require"
 )
