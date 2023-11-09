@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -12,7 +13,6 @@ import (
 	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/githosts-utils"
 	"github.com/pkg/errors"
-	"slices"
 )
 
 const (
