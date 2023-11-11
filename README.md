@@ -36,6 +36,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.4 release 2023-11-11
+
+- Minor updates
+
 ### 1.2.3 release 2023-08-25
 
 - Backup interval can now be specified in minutes
@@ -144,8 +148,8 @@ and this will run the backup every 45 minutes:
 export GIT_BACKUP_INTERVAL=45m
 ```
 
-note:   
-- if you don't specify the trailing 'm' or 'h' then hours are assumed.  
+note:
+- if you don't specify the trailing 'm' or 'h' then hours are assumed.
 - the interval is added to the start of the last backup and not the time it finished, therefore ensure the interval is greater than the duration of a backup.
 
 ## rotating backups
@@ -166,16 +170,16 @@ Messages are written to stdout and can be persisted by directing to a file, e.g.
 
 #### logging to /var/log/soba
 
-create a user called soba:  
-`sudo adduser soba`  
-create a log directory:   
-`sudo mkdir /var/log/soba`  
-set user permissions:   
-`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`  
-switch to soba user:  
-`sudo su - soba`  
-run soba and direct output:  
-`soba > /var/log/soba/soba.log`  
+create a user called soba:
+`sudo adduser soba`
+create a log directory:
+`sudo mkdir /var/log/soba`
+set user permissions:
+`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`
+switch to soba user:
+`sudo su - soba`
+run soba and direct output:
+`soba > /var/log/soba/soba.log`
 
 ### rotation
 
