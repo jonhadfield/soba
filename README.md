@@ -36,6 +36,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.5 release 2024-01-01
+
+- Dependency updates
+
 ### 1.2.4 release 2023-11-11
 
 - Minor updates
