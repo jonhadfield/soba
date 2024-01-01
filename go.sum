@@ -11,6 +11,8 @@ github.com/hashicorp/go-retryablehttp v0.7.5 h1:bJj+Pj19UZMIweq/iie+1u5YCdGrnxCT
 github.com/hashicorp/go-retryablehttp v0.7.5/go.mod h1:Jy/gPYAdjqffZ/yFGCFV2doI5wjtH1ewM9u8iYVjtX8=
 github.com/jonhadfield/githosts-utils v0.0.0-20231111203804-edf2e60eee43 h1:U2myZlbXAgIT70+3iRZ2D6zIsVFGlcgqlzVzSSGrVaw=
 github.com/jonhadfield/githosts-utils v0.0.0-20231111203804-edf2e60eee43/go.mod h1:F9D+jhZnVsUXvWGtEQ0lS0nBogwzQi/jd/HPMmBuIGw=
+github.com/jonhadfield/githosts-utils v0.0.0-20240101120931-5c8ac1173048 h1:ObttQPnUovzDJrXL1YRX2IBUxZRiE4TlewfY6XdV1d4=
+github.com/jonhadfield/githosts-utils v0.0.0-20240101120931-5c8ac1173048/go.mod h1:F9D+jhZnVsUXvWGtEQ0lS0nBogwzQi/jd/HPMmBuIGw=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=

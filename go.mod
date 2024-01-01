@@ -6,7 +6,7 @@ toolchain go1.21.0
 
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
-	github.com/jonhadfield/githosts-utils v0.0.0-20231111203804-edf2e60eee43
+	github.com/jonhadfield/githosts-utils v0.0.0-20240101120931-5c8ac1173048
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
 )
