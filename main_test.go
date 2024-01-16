@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"regexp"
@@ -491,6 +492,7 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	resetGlobals()
 
 	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
 
 	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
 
@@ -505,8 +507,43 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	require.NoError(t, run())
 
 	require.NoError(t, run())
+}
 
-	restoreEnvironmentVariables(envBackup)
+func TestPublicBitBucketInvalidCredentials(t *testing.T) {
+	if os.Getenv(envBitBucketUser) == "" {
+		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketUser)
+	}
+
+	resetGlobals()
+
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	unsetEnvVarsExcept([]string{envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
+
+	defer func() {
+		if err := os.Unsetenv(envBitBucketCompare); err != nil {
+			panic(fmt.Sprintf("failed to unset envvar: %s", err.Error()))
+		}
+	}()
+
+	_ = os.Setenv(envBitBucketCompare, compareTypeRefs)
+
+	// set invalid key
+	_ = os.Setenv(envBitBucketKey, "invalid")
+
+	if os.Getenv("BE_CRASHER") == "1" {
+		_ = run()
+
+		return
+	}
+	cmd := exec.Command(os.Args[0], "-test.run=TestPublicBitBucketInvalidCredentials")
+	cmd.Env = append(os.Environ(), "BE_CRASHER=1")
+	err := cmd.Run()
+	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
+		return
+	}
+	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
 func TestCheckProvidersFailureWhenNoneDefined(t *testing.T) {
