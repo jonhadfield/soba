@@ -1,0 +1,33 @@
+# soba backup schedule
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: soba
+  namespace: soba
+spec:
+  # cron format: https://en.wikipedia.org/wiki/Cron
+  # this runs soba every hour
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: soba
+            image: jonhadfield/soba:latest
+            envFrom:
+            - secretRef:
+                 name: soba
+            - configMapRef:
+                 name: soba
+            imagePullPolicy: IfNotPresent
+            volumeMounts:
+            - name: soba
+              # always keep as backup
+              mountPath: "/backup"
+          restartPolicy: Never
+          volumes:
+          - name: soba
+            persistentVolumeClaim:
+              claimName: soba

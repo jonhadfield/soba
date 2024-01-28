@@ -7,14 +7,15 @@
 - [about](#about)
 - [configuration](#configuration)
 - [run using the binary](#run-using-the-binary)
+- [run with Docker](#run-with-docker)
+- [run on Synology NAS](#run-on-synology-nas)
+- [run on Kubernetes](kubernetes/README.md)
 - [scheduling backups](#scheduling-backups)
 - [rotating backups](#rotating-backups)
 - [logging](#logging)
 - [setting provider credentials](#setting-provider-credentials)
 - [additional options](#additional-options)
-- [run using docker](#run-using-docker)
-- [run on Synology NAS](#run-on-synology-nas)
-- [restore](#restore)
+- [restoring backups](#restoring-backups)
 
 ## about
 
@@ -64,7 +65,7 @@ Not tested, but should also work on builds for: Linux (386, arm386 and arm64), F
 
 ## configuration
 
-soba can be run from the command line or as docker container. In both cases the only configuration required is an
+soba can be run from the command line or as a container. In both cases the only configuration required is an
 environment variable with the directory in which to create backups, and additional to define credentials for each the
 providers.
 
@@ -97,9 +98,9 @@ and then run:
 soba
 ```
 
-## run using docker
+## run with Docker
 
-Using docker enables you to run soba without anything else installed.
+Using Docker enables you to run soba without anything else installed.
 
 Docker requires you pass environment variables to the container using the '-e' option and that you mount your preferred
 backup directory. For example:
@@ -123,6 +124,9 @@ docker run --rm -t \
              -e GITLAB_TOKEN=$GITLAB_TOKEN \
              ghcr.io/jonhadfield/soba
 ```
+
+## run on Kubernetes
+For instructions on how to run soba on Kubernetes, see [here](kubernetes/README.md).
 
 ## scheduling backups
 
@@ -210,6 +214,8 @@ run `crontab -e`
 
 add the following (assuming you have a user called soba with a script to run it called backup in their home directory):
 `* * * * * /usr/bin/flock -n /tmp/soba.lockfile /home/soba/backup >> /var/log/soba/soba.log 2>&1`
+
+note: A useful tool for testing cron jobs is [crontab guru](https://crontab.guru/).
 
 ## setting provider credentials
 
@@ -394,7 +400,7 @@ This process is far quicker than cloning but should only be used if the followin
 The container should launch in a few seconds. You can view progress by choosing 'Container' in the left-hand menu,
 select 'soba', choose 'details' and then click on 'Log'
 
-## restore
+## restoring backups
 
 A Git bundle is an archive of a Git repository. The simplest way to restore is to clone it like a remote repository.
 
