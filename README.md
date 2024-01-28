@@ -36,31 +36,17 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.7 release 2024-01-16
+
+- Improve feedback for invalid BitBucket authentication
+
+### 1.2.6 release 2024-01-11
+
+- Minor fixes and security updates
+
 ### 1.2.5 release 2024-01-01
 
 - Dependency updates
-
-### 1.2.4 release 2023-11-11
-
-- Minor updates
-
-### 1.2.3 release 2023-08-25
-
-- Backup interval can now be specified in minutes
-
-### 1.2.2 release 2023-08-19
-
-- Minor output improvements
-
-### 1.2.1 release 2023-08-19
-
-- GitHub user repositories can now be skipped by setting GITHUB_SKIP_USER_REPOS=true
-
-### 1.2.0 release 2023-07-02
-
-- All GitHub Organizations can now be backed up by specifying * instead of individual names
-- GitLab API calls will now be retried if they initially fail
-
 
 See full changelog [here](./CHANGELOG.md).
 
