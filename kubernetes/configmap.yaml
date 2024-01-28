@@ -1,0 +1,20 @@
+# configuration used by soba
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: soba
+  namespace: soba
+data:
+  # always set to /backup
+  GIT_BACKUP_DIR: /backup
+  GITHUB_ORGS:  MyOrgOne, MyOrgTwo
+  # value must be in quotes
+  GITHUB_BACKUPS: "2"
+  GITHUB_COMPARE: refs
+  GITLAB_COMPARE: refs
+  BITBUCKET_COMPARE: refs
+  # the api url of you installation
+  # Gitea Cloud (https://about.gitea.com/) not currently supported
+  GITEA_APIURL: https://gitea.example.com/api/v1
+  GITEA_ORGS: "*"
+  GITEA_COMPARE: refs

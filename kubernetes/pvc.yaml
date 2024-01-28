@@ -1,0 +1,15 @@
+# storage claim for soba backups
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: soba
+  namespace: soba
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  volumeName: soba
+  resources:
+    requests:
+      storage: 5Gi
+  storageClassName: my-storage-class
