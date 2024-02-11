@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/go-retryablehttp"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResults, url, format string) error {
@@ -38,6 +39,9 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 	// o, err := json.MarshalIndent(webhookData, "", "  ")
 
 	o, err := json.Marshal(webhookData)
+	if err != nil {
+		return fmt.Errorf("error marshalling webhook data: %w", err)
+	}
 
 	// send to webhook
 	client := c
@@ -46,12 +50,14 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 	client.RetryWaitMax = 3 * time.Second
 
 	var req *retryablehttp.Request
+
 	req, err = retryablehttp.NewRequest(http.MethodPost, url, strings.NewReader(string(o)))
 	if err != nil {
-		return err
+		return fmt.Errorf("error creating request: %w", err)
 	}
+
 	req.Header.Set("Content-Type", "application/json")
-	// var resp *http.Response
+
 	_, err = client.Do(req)
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
@@ -94,6 +100,7 @@ func getBackupsStats(br BackupResults) (ok, failed int) {
 	if br.Results == nil {
 		return 0, 0
 	}
+
 	for _, pr := range *br.Results {
 		for _, r := range pr.Results {
 			if r.Error != nil {

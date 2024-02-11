@@ -558,12 +558,15 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 
 		return
 	}
-	cmd := exec.Command(os.Args[0], "-test.run=TestPublicBitBucketInvalidCredentials")
+
+	cmd := exec.Command(os.Args[0], "-test.run=TestPublicBitBucketInvalidCredentials") // nolint:gosec
 	cmd.Env = append(os.Environ(), "BE_CRASHER=1")
+
 	err := cmd.Run()
 	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
 		return
 	}
+
 	t.Fatalf("process ran with err %v, want exit status 1", err)
 }
 
@@ -689,6 +692,7 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 
 	result := githubHost.Backup()
 	require.Len(t, result, 7)
+
 	for _, r := range result {
 		require.Nil(t, r.Error)
 	}
