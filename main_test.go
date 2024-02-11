@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -210,6 +211,8 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
 	}
 
+	_ = os.Unsetenv(envSobaWebHookURL)
+
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
@@ -246,6 +249,8 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
 	}
 
+	_ = os.Unsetenv(envSobaWebHookURL)
+
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
@@ -279,6 +284,8 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
 	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -318,6 +325,8 @@ func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) 
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
 	}
 
+	_ = os.Unsetenv(envSobaWebHookURL)
+
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
@@ -338,6 +347,8 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 		t.Skipf("Skipping GitLab test as %s is missing", envGitLabToken)
 	}
 
+	_ = os.Unsetenv(envSobaWebHookURL)
+
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
@@ -354,6 +365,8 @@ func TestPublicGitLabRepositoryBackup2(t *testing.T) {
 	if os.Getenv(envGitLabToken) == "" {
 		t.Skipf("Skipping GitLab test as %s is missing", envGitLabToken)
 	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -375,6 +388,8 @@ func TestGiteaRepositoryBackup(t *testing.T) {
 	if os.Getenv(envGiteaAPIURL) == "" {
 		t.Skipf("Skipping Gitea test as %s is missing", envGiteaAPIURL)
 	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -403,6 +418,8 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 	if os.Getenv(envGiteaAPIURL) == "" {
 		t.Skipf("Skipping Gitea test as %s is missing", envGiteaAPIURL)
 	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -489,6 +506,8 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketUser)
 	}
 
+	_ = os.Unsetenv(envSobaWebHookURL)
+
 	resetGlobals()
 
 	envBackup := backupEnvironmentVariables()
@@ -513,6 +532,8 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 	if os.Getenv(envBitBucketUser) == "" {
 		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketUser)
 	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
 
 	resetGlobals()
 
@@ -584,6 +605,8 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
 	}
 
+	_ = os.Unsetenv(envSobaWebHookURL)
+
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
@@ -612,7 +635,10 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 		logger.Fatal(err)
 	}
 
-	githubHost.Backup()
+	result := githubHost.Backup()
+
+	out, _ := json.MarshalIndent(result, "", "  ")
+	fmt.Println(string(out))
 
 	for _, repoName := range []string{"public1", "public2"} {
 		require.DirExists(t, path.Join(backupDir, "github.com", "Nudelmesse", repoName))
@@ -630,6 +656,8 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
 		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
 	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -659,7 +687,11 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 		logger.Fatal(err)
 	}
 
-	githubHost.Backup()
+	result := githubHost.Backup()
+	require.Len(t, result, 7)
+	for _, r := range result {
+		require.Nil(t, r.Error)
+	}
 
 	for _, repoName := range []string{"public1", "public2"} {
 		require.DirExists(t, path.Join(backupDir, "github.com", "Nudelmesse", repoName))
