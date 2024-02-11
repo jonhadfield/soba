@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-retryablehttp"
 	"log"
 	"os"
 	"runtime"
@@ -26,6 +27,8 @@ const (
 
 	// env vars
 	envSobaLogLevel      = "SOBA_LOG"
+	envSobaWebHookURL    = "SOBA_WEBHOOK_URL"
+	envSobaWebHookFormat = "SOBA_WEBHOOK_FORMAT"
 	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
 	envGitBackupDir      = "GIT_BACKUP_DIR"
 	envGitHubAPIURL      = "GITHUB_APIURL"
@@ -377,12 +380,32 @@ func getOrgsListFromEnvVar(envVar string) []string {
 	return strings.Split(orgsList, ",")
 }
 
+type ProviderBackupResults struct {
+	Provider string                        `json:"provider"`
+	Results  githosts.ProviderBackupResult `json:"results"`
+}
+
+type BackupResults struct {
+	StartedAt  sobaTime                 `json:"started_at"`
+	FinishedAt sobaTime                 `json:"finished_at"`
+	Results    *[]ProviderBackupResults `json:"results,omitempty"`
+}
+
 func execProviderBackups() {
 	var err error
 
 	startTime := time.Now()
 
 	backupDir := os.Getenv(envGitBackupDir)
+
+	backupResults := BackupResults{
+		StartedAt: sobaTime{
+			Time: time.Now(),
+			f:    time.RFC3339,
+		},
+	}
+
+	var providerBackupResults []ProviderBackupResults
 
 	if os.Getenv(envBitBucketUser) != "" {
 		logger.Println("backing up BitBucket repos")
@@ -404,7 +427,12 @@ func execProviderBackups() {
 			logger.Fatal(err)
 		}
 
-		bitbucketHost.Backup()
+		bitBucketResults := bitbucketHost.Backup()
+
+		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
+			Provider: providerNameBitBucket,
+			Results:  bitBucketResults,
+		})
 	}
 
 	if os.Getenv(envGiteaToken) != "" {
@@ -426,7 +454,12 @@ func execProviderBackups() {
 			logger.Fatal(err)
 		}
 
-		giteaHost.Backup()
+		giteaResults := giteaHost.Backup()
+
+		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
+			Provider: providerNameBitBucket,
+			Results:  giteaResults,
+		})
 	}
 
 	if os.Getenv(envGitHubToken) != "" {
@@ -449,7 +482,11 @@ func execProviderBackups() {
 			logger.Fatal(err)
 		}
 
-		githubHost.Backup()
+		githubResults := githubHost.Backup()
+		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
+			Provider: providerNameGitHub,
+			Results:  githubResults,
+		})
 	}
 
 	if os.Getenv(envGitLabToken) != "" {
@@ -471,7 +508,12 @@ func execProviderBackups() {
 			logger.Fatal(err)
 		}
 
-		gitlabHost.Backup()
+		gitlabResults := gitlabHost.Backup()
+
+		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
+			Provider: providerNameGitLab,
+			Results:  gitlabResults,
+		})
 	}
 
 	logger.Println("cleaning up")
@@ -486,7 +528,34 @@ func execProviderBackups() {
 	// TODO: use a debug flag to enable this
 	// logger.Printf("file removals took %s", time.Since(startFileRemovals).String())
 
-	logger.Println("backups complete")
+	backupResults.Results = &providerBackupResults
+	backupResults.FinishedAt = sobaTime{
+		Time: time.Now(),
+		f:    time.RFC3339,
+	}
+
+	_, failed := getBackupsStats(backupResults)
+
+	if failed > 0 {
+		logger.Println("backups completed with errors")
+	} else {
+		logger.Println("backups complete")
+	}
+
+	client := getHttpClient(os.Getenv(envSobaLogLevel))
+
+	webHookURL := os.Getenv(envSobaWebHookURL)
+	if webHookURL != "" {
+		err = sendWebhook(client, sobaTime{
+			Time: time.Now(),
+			f:    time.RFC3339,
+		}, backupResults, os.Getenv(envSobaWebHookURL), os.Getenv(envSobaWebHookFormat))
+		if err != nil {
+			logger.Printf("error sending webhook: %s", err)
+		} else {
+			logger.Println("webhook sent")
+		}
+	}
 
 	if backupInterval := getBackupInterval(); backupInterval > 0 {
 		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Minute)
@@ -546,4 +615,15 @@ func isInt(i string) (int, bool) {
 	}
 
 	return 0, false
+}
+
+func getHttpClient(logLevel string) *retryablehttp.Client {
+	c := retryablehttp.NewClient()
+	c.RetryWaitMin = 10 * time.Second
+	c.RetryMax = 3
+	if !strings.EqualFold(logLevel, "debug") {
+		c.Logger = nil
+	}
+
+	return c
 }
