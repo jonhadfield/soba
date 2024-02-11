@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/hashicorp/go-retryablehttp"
 	"log"
 	"os"
 	"runtime"
@@ -10,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
 
 	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/githosts-utils"
@@ -542,7 +543,7 @@ func execProviderBackups() {
 		logger.Println("backups complete")
 	}
 
-	client := getHttpClient(os.Getenv(envSobaLogLevel))
+	client := getHTTPClient(os.Getenv(envSobaLogLevel))
 
 	webHookURL := os.Getenv(envSobaWebHookURL)
 	if webHookURL != "" {
@@ -617,10 +618,11 @@ func isInt(i string) (int, bool) {
 	return 0, false
 }
 
-func getHttpClient(logLevel string) *retryablehttp.Client {
+func getHTTPClient(logLevel string) *retryablehttp.Client {
 	c := retryablehttp.NewClient()
 	c.RetryWaitMin = 10 * time.Second
 	c.RetryMax = 3
+
 	if !strings.EqualFold(logLevel, "debug") {
 		c.Logger = nil
 	}

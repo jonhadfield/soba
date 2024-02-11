@@ -1,13 +1,14 @@
 package main
 
 import (
+	"net/url"
+	"testing"
+	"time"
+
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/jonhadfield/githosts-utils"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/h2non/gock.v1"
-	"net/url"
-	"testing"
-	"time"
 )
 
 const exampleWebHookURL = "https://webhook.example.com"
@@ -42,10 +43,12 @@ func TestWebhookLongFormat(t *testing.T) {
 
 	u, err := url.Parse(exampleWebHookURL)
 	require.NoError(t, err)
+
 	theTime := sobaTime{
 		Time: time.Date(2024, 1, 15, 14, 30, 45, 100, time.UTC),
 		f:    time.RFC3339,
 	}
+
 	start := theTime.Add(-time.Minute * 20)
 	end := theTime.Add(-time.Second * 10)
 
@@ -80,10 +83,12 @@ func TestWebhookShortFormat(t *testing.T) {
 
 	u, err := url.Parse(exampleWebHookURL)
 	require.NoError(t, err)
+
 	theTime := sobaTime{
 		Time: time.Date(2024, 1, 15, 14, 30, 45, 100, time.UTC),
 		f:    time.RFC3339,
 	}
+
 	start := theTime.Add(-time.Minute * 20)
 	end := theTime.Add(-time.Second * 10)
 
