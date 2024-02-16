@@ -12,6 +12,7 @@
 - [run on Kubernetes](kubernetes/README.md)
 - [scheduling backups](#scheduling-backups)
 - [rotating backups](#rotating-backups)
+- [notifications](#notifications)
 - [logging](#logging)
 - [setting provider credentials](#setting-provider-credentials)
 - [additional options](#additional-options)
@@ -37,6 +38,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.8 release 2024-02-14
+
+- Adds new feature to enable sending webhooks on completion
+
 ### 1.2.7 release 2024-01-16
 
 - Improve feedback for invalid BitBucket authentication
@@ -44,10 +49,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.6 release 2024-01-11
 
 - Minor fixes and security updates
-
-### 1.2.5 release 2024-01-01
-
-- Dependency updates
 
 See full changelog [here](./CHANGELOG.md).
 
@@ -130,7 +131,7 @@ For instructions on how to run soba on Kubernetes, see [here](kubernetes/README.
 
 ## scheduling backups
 
-Backups can be scheduled to run by setting an additional environment variable: GIT_BACKUP_INTERVAL. The value is the can be specified in hours (default) or minutes. For example, this will run the backup daily:
+Backups can be scheduled to run by setting an additional environment variable: `GIT_BACKUP_INTERVAL`. The value is the can be specified in hours (default) or minutes. For example, this will run the backup daily:
 
 ```bash
 export GIT_BACKUP_INTERVAL=24h
@@ -149,11 +150,24 @@ note:
 ## rotating backups
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
-following provider specific environment variables:
-`GITEA_BACKUPS=x`
-`GITHUB_BACKUPS=x`
-`GITLAB_BACKUPS=x`
-`BITBUCKET_BACKUPS=x`
+following provider specific environment variables:  
+`GITEA_BACKUPS=x`  
+`GITHUB_BACKUPS=x`  
+`GITLAB_BACKUPS=x`  
+`BITBUCKET_BACKUPS=x`  
+
+## notifications
+
+### webhooks 
+*(since release 1.2.8)*  
+To send a webhook on completion of a run set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint. For example:  
+`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`
+#### webhook payload
+The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup. You can see an example [here](examples/webhook.json).  
+For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBOOK_FORMAT`. For example:    
+`$ export SOBA_WEBHOOK_FORMAT=short`
+You can see a sample [here](examples/webhook-short.json).  
+*The default format (if not specified) is `long`*
 
 ## logging
 

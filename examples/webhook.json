@@ -1,0 +1,45 @@
+{
+  "app": "soba",
+  "type": "backups.complete",
+  "stats": {
+    "succeeded": 5,
+    "failed": 0
+  },
+  "timestamp": "2024-02-11T12:34:39Z",
+  "data": {
+    "started_at": "2024-02-11T12:34:32Z",
+    "finished_at": "2024-02-11T12:34:39Z",
+    "results": [
+      {
+        "provider": "GitHub",
+        "results": [
+          {
+            "repo": "go-soba/repo1",
+            "status": "ok"
+          },
+          {
+            "repo": "go-soba/repo0",
+            "status": "ok"
+          },
+          {
+            "repo": "Nudelmesse/private2",
+            "status": "ok"
+          }
+        ]
+      },
+      {
+        "provider": "GitLab",
+        "results": [
+          {
+            "repo": "biscuits2/bourbon",
+            "status": "ok"
+          },
+          {
+            "repo": "soba-test/my-soba-group-project",
+            "status": "ok"
+          }
+        ]
+      }
+    ]
+  }
+}

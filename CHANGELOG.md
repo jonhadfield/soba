@@ -1,3 +1,7 @@
+### 1.2.8 release 2024-02-14
+
+- Adds new feature to enable sending webhooks on completion
+
 ### 1.2.7 release 2024-01-16
 
 - Improve feedback for invalid BitBucket authentication
