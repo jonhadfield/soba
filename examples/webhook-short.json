@@ -1,0 +1,13 @@
+{
+  "app": "soba",
+  "type": "backups.complete",
+  "stats": {
+    "succeeded": 14,
+    "failed": 0
+  },
+  "timestamp": "2024-02-11T12:35:08Z",
+  "data": {
+    "started_at": "2024-02-11T12:35:01Z",
+    "finished_at": "2024-02-11T12:35:08Z"
+  }
+}
