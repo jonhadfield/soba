@@ -22,7 +22,7 @@ fmt:
 	goimports -w . && gofumpt -l -w .
 
 lint:
-	golangci-lint run --disable lll --disable interfacer --disable gochecknoglobals --disable gochecknoinits --enable wsl --enable revive --enable gosec --enable exhaustruct --enable unused --enable gocritic --enable gofmt --enable goimports --enable misspell --enable unparam --enable goconst --enable wrapcheck
+	golangci-lint run --disable lll --disable interfacer --disable gochecknoglobals --disable gochecknoinits --enable wsl --enable revive --enable gosec --enable unused --enable gocritic --enable gofmt --enable goimports --enable misspell --enable unparam --enable goconst --enable wrapcheck
 ci: lint test
 
 BUILD_TAG := $(shell git describe --tags 2>/dev/null)

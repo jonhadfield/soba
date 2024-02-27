@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"strconv"
@@ -23,17 +24,19 @@ const (
 	workingDIRMode                         = 0o755
 	defaultBackupsToRetain                 = 2
 	defaultGitLabMinimumProjectAccessLevel = 20
+	defaultEarlyErrorBackOffSeconds        = 5
 
 	pathSep = string(os.PathSeparator)
 
 	// env vars
-	envSobaLogLevel      = "SOBA_LOG"
-	envSobaWebHookURL    = "SOBA_WEBHOOK_URL"
-	envSobaWebHookFormat = "SOBA_WEBHOOK_FORMAT"
-	envGitBackupInterval = "GIT_BACKUP_INTERVAL"
-	envGitBackupDir      = "GIT_BACKUP_DIR"
-	envGitHubAPIURL      = "GITHUB_APIURL"
-	envGitHubBackups     = "GITHUB_BACKUPS"
+	envSobaLogLevel          = "SOBA_LOG"
+	envSobaWebHookURL        = "SOBA_WEBHOOK_URL"
+	envSobaWebHookFormat     = "SOBA_WEBHOOK_FORMAT"
+	envSobaEarlyErrorBackOff = "SOBA_EARLY_ERROR_BACKOFF"
+	envGitBackupInterval     = "GIT_BACKUP_INTERVAL"
+	envGitBackupDir          = "GIT_BACKUP_DIR"
+	envGitHubAPIURL          = "GITHUB_APIURL"
+	envGitHubBackups         = "GITHUB_BACKUPS"
 	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
@@ -133,18 +136,16 @@ func getBackupInterval() int {
 func getLogLevel() int {
 	sobaLogLevelEnv := os.Getenv(envSobaLogLevel)
 
-	var sobaLogLevel int
-
-	var intervalConversionErr error
-
 	if sobaLogLevelEnv != "" {
-		sobaLogLevel, intervalConversionErr = strconv.Atoi(sobaLogLevelEnv)
-		if intervalConversionErr != nil {
+		sobaLogLevel, err := strconv.Atoi(sobaLogLevelEnv)
+		if err != nil {
 			logger.Fatalf("%s must be a number.", envSobaLogLevel)
 		}
+
+		return sobaLogLevel
 	}
 
-	return sobaLogLevel
+	return 0
 }
 
 func checkProviderFactory(provider string) func() {
@@ -302,11 +303,7 @@ func displayStartupConfig() {
 func run() error {
 	displayStartupConfig()
 
-	var backupDIR string
-
-	var backupDIRKeyExists bool
-
-	backupDIR, backupDIRKeyExists = os.LookupEnv(envGitBackupDir)
+	backupDIR, backupDIRKeyExists := os.LookupEnv(envGitBackupDir)
 	if !backupDIRKeyExists || backupDIR == "" {
 		return fmt.Errorf("environment variable %s must be set", envGitBackupDir)
 	}
@@ -317,7 +314,7 @@ func run() error {
 		}
 	}
 
-	backupDIR = stripTrailingLineBreak(backupDIR)
+	backupDIR = strings.TrimSuffix(backupDIR, "\n")
 
 	_, err := os.Stat(backupDIR)
 	if os.IsNotExist(err) {
@@ -328,11 +325,7 @@ func run() error {
 		logger.Fatal("no providers defined")
 	}
 
-	if len(backupDIR) > 1 && strings.HasSuffix(backupDIR, "/") {
-		backupDIR = backupDIR[:len(backupDIR)-1]
-	}
-
-	workingDIR := backupDIR + pathSep + workingDIRName
+	workingDIR := filepath.Join(backupDIR, workingDIRName)
 
 	logger.Println("creating working directory:", workingDIR)
 	createWorkingDIRErr := os.MkdirAll(workingDIR, workingDIRMode)
@@ -409,112 +402,19 @@ func execProviderBackups() {
 	var providerBackupResults []ProviderBackupResults
 
 	if os.Getenv(envBitBucketUser) != "" {
-		logger.Println("backing up BitBucket repos")
-
-		var bitbucketHost *githosts.BitbucketHost
-
-		bitbucketHost, err = githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
-			Caller:           appName,
-			APIURL:           os.Getenv(envBitBucketAPIURL),
-			DiffRemoteMethod: os.Getenv(envBitBucketCompare),
-			BackupDir:        backupDir,
-			User:             os.Getenv(envBitBucketUser),
-			Key:              os.Getenv(envBitBucketKey),
-			Secret:           os.Getenv(envBitBucketSecret),
-			BackupsToRetain:  getBackupsToRetain(envBitBucketBackups),
-			LogLevel:         getLogLevel(),
-		})
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		bitBucketResults := bitbucketHost.Backup()
-
-		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
-			Provider: providerNameBitBucket,
-			Results:  bitBucketResults,
-		})
+		providerBackupResults = append(providerBackupResults, *Bitbucket(backupDir))
 	}
 
 	if os.Getenv(envGiteaToken) != "" {
-		logger.Println("backing up Gitea repos")
-
-		var giteaHost *githosts.GiteaHost
-
-		giteaHost, err = githosts.NewGiteaHost(githosts.NewGiteaHostInput{
-			Caller:           appName,
-			APIURL:           os.Getenv(envGiteaAPIURL),
-			DiffRemoteMethod: os.Getenv(envGiteaCompare),
-			BackupDir:        backupDir,
-			Token:            os.Getenv(envGiteaToken),
-			Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
-			BackupsToRetain:  getBackupsToRetain(envGiteaBackups),
-			LogLevel:         getLogLevel(),
-		})
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		giteaResults := giteaHost.Backup()
-
-		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
-			Provider: providerNameBitBucket,
-			Results:  giteaResults,
-		})
+		providerBackupResults = append(providerBackupResults, *Gitea(backupDir))
 	}
 
 	if os.Getenv(envGitHubToken) != "" {
-		logger.Println("backing up GitHub repos")
-
-		var githubHost *githosts.GitHubHost
-
-		githubHost, err = githosts.NewGitHubHost(githosts.NewGitHubHostInput{
-			Caller:           appName,
-			APIURL:           os.Getenv(envGitHubAPIURL),
-			DiffRemoteMethod: os.Getenv(envGitHubCompare),
-			BackupDir:        backupDir,
-			Token:            os.Getenv(envGitHubToken),
-			Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
-			BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
-			SkipUserRepos:    envTrue(envGitHubSkipUserRepos),
-			LogLevel:         getLogLevel(),
-		})
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		githubResults := githubHost.Backup()
-		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
-			Provider: providerNameGitHub,
-			Results:  githubResults,
-		})
+		providerBackupResults = append(providerBackupResults, *GitHub(backupDir))
 	}
 
 	if os.Getenv(envGitLabToken) != "" {
-		logger.Println("backing up GitLab repos")
-
-		var gitlabHost *githosts.GitLabHost
-
-		gitlabHost, err = githosts.NewGitLabHost(githosts.NewGitLabHostInput{
-			Caller:                appName,
-			APIURL:                os.Getenv(envGitLabAPIURL),
-			DiffRemoteMethod:      os.Getenv(envGitLabCompare),
-			BackupDir:             backupDir,
-			Token:                 os.Getenv(envGitLabToken),
-			BackupsToRetain:       getBackupsToRetain(envGitLabBackups),
-			ProjectMinAccessLevel: getProjectMinimumAccessLevel(),
-			LogLevel:              getLogLevel(),
-		})
-		if err != nil {
-			logger.Fatal(err)
-		}
-
-		gitlabResults := gitlabHost.Backup()
-
-		providerBackupResults = append(providerBackupResults, ProviderBackupResults{
-			Provider: providerNameGitLab,
-			Results:  gitlabResults,
-		})
+		providerBackupResults = append(providerBackupResults, *Gitlab(backupDir))
 	}
 
 	logger.Println("cleaning up")
@@ -526,7 +426,6 @@ func execProviderBackups() {
 			backupDir+pathSep+workingDIRName)
 	}
 
-	// TODO: use a debug flag to enable this
 	// logger.Printf("file removals took %s", time.Since(startFileRemovals).String())
 
 	backupResults.Results = &providerBackupResults
@@ -558,6 +457,16 @@ func execProviderBackups() {
 		}
 	}
 
+	// help avoid thrashing provider apis if job auto-restartsrestarts
+	// after an early failure by adding delay if backup took less than 10 seconds
+	if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
+		logger.Printf("backup took less than 10 seconds, "+
+			"waiting %d seconds before next run to avoid thrashing"+
+			" provider apis", defaultEarlyErrorBackOffSeconds)
+
+		time.Sleep(time.Second * defaultEarlyErrorBackOffSeconds)
+	}
+
 	if backupInterval := getBackupInterval(); backupInterval > 0 {
 		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Minute)
 		if nextBackupTime.Before(time.Now()) {
@@ -566,14 +475,6 @@ func execProviderBackups() {
 
 		logger.Printf("next run scheduled for: %s", nextBackupTime.Format("2006-01-02 15:04:05 -0700 MST"))
 	}
-}
-
-func stripTrailingLineBreak(input string) string {
-	if strings.HasSuffix(input, "\n") {
-		return input[:len(input)-2]
-	}
-
-	return input
 }
 
 func getProjectMinimumAccessLevel() int {

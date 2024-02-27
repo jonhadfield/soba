@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -278,6 +279,41 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
 	require.Len(t, files, 2)
+}
+
+func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
+	_ = os.Unsetenv(envSobaWebHookURL)
+
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	preflight()
+	resetGlobals()
+
+	defer resetBackups()
+
+	// Unset Env Vars but exclude those defined
+	unsetEnvVarsExcept([]string{envGitBackupDir, envGitHubToken, envGitHubCompare})
+
+	// set invalid token
+	_ = os.Setenv(envGitHubToken, "invalid")
+
+	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
+		Caller:           appName,
+		APIURL:           os.Getenv(envGitHubAPIURL),
+		DiffRemoteMethod: os.Getenv(envGitHubCompare),
+		BackupDir:        os.TempDir(),
+		Token:            os.Getenv(envGitHubToken),
+		Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
+		BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
+		SkipUserRepos:    envTrue(envGitHubSkipUserRepos),
+		LogLevel:         getLogLevel(),
+	})
+	require.NoError(t, err)
+
+	result := githubHost.Backup()
+	require.NotNil(t, result.Error)
+	require.Contains(t, errors.Unwrap(result.Error).Error(), "Bad credentials")
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
@@ -691,11 +727,14 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 	}
 
 	result := githubHost.Backup()
-	require.Len(t, result, 7)
+	require.Len(t, result.BackupResults, 7)
+	require.Nil(t, result.Error)
 
-	for _, r := range result {
+	for _, r := range result.BackupResults {
 		require.Nil(t, r.Error)
 	}
+
+	require.Nil(t, result.Error)
 
 	for _, repoName := range []string{"public1", "public2"} {
 		require.DirExists(t, path.Join(backupDir, "github.com", "Nudelmesse", repoName))
