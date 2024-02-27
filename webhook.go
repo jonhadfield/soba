@@ -44,10 +44,9 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 	}
 
 	// send to webhook
-	client := c
-	client.RetryMax = 3
-	client.RetryWaitMin = 1 * time.Second
-	client.RetryWaitMax = 3 * time.Second
+	c.RetryMax = 3
+	c.RetryWaitMin = 1 * time.Second
+	c.RetryWaitMax = 3 * time.Second
 
 	var req *retryablehttp.Request
 
@@ -58,7 +57,7 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = client.Do(req)
+	_, err = c.Do(req)
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 	}
@@ -80,11 +79,11 @@ func (j sobaTime) format() string {
 	return j.Time.Format(j.f)
 }
 
-func (j sobaTime) MarshalText() ([]byte, error) {
+func (j sobaTime) MarshalText() ([]byte, error) { // nolint: unparam
 	return []byte(j.format()), nil
 }
 
-func (j sobaTime) MarshalJSON() ([]byte, error) {
+func (j sobaTime) MarshalJSON() ([]byte, error) { // nolint: unparam
 	return []byte(`"` + j.format() + `"`), nil
 }
 
@@ -102,7 +101,7 @@ func getBackupsStats(br BackupResults) (ok, failed int) {
 	}
 
 	for _, pr := range *br.Results {
-		for _, r := range pr.Results {
+		for _, r := range pr.Results.BackupResults {
 			if r.Error != nil {
 				failed++
 

@@ -17,16 +17,19 @@ var testProviderBackupResults = []ProviderBackupResults{
 	{
 		Provider: "GitHub",
 		Results: githosts.ProviderBackupResult{
-			githosts.RepoBackupResults{
-				Repo:   "https://github.com/jonhadfield/githosts-utils",
-				Status: "ok",
-				Error:  nil,
+			BackupResults: []githosts.RepoBackupResults{
+				{
+					Repo:   "https://github.com/jonhadfield/githosts-utils",
+					Status: "ok",
+					Error:  nil,
+				},
+				{
+					Repo:   "https://github.com/jonhadfield/soba",
+					Status: "ok",
+					Error:  nil,
+				},
 			},
-			githosts.RepoBackupResults{
-				Repo:   "https://github.com/jonhadfield/soba",
-				Status: "ok",
-				Error:  nil,
-			},
+			Error: nil,
 		},
 	},
 }
@@ -52,7 +55,7 @@ func TestWebhookLongFormat(t *testing.T) {
 	start := theTime.Add(-time.Minute * 20)
 	end := theTime.Add(-time.Second * 10)
 
-	json := `{"app":"soba","type":"backups.complete","stats":{"succeeded":2,"failed":0},"timestamp":"2024-01-15T14:30:45Z","data":{"started_at":"2024-01-15T14:10:45Z","finished_at":"2024-01-15T14:30:35Z","results":[{"provider":"GitHub","results":[{"repo":"https://github.com/jonhadfield/githosts-utils","status":"ok"},{"repo":"https://github.com/jonhadfield/soba","status":"ok"}]}]}}`
+	json := `{"app":"soba","type":"backups.complete","stats":{"succeeded":2,"failed":0},"timestamp":"2024-01-15T14:30:45Z","data":{"started_at":"2024-01-15T14:10:45Z","finished_at":"2024-01-15T14:30:35Z","results":[{"provider":"GitHub","results":{"BackupResults":[{"repo":"https://github.com/jonhadfield/githosts-utils","status":"ok"},{"repo":"https://github.com/jonhadfield/soba","status":"ok"}],"Error":null}}]}}`
 	gock.New(exampleWebHookURL).
 		Post(u.Path).
 		MatchHeader("Content-Type", "application/json").
