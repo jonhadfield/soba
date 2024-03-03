@@ -386,8 +386,6 @@ type BackupResults struct {
 }
 
 func execProviderBackups() {
-	var err error
-
 	startTime := time.Now()
 
 	backupDir := os.Getenv(envGitBackupDir)
@@ -434,7 +432,7 @@ func execProviderBackups() {
 		f:    time.RFC3339,
 	}
 
-	_, failed := getBackupsStats(backupResults)
+	succeeded, failed := getBackupsStats(backupResults)
 
 	if failed > 0 {
 		logger.Println("backups completed with errors")
@@ -442,19 +440,16 @@ func execProviderBackups() {
 		logger.Println("backups complete")
 	}
 
-	client := getHTTPClient(os.Getenv(envSobaLogLevel))
+	notify(backupResults, succeeded, failed)
 
-	webHookURL := os.Getenv(envSobaWebHookURL)
-	if webHookURL != "" {
-		err = sendWebhook(client, sobaTime{
-			Time: time.Now(),
-			f:    time.RFC3339,
-		}, backupResults, os.Getenv(envSobaWebHookURL), os.Getenv(envSobaWebHookFormat))
-		if err != nil {
-			logger.Printf("error sending webhook: %s", err)
-		} else {
-			logger.Println("webhook sent")
-		}
+	// help avoid thrashing provider apis if job auto-restarts
+	// after an early failure by adding delay if backup took less than 10 seconds
+	if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
+		logger.Printf("backup took less than 10 seconds, "+
+			"waiting %d seconds before next run to avoid thrashing"+
+			" provider apis", defaultEarlyErrorBackOffSeconds)
+
+		time.Sleep(time.Second * defaultEarlyErrorBackOffSeconds)
 	}
 
 	// help avoid thrashing provider apis if job auto-restartsrestarts
