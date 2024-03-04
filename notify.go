@@ -24,7 +24,9 @@ func getResultsErrors(results BackupResults) []errors.E {
 	}
 
 	for _, providerResults := range *results.Results {
-		errs = append(errs, providerResults.Results.Error)
+		if providerResults.Results.Error != nil {
+			errs = append(errs, providerResults.Results.Error)
+		}
 	}
 
 	return errs
@@ -68,7 +70,7 @@ func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs
 	msg := fmt.Sprintf("completed: %d, failed: %d",
 		succeeded, failed)
 
-	if len(errs) > 0 {
+	if len(errs) > 0 && errs[0] != nil {
 		msg = fmt.Sprintf("%s\nerror: %s", msg, errs[0].Error())
 	}
 
