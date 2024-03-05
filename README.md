@@ -38,6 +38,14 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.10 release 2024-03-04
+
+- Bugfix for notification error handling
+
+### 1.2.9 release 2024-03-03
+
+- Adds new feature to enable publishing to [ntfy](https://ntfy.sh/) topic on completion
+
 ### 1.2.8 release 2024-02-14
 
 - Adds new feature to enable sending webhooks on completion
@@ -45,10 +53,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.7 release 2024-01-16
 
 - Improve feedback for invalid BitBucket authentication
-
-### 1.2.6 release 2024-01-11
-
-- Minor fixes and security updates
 
 See full changelog [here](./CHANGELOG.md).
 
@@ -150,24 +154,33 @@ note:
 ## rotating backups
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
-following provider specific environment variables:  
-`GITEA_BACKUPS=x`  
-`GITHUB_BACKUPS=x`  
-`GITLAB_BACKUPS=x`  
-`BITBUCKET_BACKUPS=x`  
+following provider specific environment variables:
+`GITEA_BACKUPS=x`
+`GITHUB_BACKUPS=x`
+`GITLAB_BACKUPS=x`
+`BITBUCKET_BACKUPS=x`
 
 ## notifications
 
-### webhooks 
-*(since release 1.2.8)*  
-To send a webhook on completion of a run set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint. For example:  
-`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`
+### webhooks
+*(since release 1.2.8)*
+To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint. For example:
+`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`   
+
 #### webhook payload
-The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup. You can see an example [here](examples/webhook.json).  
-For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBOOK_FORMAT`. For example:    
+The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup. You can see an example [here](examples/webhook.json).
+For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBOOK_FORMAT`. For example:
 `$ export SOBA_WEBHOOK_FORMAT=short`
-You can see a sample [here](examples/webhook-short.json).  
+You can see a sample [here](examples/webhook-short.json).
 *The default format (if not specified) is `long`*
+
+> NOTE: The long format webhook will contain a list of your repos and, if there's an error, may contain other details including URLs. Please keep this in mind when sending to endpoints that may be insecure.
+
+### ntfy
+*(since release 1.2.10)*
+ntfy is a popular service that enables push notifications for desktop and mobile apps.
+To send a message on completion of a run: set the environment variable `SOBA_NTFY_URL` with the url of the endpoint. For example:
+`$ export SOBA_NTFY_URL=https://ntfy.sh/example-topic`  
 
 ## logging
 
