@@ -1,3 +1,11 @@
+### 1.2.10 release 2024-03-04
+
+- Bugfix for notification error handling
+
+### 1.2.9 release 2024-03-03
+
+- Adds new feature to enable publishing to [ntfy](https://ntfy.sh/) topic on completion
+
 ### 1.2.8 release 2024-02-14
 
 - Adds new feature to enable sending webhooks on completion
