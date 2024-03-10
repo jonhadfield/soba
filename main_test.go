@@ -23,6 +23,7 @@ var sobaEnvVarKeys = []string{
 	envGitHubCompare, envGitLabCompare, envBitBucketCompare,
 	envBitBucketUser, envBitBucketKey, envBitBucketSecret, envBitBucketBackups,
 	envGiteaAPIURL, envGiteaToken, envGiteaOrgs, envGiteaCompare, envGiteaBackups,
+	envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsCompare, envAzureDevOpsBackups,
 }
 
 func removeContents(dir string) error {
@@ -205,6 +206,37 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	require.Zero(t, originalFound)
 
 	require.Equal(t, 1, renamedFound)
+}
+
+func TestAzureDevOpsRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
+	if os.Getenv(envAzureDevOpsUserName) == "" {
+		t.Skipf("Skipping Azure DevOps test as %s is missing", envAzureDevOpsUserName)
+	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
+
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	preflight()
+	resetGlobals()
+
+	defer resetBackups()
+
+	// Unset Env Vars but exclude those defined
+	unsetEnvVarsExcept([]string{
+		envGitBackupDir,
+		envAzureDevOpsUserName,
+		envAzureDevOpsPAT,
+		envAzureDevOpsOrgs,
+		envAzureDevOpsBackups,
+		envAzureDevOpsCompare,
+	})
+
+	// run
+	require.NoError(t, run())
+
+	require.NoError(t, run())
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
