@@ -37,6 +37,11 @@ const (
 	envGitBackupDir          = "GIT_BACKUP_DIR"
 	envGitHubAPIURL          = "GITHUB_APIURL"
 	envGitHubBackups         = "GITHUB_BACKUPS"
+	envAzureDevOpsOrgs       = "AZURE_DEVOPS_ORGS"
+	envAzureDevOpsUserName   = "AZURE_DEVOPS_USERNAME"
+	envAzureDevOpsPAT        = "AZURE_DEVOPS_PAT"
+	envAzureDevOpsCompare    = "AZURE_DEVOPS_COMPARE"
+	envAzureDevOpsBackups    = "AZURE_DEVOPS_BACKUPS"
 	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
@@ -60,10 +65,11 @@ const (
 	envGiteaOrgs            = "GITEA_ORGS"
 
 	// provider names
-	providerNameBitBucket = "BitBucket"
-	providerNameGitHub    = "GitHub"
-	providerNameGitLab    = "GitLab"
-	providerNameGitea     = "Gitea"
+	providerNameAzureDevOps = "AzureDevOps"
+	providerNameBitBucket   = "BitBucket"
+	providerNameGitHub      = "GitHub"
+	providerNameGitLab      = "GitLab"
+	providerNameGitea       = "Gitea"
 
 	// compare types
 	compareTypeRefs  = "refs"
@@ -76,6 +82,10 @@ var (
 	version, tag, sha, buildDate string
 
 	enabledProviderAuth = map[string][]string{
+		providerNameAzureDevOps: {
+			envAzureDevOpsUserName,
+			envAzureDevOpsPAT,
+		},
 		providerNameGitHub: {
 			envGitHubToken,
 		},
@@ -99,6 +109,7 @@ var (
 	}
 	userAndPasswordProviders = []string{
 		providerNameBitBucket,
+		providerNameAzureDevOps,
 	}
 	numUserDefinedProviders int64
 )
@@ -298,6 +309,20 @@ func displayStartupConfig() {
 			logger.Printf("BitBucket compare method: %s", compareTypeClone)
 		}
 	}
+
+	// output azure devops config
+	// output github config
+	if azureDevOpsUserName := os.Getenv(envAzureDevOpsUserName); azureDevOpsUserName != "" {
+		if ghOrgs := strings.ToLower(os.Getenv(envAzureDevOpsOrgs)); ghOrgs != "" {
+			logger.Printf("Azure DevOps Organistations: %s", ghOrgs)
+		}
+
+		if strings.EqualFold(os.Getenv(envAzureDevOpsCompare), compareTypeRefs) {
+			logger.Print("Azure DevOps compare method: refs")
+		} else {
+			logger.Print("Azure DevOps compare method: clone")
+		}
+	}
 }
 
 func run() error {
@@ -413,6 +438,10 @@ func execProviderBackups() {
 
 	if os.Getenv(envGitLabToken) != "" {
 		providerBackupResults = append(providerBackupResults, *Gitlab(backupDir))
+	}
+
+	if os.Getenv(envAzureDevOpsUserName) != "" {
+		providerBackupResults = append(providerBackupResults, *AzureDevOps(backupDir))
 	}
 
 	logger.Println("cleaning up")
