@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"slices"
@@ -29,6 +30,7 @@ const (
 	pathSep = string(os.PathSeparator)
 
 	// env vars
+	envPath                  = "PATH"
 	envSobaLogLevel          = "SOBA_LOG"
 	envSobaWebHookURL        = "SOBA_WEBHOOK_URL"
 	envSobaWebHookFormat     = "SOBA_WEBHOOK_FORMAT"
@@ -326,7 +328,14 @@ func displayStartupConfig() {
 }
 
 func run() error {
+	gitExecPath := gitInstallPath()
+	if gitExecPath == "" {
+		return errors.New("git not found in PATH")
+	}
+
 	displayStartupConfig()
+
+	logger.Println("using git executable:", gitExecPath)
 
 	backupDIR, backupDIRKeyExists := os.LookupEnv(envGitBackupDir)
 	if !backupDIRKeyExists || backupDIR == "" {
@@ -553,4 +562,12 @@ func getHTTPClient(logLevel string) *retryablehttp.Client {
 	}
 
 	return c
+}
+
+var lookPath = exec.LookPath
+
+func gitInstallPath() string {
+	path, _ := lookPath("git")
+
+	return path
 }
