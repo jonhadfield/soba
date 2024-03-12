@@ -1,3 +1,7 @@
+### 1.2.11 release 2024-03-10
+
+- Add support for Azure DevOps respositories
+
 ### 1.2.10 release 2024-03-04
 
 - Bugfix for notification error handling

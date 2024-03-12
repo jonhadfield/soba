@@ -38,6 +38,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.11 release 2024-03-10
+
+- Add support for Azure DevOps respositories
+
 ### 1.2.10 release 2024-03-04
 
 - Bugfix for notification error handling
@@ -50,10 +54,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 - Adds new feature to enable sending webhooks on completion
 
-### 1.2.7 release 2024-01-16
-
-- Improve feedback for invalid BitBucket authentication
-
 See full changelog [here](./CHANGELOG.md).
 
 ## supported OSes
@@ -63,6 +63,7 @@ Not tested, but should also work on builds for: Linux (386, arm386 and arm64), F
 
 ## supported providers
 
+- Azure DevOps
 - BitBucket
 - Gitea
 - GitHub
@@ -165,7 +166,7 @@ following provider specific environment variables:
 ### webhooks
 *(since release 1.2.8)*
 To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint. For example:
-`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`   
+`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`
 
 #### webhook payload
 The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup. You can see an example [here](examples/webhook.json).
@@ -180,7 +181,7 @@ You can see a sample [here](examples/webhook-short.json).
 *(since release 1.2.10)*
 ntfy is a popular service that enables push notifications for desktop and mobile apps.
 To send a message on completion of a run: set the environment variable `SOBA_NTFY_URL` with the url of the endpoint. For example:
-`$ export SOBA_NTFY_URL=https://ntfy.sh/example-topic`  
+`$ export SOBA_NTFY_URL=https://ntfy.sh/example-topic`
 
 ## logging
 
@@ -268,7 +269,10 @@ source /home/<your-user-id>/.bashrc
 
 | Provider  | Environment Variable(s)         | Generating token                                                                                         |
 |:----------|:--------------------------------|:---------------------------------------------------------------------------------------------------------|
-| BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)       |
+| Azure DevOps | AZURE\_DEVOPS\_USERNAME                   | [instructions](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops)       |
+|           | AZURE\_DEVOPS\_PAT                   |                                                                                                     |
+|           | AZURE\_DEVOPS\_ORGS             |                                                                                                          |
+| BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
 | Gitea     | GITEA_APIURL                    | [instructions](#gitea-instructions) |
@@ -278,6 +282,25 @@ source /home/<your-user-id>/.bashrc
 |           | GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
 
 ## additional options
+
+### Azure DevOps
+
+#### Returning Organisations' repositories (available since soba 1.2.11)
+
+An organisation must be specified using environment variable AZURE\_DEVOPS\_ORGS in order for soba to discover the projects and their repos.
+_Note: Only a single organisation is currently supported._
+
+#### Repo/Bundle comparison method
+
+Environment variable: AZURE\_DEVOPS\_COMPARE
+
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |                                                                |
+|:----------------|:---------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle                     |
+| refs            | Compare refs without downloading (available since soba 1.1.4)  |
+
 
 ### BitBucket
 
