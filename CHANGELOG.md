@@ -1,3 +1,7 @@
+### 1.2.12 release 2024-03-13
+
+- Enable limiting GitHub repo backups to user owned
+
 ### 1.2.11 release 2024-03-10
 
 - Add support for Azure DevOps respositories
