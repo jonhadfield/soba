@@ -20,6 +20,7 @@ func GitHub(backupDir string) *ProviderBackupResults {
 		Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
 		BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
 		SkipUserRepos:    envTrue(envGitHubSkipUserRepos),
+		LimitUserOwned:   envTrue(envGitHubLimitUserOwned),
 		LogLevel:         getLogLevel(),
 	})
 	if err != nil {

@@ -7,7 +7,7 @@ toolchain go1.21.0
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
 	github.com/hashicorp/go-retryablehttp v0.7.5
-	github.com/jonhadfield/githosts-utils v0.0.0-20240310201523-4a29947afd0b
+	github.com/jonhadfield/githosts-utils v0.0.0-20240313174126-39bd42e7a7eb
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.9.0
 	gitlab.com/tozd/go/errors v0.8.1
