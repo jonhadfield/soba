@@ -38,6 +38,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.12 release 2024-03-13
+
+- Enable limiting GitHub repo backups to user owned
+
 ### 1.2.11 release 2024-03-10
 
 - Add support for Azure DevOps respositories
@@ -49,10 +53,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.9 release 2024-03-03
 
 - Adds new feature to enable publishing to [ntfy](https://ntfy.sh/) topic on completion
-
-### 1.2.8 release 2024-02-14
-
-- Adds new feature to enable sending webhooks on completion
 
 See full changelog [here](./CHANGELOG.md).
 
@@ -363,6 +363,11 @@ list of organisations in the environment variable: GITHUB_ORGS.
 By default, all users' repositories will be backed up, even when specifying organisations.
 To skip user repositories set environment variable: GITHUB\_SKIP\_USER_REPOS to true.
 
+#### Limit user repo backups to those owned by the user
+
+By default, all repositories a user is affiliated with, e.g. a collaborator on, are included for backup.
+To limit these to only those owned by the user, set environment variable: GITHUB\_LIMIT\_USER\_OWNED to true.
+
 #### GitHub Repo/Bundle comparison method
 
 Environment variable: GITHUB_COMPARE
@@ -439,6 +444,7 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** GITHUB_TOKEN **Value**
     - **variable** GITHUB_ORGS **Value** (Optional - comma separated list of organisations)
     - **variable** GITHUB\_SKIP\_USER\_REPOS **Value** (Optional - defaults to false)
+    - **variable** GITHUB\_LIMIT\_USER\_OWNED **Value** (Optional - defaults to false)
     - **variable** GITHUB_BACKUPS **Value** (Number of backups to keep for each repo)
     - **variable** GITLAB_TOKEN **Value**
     - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
