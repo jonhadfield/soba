@@ -48,6 +48,7 @@ const (
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
 	envGitHubSkipUserRepos  = "GITHUB_SKIP_USER_REPOS"
+	envGitHubLimitUserOwned = "GITHUB_LIMIT_USER_OWNED"
 	envGitHubCompare        = "GITHUB_COMPARE"
 	envGitLabBackups        = "GITLAB_BACKUPS"
 	envGitLabMinAccessLevel = "GITLAB_PROJECT_MIN_ACCESS_LEVEL"
@@ -233,6 +234,15 @@ func main() {
 }
 
 func envTrue(envVar string) bool {
+	val := os.Getenv(envVar)
+	if val == "" {
+		return false
+	}
+
+	if strings.EqualFold(val, "yes") || strings.EqualFold(val, "y") {
+		return true
+	}
+
 	res, err := strconv.ParseBool(os.Getenv(envVar))
 	if err != nil {
 		return false
