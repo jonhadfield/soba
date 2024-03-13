@@ -490,27 +490,17 @@ func execProviderBackups() {
 
 	notify(backupResults, succeeded, failed)
 
-	// help avoid thrashing provider apis if job auto-restarts
-	// after an early failure by adding delay if backup took less than 10 seconds
-	if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
-		logger.Printf("backup took less than 10 seconds, "+
-			"waiting %d seconds before next run to avoid thrashing"+
-			" provider apis", defaultEarlyErrorBackOffSeconds)
-
-		time.Sleep(time.Second * defaultEarlyErrorBackOffSeconds)
-	}
-
-	// help avoid thrashing provider apis if job auto-restartsrestarts
-	// after an early failure by adding delay if backup took less than 10 seconds
-	if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
-		logger.Printf("backup took less than 10 seconds, "+
-			"waiting %d seconds before next run to avoid thrashing"+
-			" provider apis", defaultEarlyErrorBackOffSeconds)
-
-		time.Sleep(time.Second * defaultEarlyErrorBackOffSeconds)
-	}
-
 	if backupInterval := getBackupInterval(); backupInterval > 0 {
+		// help avoid thrashing provider apis if job auto-restartsrestarts
+		// after an early failure by adding delay if backup took less than 10 seconds
+		if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
+			logger.Printf("backup took less than 10 seconds, "+
+				"waiting %d seconds before next run to avoid thrashing"+
+				" provider apis", defaultEarlyErrorBackOffSeconds)
+
+			time.Sleep(time.Second * defaultEarlyErrorBackOffSeconds)
+		}
+
 		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Minute)
 		if nextBackupTime.Before(time.Now()) {
 			logger.Fatal("error: backup took longer than scheduled interval")
