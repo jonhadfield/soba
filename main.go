@@ -482,9 +482,12 @@ func execProviderBackups() {
 
 	succeeded, failed := getBackupsStats(backupResults)
 
-	if failed > 0 {
+	switch {
+	case succeeded == 0 && failed >= 0:
+		logger.Println("all backups failed")
+	case succeeded > 0 && failed > 0:
 		logger.Println("backups completed with errors")
-	} else {
+	default:
 		logger.Println("backups complete")
 	}
 
@@ -508,6 +511,11 @@ func execProviderBackups() {
 
 		logger.Printf("next run scheduled for: %s", nextBackupTime.Format("2006-01-02 15:04:05 -0700 MST"))
 	}
+
+	if failed > 0 {
+		os.Exit(1)
+	}
+
 }
 
 func getProjectMinimumAccessLevel() int {
