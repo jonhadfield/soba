@@ -493,7 +493,9 @@ func execProviderBackups() {
 
 	notify(backupResults, succeeded, failed)
 
-	if backupInterval := getBackupInterval(); backupInterval > 0 {
+	var backupInterval int
+
+	if backupInterval = getBackupInterval(); backupInterval > 0 {
 		// help avoid thrashing provider apis if job auto-restartsrestarts
 		// after an early failure by adding delay if backup took less than 10 seconds
 		if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
@@ -510,12 +512,13 @@ func execProviderBackups() {
 		}
 
 		logger.Printf("next run scheduled for: %s", nextBackupTime.Format("2006-01-02 15:04:05 -0700 MST"))
+	} else {
+		// if no interval is set then exit
+		if failed > 0 {
+			os.Exit(1)
+		}
+		os.Exit(0)
 	}
-
-	if failed > 0 {
-		os.Exit(1)
-	}
-
 }
 
 func getProjectMinimumAccessLevel() int {
