@@ -38,6 +38,12 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.13 release 2024-03-15
+
+- Improved error handling to catch and report provider errors
+- Return non-zero exit code for runs with failures
+- Remove pause after run if not daemonized
+
 ### 1.2.12 release 2024-03-13
 
 - Enable limiting GitHub repo backups to user owned
