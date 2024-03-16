@@ -26,6 +26,13 @@ var sobaEnvVarKeys = []string{
 	envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsCompare, envAzureDevOpsBackups,
 }
 
+const (
+	goSobaOrg                  = "go-soba"
+	sobaOrgOne                 = "soba-org-one"
+	sobaOrgTwo                 = "soba-org-two"
+	skipGitHubTestMissingToken = "Skipping GitHub test as %s is missing"
+)
+
 func TestGetBackupInterval(t *testing.T) {
 	os.Setenv(envGitBackupInterval, "1h")
 	require.Equal(t, 60, getBackupInterval())
@@ -79,7 +86,6 @@ func TestGitInstalled(t *testing.T) {
 	// succeed
 	gitPath := gitInstallPath()
 	require.NotEmpty(t, gitPath)
-	fmt.Printf("gitPath: %s\n", gitPath)
 
 	// mock exec.LookPath function to return an error
 	lookPath = func(file string) (string, error) {
@@ -220,7 +226,7 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	require.NoError(t, os.Setenv(envGitHubCompare, compareTypeRefs))
 
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	envBackup := backupEnvironmentVariables()
@@ -235,7 +241,7 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
 	// create invalid bundle
 	backupDir := os.Getenv(envGitBackupDir)
-	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
+	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 
 	dfName := "repo0.20200401111111.bundle"
@@ -307,7 +313,7 @@ func TestAzureDevOpsRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -324,7 +330,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
 	// create dummy bundle
 	backupDir := os.Getenv(envGitBackupDir)
-	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
+	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	require.NoError(t, os.Setenv(envGitHubBackups, "1"))
 	// run
@@ -345,7 +351,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -363,7 +369,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
 	// create dummy bundle
 	backupDir := os.Getenv(envGitBackupDir)
-	dfDir := path.Join(backupDir, "github.com", "go-soba", "repo0")
+	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 
 	dfName := "repo0.20200401111111.bundle"
@@ -396,6 +402,8 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 	// set invalid token
 	_ = os.Setenv(envGitHubToken, "invalid")
 
+	defer os.Unsetenv(envGitHubToken)
+
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
 		Caller:           appName,
 		APIURL:           os.Getenv(envGitHubAPIURL),
@@ -412,11 +420,12 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 	result := githubHost.Backup()
 	require.NotNil(t, result.Error)
 	require.Contains(t, errors.Unwrap(result.Error).Error(), "Bad credentials")
+
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -436,7 +445,7 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 
 func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	envBackup := backupEnvironmentVariables()
@@ -456,7 +465,7 @@ func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
 
 func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -565,16 +574,16 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGiteaToken, envGiteaAPIURL})
 
-	for _, org := range []string{"soba-org-two", "*"} {
+	for _, org := range []string{sobaOrgTwo, "*"} {
 		require.NoError(t, os.Setenv(envGiteaOrgs, org))
 
 		require.NoError(t, run())
 
 		switch org {
-		case "soba-org-two":
-			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-			require.NoDirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
-			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+		case sobaOrgTwo:
+			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
+			require.NoDirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
+			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
 			require.NoError(t, err)
 
 			require.Len(t, entriesOrgTwo, 2)
@@ -596,11 +605,11 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 			resetBackups()
 		case "*":
-			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
-			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
-			entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-one"))
+			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
+			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
+			entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
 			require.NoError(t, err)
-			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", "soba-org-two"))
+			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
 			require.NoError(t, err)
 
 			require.Len(t, entriesOrgOne, 1)
@@ -656,6 +665,8 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	}()
 
 	_ = os.Setenv(envBitBucketCompare, compareTypeRefs)
+
+	defer os.Unsetenv(envBitBucketCompare)
 
 	require.NoError(t, run())
 
@@ -734,12 +745,14 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 
 	_ = os.Setenv(envGitHubToken, "ABCD1234")
 
+	defer os.Unsetenv(envGitHubToken)
+
 	require.Errorf(t, run(), "expected: %s undefined error", envGitBackupDir)
 }
 
 func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -791,7 +804,7 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 
 func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf("Skipping GitHub test as %s is missing", envGitHubToken)
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -847,11 +860,11 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 	}
 
 	for _, repoName := range []string{"repo0", "repo1"} {
-		require.DirExists(t, path.Join(backupDir, "github.com", "go-soba", repoName))
+		require.DirExists(t, path.Join(backupDir, "github.com", goSobaOrg, repoName))
 
 		var entries []os.DirEntry
 
-		entries, err = os.ReadDir(path.Join(backupDir, "github.com", "go-soba", repoName))
+		entries, err = os.ReadDir(path.Join(backupDir, "github.com", goSobaOrg, repoName))
 		require.NoError(t, err)
 
 		// one bundle in each folder
