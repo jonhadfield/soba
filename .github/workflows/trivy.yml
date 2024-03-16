@@ -1,4 +1,4 @@
-name: "Code Scanning"
+name: "Trivy Code Scan"
 
 on:
   push:
