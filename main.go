@@ -517,7 +517,6 @@ func execProviderBackups() {
 		if failed > 0 {
 			os.Exit(1)
 		}
-		os.Exit(0)
 	}
 }
 
