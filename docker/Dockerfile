@@ -2,6 +2,9 @@ FROM alpine:3
 
 LABEL maintainer="Jon Hadfield jon@lessknown.co.uk"
 
+RUN addgroup -S nonroot \
+    && adduser -S nonroot -G nonroot
+
 RUN apk add --update --no-cache ca-certificates bash curl git jq grep \
     && rm -f "/var/cache/apk/*"
 
@@ -14,5 +17,7 @@ RUN curl -L -o soba.tar.gz https://github.com/jonhadfield/soba/releases/download
     && mv ./soba /soba \
     && rm -rf /tmp/* \
     && chmod 755 /soba
+
+USER nonroot
 
 ENTRYPOINT ["/bin/bash", "-c", "/soba \"$@\"", "--"]
