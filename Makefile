@@ -28,6 +28,7 @@ ci: lint test
 BUILD_TAG := $(shell git describe --tags 2>/dev/null)
 BUILD_SHA := $(shell git rev-parse --short HEAD)
 BUILD_DATE := $(shell date -u '+%Y/%m/%d:%H:%M:%S')
+LATEST_TAG := $(shell git describe --abbrev=0 2>/dev/null)
 
 build:
 	CGO_ENABLED=0 go build -ldflags '-s -w -X "main.version=[$(BUILD_TAG)-$(BUILD_SHA)] $(BUILD_DATE) UTC"' -o ".local_dist/soba"
@@ -61,6 +62,9 @@ pull-image:
 
 scan-image: pull-image
 	trivy image jonhadfield/soba:latest
+
+build-latest-docker-tag:
+	docker build --build-arg="TAG=$(LATEST_TAG)" -f ./docker/Dockerfile -t soba ./docker
 
 release:
 	goreleaser && git push --follow-tags
