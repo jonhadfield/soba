@@ -39,6 +39,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.14 release 2024-03-15
+
+- Fix bug introduced in 1.2.13 where daemon exits on run error
+
 ### 1.2.13 release 2024-03-15
 
 - Improved error handling to catch and report provider errors
@@ -56,10 +60,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.10 release 2024-03-04
 
 - Bugfix for notification error handling
-
-### 1.2.9 release 2024-03-03
-
-- Adds new feature to enable publishing to [ntfy](https://ntfy.sh/) topic on completion
 
 See full changelog [here](./CHANGELOG.md).
 
