@@ -30,7 +30,7 @@ jobs:
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     -
-      if: startsWith(github.ref, 'refs/heads/master')
+      if: startsWith(github.ref, 'refs/heads/main')
       run: echo "TAG=latest" >> $GITHUB_ENV
 
     -
