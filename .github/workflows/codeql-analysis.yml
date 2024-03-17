@@ -5,12 +5,10 @@ on:
     branches:
       - main
       - master
-      - fix_integrations
   pull_request:
     branches:
     - main
     - master
-    - fix_integrations
   schedule:
     - cron: '25 23 * * 6'
 
