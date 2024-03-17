@@ -1,7 +1,8 @@
 # soba: backup hosted git repositories
 
-[![Build Status](https://travis-ci.org/jonhadfield/soba.svg?branch=master)](https://travis-ci.org/jonhadfield/soba)
+[![GitHub Release][release-img]][release]
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://www.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jonhadfield/soba&amp;utm_campaign=Badge_Grade)
+[![CodeQL](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
 
 - [about](#about)
@@ -469,3 +470,5 @@ A Git bundle is an archive of a Git repository. The simplest way to restore is t
 ```bash
 git clone soba.20180708153107.bundle soba
 ```
+[release]: https://github.com/jonhadfield/soba/releases
+[release-img]: https://img.shields.io/github/release/jonhadfield/soba.svg?logo=github
