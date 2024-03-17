@@ -1,3 +1,7 @@
+### 1.2.14 release 2024-03-15
+
+- Fix bug introduced in 1.2.13 where daemon exits on run error
+
 ### 1.2.13 release 2024-03-15
 
 - Improved error handling to catch and report provider errors
