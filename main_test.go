@@ -30,7 +30,7 @@ const (
 	goSobaOrg                  = "go-soba"
 	sobaOrgOne                 = "soba-org-one"
 	sobaOrgTwo                 = "soba-org-two"
-	skipGitHubTestMissingToken = "Skipping GitHub test as %s is missing"
+	skipGitHubTestMissingToken = "Skipping GitHub test as %s is missing" //nolint:gosec
 )
 
 func TestGetBackupInterval(t *testing.T) {
@@ -88,7 +88,7 @@ func TestGitInstalled(t *testing.T) {
 	require.NotEmpty(t, gitPath)
 
 	// mock exec.LookPath function to return an error
-	lookPath = func(file string) (string, error) {
+	lookPath = func(file string) (string, error) { //nolint:revive
 		return "", errors.New("command not found")
 	}
 	defer func() { lookPath = exec.LookPath }()
@@ -420,7 +420,6 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 	result := githubHost.Backup()
 	require.NotNil(t, result.Error)
 	require.Contains(t, errors.Unwrap(result.Error).Error(), "Bad credentials")
-
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
