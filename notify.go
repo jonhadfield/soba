@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/slack-go/slack"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,7 +14,9 @@ import (
 )
 
 const (
-	envSobaNtfyURL = "SOBA_NTFY_URL"
+	envSobaNtfyURL    = "SOBA_NTFY_URL"
+	envSlackChannelID = "SLACK_CHANNEL_ID"
+	envSlackAPIToken  = "SLACK_API_TOKEN"
 )
 
 func getResultsErrors(results BackupResults) []errors.E {
@@ -54,6 +57,11 @@ func notify(backupResults BackupResults, succeeded int, failed int) {
 	ntfyURL := os.Getenv(envSobaNtfyURL)
 	if ntfyURL != "" {
 		sendNtfy(httpClient, ntfyURL, succeeded, failed, errs)
+	}
+
+	slackChannelID := os.Getenv(envSlackChannelID)
+	if slackChannelID != "" {
+		sendSlackMessage(slackChannelID, succeeded, failed, errs)
 	}
 }
 
@@ -99,4 +107,45 @@ func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs
 	}
 
 	logger.Println("ntfy publish sent")
+}
+
+func sendSlackMessage(slackChannelID string, succeeded, failed int, errs []errors.E) {
+	errorMsgs := make([]string, 0)
+	for _, err := range errs {
+		if err != nil {
+			errorMsgs = append(errorMsgs, err.Error())
+		}
+	}
+
+	var title string
+	switch {
+	case succeeded > 0 && failed == 0:
+		title = "🚀 soba backups succeeded"
+	case failed > 0 && succeeded > 0:
+
+		title = "️⚠️ soba backups completed with errors"
+	default:
+		title = "️🚨 soba backups failed"
+	}
+
+	attachment := slack.Attachment{
+		Pretext: fmt.Sprintf("Succeeded: %d, Failed: %d", succeeded, failed),
+		Text:    strings.Join(errorMsgs, "\n"),
+	}
+
+	api := slack.New(os.Getenv(envSlackAPIToken))
+
+	channelID, timestamp, err := api.PostMessage(
+		slackChannelID,
+		slack.MsgOptionText(title, false),
+		slack.MsgOptionAttachments(attachment),
+		slack.MsgOptionAsUser(true),
+	)
+	if err != nil {
+		logger.Println(err.Error())
+
+		return
+	}
+
+	logger.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
 }

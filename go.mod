@@ -9,6 +9,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.6
 	github.com/jonhadfield/githosts-utils v0.0.0-20240509190501-748030bef546
 	github.com/pkg/errors v0.9.1
+	github.com/slack-go/slack v0.13.0
 	github.com/stretchr/testify v1.9.0
 	gitlab.com/tozd/go/errors v0.8.1
 	gopkg.in/h2non/gock.v1 v1.1.2
@@ -17,12 +18,14 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/microsoft/azure-devops-go-api/azuredevops/v7 v7.1.0 // indirect
 	github.com/peterhellberg/link v1.2.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
