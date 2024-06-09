@@ -169,6 +169,20 @@ following provider specific environment variables:
 
 ## notifications
 
+### Slack
+*(since release 1.2.16)*
+To send a Slack message on completion, set the environment variables:  
+`SLACK_CHANNEL_ID` with the channel id  
+`SLACK_API_TOKEN` with the token for the Slack app  
+For example:  
+`$ export SLACK_CHANNEL_ID=C12345678`  
+`$ export SLACK_API_TOKEN=xoxb-***********-************-************************`   
+
+#### note  
+- channel id can be in `About` section at bottom of the channel details
+- the app needs to be added under `Apps` in the `Integrations` section of channel details
+- use the token starting with `xoxb-` and not the one starting with `xoxp-`
+
 ### webhooks
 *(since release 1.2.8)*
 To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint. For example:
