@@ -1,3 +1,11 @@
+### 1.2.16 release 2024-06-09
+
+- Add Slack notifications
+
+### 1.2.15 release 2024-05-09
+
+- Minor fixes and updates
+
 ### 1.2.14 release 2024-03-15
 
 - Fix bug introduced in 1.2.13 where daemon exits on run error
