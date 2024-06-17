@@ -39,7 +39,7 @@ jobs:
 
     -
       name: build image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ./docker
         file: ./docker/Dockerfile
@@ -60,7 +60,7 @@ jobs:
 
     -
       name: push image
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: ./docker
         file: ./docker/Dockerfile
