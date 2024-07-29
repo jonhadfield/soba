@@ -1,13 +1,13 @@
 module github.com/jonhadfield/soba
 
-go 1.21
+go 1.22
 
-toolchain go1.21.0
+toolchain go1.22.0
 
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
 	github.com/hashicorp/go-retryablehttp v0.7.7
-	github.com/jonhadfield/githosts-utils v0.0.0-20240729093111-fe21be10d8ea
+	github.com/jonhadfield/githosts-utils v0.0.0-20240729093740-0aeff8e5bf1c
 	github.com/pkg/errors v0.9.1
 	github.com/slack-go/slack v0.13.1
 	github.com/stretchr/testify v1.9.0
