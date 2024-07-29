@@ -15,6 +15,7 @@ func Gitlab(backupDir string) *ProviderBackupResults {
 
 	gitlabHost, err := githosts.NewGitLabHost(githosts.NewGitLabHostInput{
 		Caller:                appName,
+		HTTPClient:            httpClient,
 		APIURL:                os.Getenv(envGitLabAPIURL),
 		DiffRemoteMethod:      os.Getenv(envGitLabCompare),
 		BackupDir:             backupDir,

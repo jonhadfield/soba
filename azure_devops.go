@@ -12,6 +12,7 @@ func AzureDevOps(backupDir string) *ProviderBackupResults {
 
 	azureDevOpsHost, err := githosts.NewAzureDevOpsHost(githosts.NewAzureDevOpsHostInput{
 		Caller:           appName,
+		HTTPClient:       httpClient,
 		BackupDir:        backupDir,
 		DiffRemoteMethod: os.Getenv(envAzureDevOpsCompare),
 		UserName:         os.Getenv(envAzureDevOpsUserName),

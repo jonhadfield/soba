@@ -13,6 +13,7 @@ func GitHub(backupDir string) *ProviderBackupResults {
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
 		Caller:           appName,
+		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envGitHubAPIURL),
 		DiffRemoteMethod: os.Getenv(envGitHubCompare),
 		BackupDir:        backupDir,

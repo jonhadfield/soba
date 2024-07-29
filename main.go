@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -28,6 +29,10 @@ const (
 	defaultEarlyErrorBackOffSeconds        = 5
 
 	pathSep = string(os.PathSeparator)
+
+	// http
+	maxIdleConns    = 10
+	idleConnTimeout = 30 * time.Second
 
 	// env vars
 	envPath                  = "PATH"
@@ -83,6 +88,8 @@ var (
 	logger *log.Logger
 	// overwritten at build time.
 	version, tag, sha, buildDate string
+
+	httpClient *retryablehttp.Client
 
 	enabledProviderAuth = map[string][]string{
 		providerNameAzureDevOps: {
@@ -429,10 +436,40 @@ type BackupResults struct {
 	Results    *[]ProviderBackupResults `json:"results,omitempty"`
 }
 
+func getHTTPClient(logLevel string) *retryablehttp.Client {
+	tr := &http.Transport{
+		DisableKeepAlives:  false,
+		DisableCompression: true,
+		MaxIdleConns:       maxIdleConns,
+		IdleConnTimeout:    idleConnTimeout,
+		ForceAttemptHTTP2:  false,
+	}
+
+	rc := retryablehttp.NewClient()
+	rc.HTTPClient = &http.Client{
+		Transport: tr,
+		Timeout:   120 * time.Second,
+	}
+
+	if !strings.EqualFold(logLevel, "debug") {
+		rc.Logger = nil
+	}
+
+	rc.RetryWaitMax = 120 * time.Second
+	rc.RetryWaitMin = 60 * time.Second
+	rc.RetryMax = 2
+
+	return rc
+}
+
 func execProviderBackups() {
 	startTime := time.Now()
 
 	backupDir := os.Getenv(envGitBackupDir)
+
+	if httpClient == nil {
+		httpClient = getHTTPClient(os.Getenv(envSobaLogLevel))
+	}
 
 	backupResults := BackupResults{
 		StartedAt: sobaTime{
@@ -560,18 +597,6 @@ func isInt(i string) (int, bool) {
 	}
 
 	return 0, false
-}
-
-func getHTTPClient(logLevel string) *retryablehttp.Client {
-	c := retryablehttp.NewClient()
-	c.RetryWaitMin = 10 * time.Second
-	c.RetryMax = 3
-
-	if !strings.EqualFold(logLevel, "debug") {
-		c.Logger = nil
-	}
-
-	return c
 }
 
 var lookPath = exec.LookPath

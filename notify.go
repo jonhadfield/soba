@@ -37,8 +37,6 @@ func getResultsErrors(results BackupResults) []errors.E {
 
 func notify(backupResults BackupResults, succeeded int, failed int) {
 	// optimistic create retryable http client
-	httpClient := getHTTPClient(os.Getenv(envSobaLogLevel))
-
 	errs := getResultsErrors(backupResults)
 
 	webHookURL := os.Getenv(envSobaWebHookURL)
