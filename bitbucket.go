@@ -13,6 +13,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 
 	bitbucketHost, err := githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
 		Caller:           appName,
+		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envBitBucketAPIURL),
 		DiffRemoteMethod: os.Getenv(envBitBucketCompare),
 		BackupDir:        backupDir,
