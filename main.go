@@ -448,7 +448,7 @@ func getHTTPClient(logLevel string) *retryablehttp.Client {
 	rc := retryablehttp.NewClient()
 	rc.HTTPClient = &http.Client{
 		Transport: tr,
-		Timeout:   120 * time.Second,
+		Timeout:   300 * time.Second,
 	}
 
 	if !strings.EqualFold(logLevel, "debug") {
