@@ -1,3 +1,11 @@
+### 1.2.18 release 2024-08-24
+
+- Increase clone timeout to allow for larger repos and slower connections
+
+### 1.2.17 release 2024-07-29
+
+- Performance improvement
+
 ### 1.2.16 release 2024-06-09
 
 - Add Slack notifications

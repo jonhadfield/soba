@@ -38,6 +38,14 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.18 release 2024-08-24
+
+- Increase clone timeout to allow for larger repos and slower connections
+
+### 1.2.17 release 2024-07-29
+
+- Performance improvement
+
 ### 1.2.16 release 2024-06-09
 
 - Add Slack notifications
@@ -63,10 +71,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.11 release 2024-03-10
 
 - Add support for Azure DevOps respositories
-
-### 1.2.10 release 2024-03-04
-
-- Bugfix for notification error handling
 
 See full changelog [here](./CHANGELOG.md).
 
