@@ -1,3 +1,7 @@
+### 1.2.19 release 2024-09-02
+
+- Let user define the request timeout
+
 ### 1.2.18 release 2024-08-24
 
 - Increase clone timeout to allow for larger repos and slower connections
