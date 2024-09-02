@@ -38,6 +38,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.2.19 release 2024-09-02
+
+- Let user define the request timeout
+
 ### 1.2.18 release 2024-08-24
 
 - Increase clone timeout to allow for larger repos and slower connections
@@ -173,11 +177,19 @@ note:
 ## rotating backups
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
-following provider specific environment variables:
-`GITEA_BACKUPS=x`
-`GITHUB_BACKUPS=x`
-`GITLAB_BACKUPS=x`
-`BITBUCKET_BACKUPS=x`
+following provider specific environment variables:  
+`GITEA_BACKUPS=x`  
+`GITHUB_BACKUPS=x`  
+`GITLAB_BACKUPS=x`  
+`BITBUCKET_BACKUPS=x`  
+
+## setting the request timeout
+
+By default, soba will wait up to five minutes for a response to complete. This could be anything from an API call to discover repositories to a clone of a large repository.  
+If you have a slow connection or very large repositories, you may want to increase this. To do so, set the environment variable `GIT_REQUEST_TIMEOUT` to the number of seconds you wish to wait. For example, to wait up to ten minutes:  
+```bash
+export GIT_REQUEST_TIMEOUT=600
+```
 
 ## notifications
 
