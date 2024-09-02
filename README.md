@@ -54,28 +54,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 - Add Slack notifications
 
-### 1.2.15 release 2024-05-09
-
-- Minor fixes and updates
-
-### 1.2.14 release 2024-03-15
-
-- Fix bug introduced in 1.2.13 where daemon exits on run error
-
-### 1.2.13 release 2024-03-15
-
-- Improved error handling to catch and report provider errors
-- Return non-zero exit code for runs with failures
-- Remove pause after run if not daemonized
-
-### 1.2.12 release 2024-03-13
-
-- Enable limiting GitHub repo backups to user owned
-
-### 1.2.11 release 2024-03-10
-
-- Add support for Azure DevOps respositories
-
 See full changelog [here](./CHANGELOG.md).
 
 ## supported OSes
@@ -195,12 +173,12 @@ export GIT_REQUEST_TIMEOUT=600
 
 ### Slack
 *(since release 1.2.16)*
-To send a Slack message on completion, set the environment variables:
-`SLACK_CHANNEL_ID` with the channel id
-`SLACK_API_TOKEN` with the token for the Slack app
-For example:
-`$ export SLACK_CHANNEL_ID=C12345678`
-`$ export SLACK_API_TOKEN=xoxb-***********-************-************************`
+To send a Slack message on completion, set the environment variables:  
+`SLACK_CHANNEL_ID` with the channel id  
+`SLACK_API_TOKEN` with the token for the Slack app  
+For example:  
+`$ export SLACK_CHANNEL_ID=C12345678`  
+`$ export SLACK_API_TOKEN=xoxb-***********-************-************************`  
 
 #### note
 - channel id can be in `About` section at bottom of the channel details
@@ -209,13 +187,15 @@ For example:
 
 ### webhooks
 *(since release 1.2.8)*
-To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint. For example:
+To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint.  
+For example:  
 `$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`
 
 #### webhook payload
-The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup. You can see an example [here](examples/webhook.json).
-For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBOOK_FORMAT`. For example:
-`$ export SOBA_WEBHOOK_FORMAT=short`
+The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup.  You can see an example [here](examples/webhook.json).  
+For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBHOOK_FORMAT`.  
+For example:  
+`$ export SOBA_WEBHOOK_FORMAT=short`  
 You can see a sample [here](examples/webhook-short.json).
 *The default format (if not specified) is `long`*
 
@@ -223,8 +203,9 @@ You can see a sample [here](examples/webhook-short.json).
 
 ### ntfy
 *(since release 1.2.10)*
-ntfy is a popular service that enables push notifications for desktop and mobile apps.
-To send a message on completion of a run: set the environment variable `SOBA_NTFY_URL` with the url of the endpoint. For example:
+ntfy is a popular service that enables push notifications for desktop and mobile apps.  
+To send a message on completion of a run: set the environment variable `SOBA_NTFY_URL` with the url of the endpoint.  
+For example:  
 `$ export SOBA_NTFY_URL=https://ntfy.sh/example-topic`
 
 ## logging
@@ -236,16 +217,16 @@ Messages are written to stdout and can be persisted by directing to a file, e.g.
 
 #### logging to /var/log/soba
 
-create a user called soba:
-`sudo adduser soba`
-create a log directory:
-`sudo mkdir /var/log/soba`
-set user permissions:
-`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`
-switch to soba user:
-`sudo su - soba`
-run soba and direct output:
-`soba > /var/log/soba/soba.log`
+create a user called soba:  
+`sudo adduser soba`  
+create a log directory:  
+`sudo mkdir /var/log/soba`  
+set user permissions:  
+`sudo chown soba /var/log/soba && sudo chmod 700 /var/log/soba`  
+switch to soba user:  
+`sudo su - soba`  
+run soba and direct output:  
+`soba > /var/log/soba/soba.log`  
 
 ### rotation
 
