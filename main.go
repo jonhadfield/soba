@@ -27,6 +27,7 @@ const (
 	defaultBackupsToRetain                 = 2
 	defaultGitLabMinimumProjectAccessLevel = 20
 	defaultEarlyErrorBackOffSeconds        = 5
+	defaultHTTPClientRequestTimeout        = 300 * time.Second
 
 	pathSep = string(os.PathSeparator)
 
@@ -35,20 +36,20 @@ const (
 	idleConnTimeout = 30 * time.Second
 
 	// env vars
-	envPath                  = "PATH"
-	envSobaLogLevel          = "SOBA_LOG"
-	envSobaWebHookURL        = "SOBA_WEBHOOK_URL"
-	envSobaWebHookFormat     = "SOBA_WEBHOOK_FORMAT"
-	envSobaEarlyErrorBackOff = "SOBA_EARLY_ERROR_BACKOFF"
-	envGitBackupInterval     = "GIT_BACKUP_INTERVAL"
-	envGitBackupDir          = "GIT_BACKUP_DIR"
-	envGitHubAPIURL          = "GITHUB_APIURL"
-	envGitHubBackups         = "GITHUB_BACKUPS"
-	envAzureDevOpsOrgs       = "AZURE_DEVOPS_ORGS"
-	envAzureDevOpsUserName   = "AZURE_DEVOPS_USERNAME"
-	envAzureDevOpsPAT        = "AZURE_DEVOPS_PAT"
-	envAzureDevOpsCompare    = "AZURE_DEVOPS_COMPARE"
-	envAzureDevOpsBackups    = "AZURE_DEVOPS_BACKUPS"
+	envPath                = "PATH"
+	envSobaLogLevel        = "SOBA_LOG"
+	envSobaWebHookURL      = "SOBA_WEBHOOK_URL"
+	envSobaWebHookFormat   = "SOBA_WEBHOOK_FORMAT"
+	envGitBackupInterval   = "GIT_BACKUP_INTERVAL"
+	envGitBackupDir        = "GIT_BACKUP_DIR"
+	envGitRequestTimeout   = "GIT_REQUEST_TIMEOUT"
+	envGitHubAPIURL        = "GITHUB_APIURL"
+	envGitHubBackups       = "GITHUB_BACKUPS"
+	envAzureDevOpsOrgs     = "AZURE_DEVOPS_ORGS"
+	envAzureDevOpsUserName = "AZURE_DEVOPS_USERNAME"
+	envAzureDevOpsPAT      = "AZURE_DEVOPS_PAT"
+	envAzureDevOpsCompare  = "AZURE_DEVOPS_COMPARE"
+	envAzureDevOpsBackups  = "AZURE_DEVOPS_BACKUPS"
 	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
@@ -330,7 +331,6 @@ func displayStartupConfig() {
 	}
 
 	// output azure devops config
-	// output github config
 	if azureDevOpsUserName := os.Getenv(envAzureDevOpsUserName); azureDevOpsUserName != "" {
 		if ghOrgs := strings.ToLower(os.Getenv(envAzureDevOpsOrgs)); ghOrgs != "" {
 			logger.Printf("Azure DevOps Organistations: %s", ghOrgs)
@@ -354,6 +354,17 @@ func run() error {
 
 	logger.Println("using git executable:", gitExecPath)
 
+	ok, reqTimeout, err := getRequestTimeout()
+	if err != nil {
+		return err
+	}
+
+	if ok {
+		logger.Printf("using defined request timeout: %s", reqTimeout.String())
+	} else {
+		logger.Printf("using default request timeout: %s", reqTimeout.String())
+	}
+
 	backupDIR, backupDIRKeyExists := os.LookupEnv(envGitBackupDir)
 	if !backupDIRKeyExists || backupDIR == "" {
 		return fmt.Errorf("environment variable %s must be set", envGitBackupDir)
@@ -367,7 +378,7 @@ func run() error {
 
 	backupDIR = strings.TrimSuffix(backupDIR, "\n")
 
-	_, err := os.Stat(backupDIR)
+	_, err = os.Stat(backupDIR)
 	if os.IsNotExist(err) {
 		return errors.Wrap(err, fmt.Sprintf("specified backup directory \"%s\" does not exist", backupDIR))
 	}
@@ -415,6 +426,21 @@ func formatIntervalDuration(m int) string {
 	return time.Duration(int64(m) * int64(time.Minute)).String()
 }
 
+func getRequestTimeout() (bool, time.Duration, error) {
+	eReqTimeout := os.Getenv(envGitRequestTimeout)
+
+	if eReqTimeout != "" {
+		reqTimeoutInt, err := strconv.Atoi(eReqTimeout)
+		if err != nil {
+			return false, defaultHTTPClientRequestTimeout, fmt.Errorf("%s value \"%s\" should be the maximum seconds to wait for a response, defined as an integer", envGitRequestTimeout, eReqTimeout)
+		}
+
+		return true, time.Duration(reqTimeoutInt) * time.Second, nil
+	}
+
+	return false, defaultHTTPClientRequestTimeout, nil
+}
+
 func getOrgsListFromEnvVar(envVar string) []string {
 	orgsList := os.Getenv(envVar)
 
@@ -446,9 +472,12 @@ func getHTTPClient(logLevel string) *retryablehttp.Client {
 	}
 
 	rc := retryablehttp.NewClient()
+
+	_, reqTimeout, _ := getRequestTimeout()
+
 	rc.HTTPClient = &http.Client{
 		Transport: tr,
-		Timeout:   300 * time.Second,
+		Timeout:   reqTimeout,
 	}
 
 	if !strings.EqualFold(logLevel, "debug") {
