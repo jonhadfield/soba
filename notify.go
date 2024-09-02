@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/slack-go/slack"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/slack-go/slack"
 
 	"github.com/hashicorp/go-retryablehttp"
 	"gitlab.com/tozd/go/errors"
