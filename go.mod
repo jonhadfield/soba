@@ -13,7 +13,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/slack-go/slack v0.14.0
 	github.com/stretchr/testify v1.9.0
-	gitlab.com/tozd/go/errors v0.8.1
+	gitlab.com/tozd/go/errors v0.10.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 )
 
