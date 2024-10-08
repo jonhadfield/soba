@@ -320,7 +320,7 @@ func TestGetRequestTimeout(t *testing.T) {
 	require.Equal(t, 600*time.Second, timeout)
 
 	t.Setenv(envGitRequestTimeout, "invalid")
-	ok, timeout, err = getRequestTimeout()
+	ok, _, err = getRequestTimeout()
 	require.False(t, ok)
 	require.Error(t, err)
 
