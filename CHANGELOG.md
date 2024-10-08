@@ -1,3 +1,7 @@
+### 1.2.20 release 2024-10-08
+
+- Add Telegram notifications
+
 ### 1.2.19 release 2024-09-02
 
 - Let user define the request timeout
