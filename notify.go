@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -15,9 +16,11 @@ import (
 )
 
 const (
-	envSobaNtfyURL    = "SOBA_NTFY_URL"
-	envSlackChannelID = "SLACK_CHANNEL_ID"
-	envSlackAPIToken  = "SLACK_API_TOKEN"
+	envSobaNtfyURL      = "SOBA_NTFY_URL"
+	envSlackChannelID   = "SLACK_CHANNEL_ID"
+	envSlackAPIToken    = "SLACK_API_TOKEN"
+	envTelegramBotToken = "SOBA_TELEGRAM_BOT_TOKEN"
+	envTelegramChatID   = "SOBA_TELEGRAM_CHAT_ID"
 )
 
 func getResultsErrors(results BackupResults) []errors.E {
@@ -62,6 +65,72 @@ func notify(backupResults BackupResults, succeeded int, failed int) {
 	if slackChannelID != "" {
 		sendSlackMessage(slackChannelID, succeeded, failed, errs)
 	}
+
+	telegramBotToken := os.Getenv(envTelegramBotToken)
+	telegramChatID := os.Getenv(envTelegramChatID)
+	if telegramBotToken != "" && telegramChatID != "" {
+		sendTelegramMessage(httpClient, telegramBotToken, telegramChatID, succeeded, failed, errs)
+	}
+}
+
+func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succeeded, failed int, errs []errors.E) {
+	var text string
+	switch {
+	case succeeded > 0 && failed == 0:
+		text = "🚀 soba backups succeeded"
+	case failed > 0 && succeeded > 0:
+
+		text = "️⚠️ soba backups completed with errors"
+	default:
+		text = "️🚨 soba backups failed"
+	}
+	text += fmt.Sprintf("\ncompleted: %d, failed: %d",
+		succeeded, failed)
+
+	if len(errs) > 0 && errs[0] != nil {
+		text = fmt.Sprintf("%s\nerror: %s", text, errs[0].Error())
+	}
+
+	apiURL := "https://api.telegram.org/bot" + botToken + "/sendMessage?chat_id=" +
+		chatID + "&text=" + url.QueryEscape(text)
+
+	req, err := retryablehttp.NewRequest(http.MethodPost, apiURL, nil)
+	if err != nil {
+		logger.Printf("telegram failed to create request: %v", err)
+
+		return
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := hc.Do(req)
+	if err != nil {
+		logger.Printf("telegram failed to send api request - error: %s", err)
+
+		return
+	}
+
+	defer func(Body io.ReadCloser) {
+		err = Body.Close()
+		if err != nil {
+			logger.Printf("telegram failed to close response body - error: %s", err)
+		}
+	}(resp.Body)
+
+	buf, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logger.Printf("telegram failed to read response: %v", err)
+
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		logger.Printf("telegram failed to send message - code [%d] - msg [%s]", resp.StatusCode, string(buf))
+
+		return
+	}
+
+	logger.Printf("telegram message successfully sent to chat id %s", chatID)
 }
 
 func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs []errors.E) {
@@ -128,7 +197,7 @@ func sendSlackMessage(slackChannelID string, succeeded, failed int, errs []error
 	}
 
 	attachment := slack.Attachment{
-		Pretext: fmt.Sprintf("Succeeded: %d, Failed: %d", succeeded, failed),
+		Pretext: fmt.Sprintf("succeeded: %d, failed: %d", succeeded, failed),
 		Text:    strings.Join(errorMsgs, "\n"),
 	}
 
@@ -146,5 +215,5 @@ func sendSlackMessage(slackChannelID string, succeeded, failed int, errs []error
 		return
 	}
 
-	logger.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
+	logger.Printf("slack message successfully sent to channel %s at %s", channelID, timestamp)
 }
