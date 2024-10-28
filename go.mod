@@ -9,7 +9,7 @@ toolchain go1.22.0
 require (
 	github.com/carlescere/scheduler v0.0.0-20170109141437-ee74d2f83d82
 	github.com/hashicorp/go-retryablehttp v0.7.7
-	github.com/jonhadfield/githosts-utils v0.0.0-20240729093740-0aeff8e5bf1c
+	github.com/jonhadfield/githosts-utils v0.0.0-20241028113538-5012ac33405f
 	github.com/pkg/errors v0.9.1
 	github.com/slack-go/slack v0.15.0
 	github.com/stretchr/testify v1.9.0
@@ -20,7 +20,7 @@ require (
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/gorilla/websocket v1.5.3 // indirect
 	github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/kr/text v0.2.0 // indirect
