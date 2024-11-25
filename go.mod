@@ -12,7 +12,7 @@ require (
 	github.com/jonhadfield/githosts-utils v0.0.0-20241028113538-5012ac33405f
 	github.com/pkg/errors v0.9.1
 	github.com/slack-go/slack v0.15.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	gitlab.com/tozd/go/errors v0.10.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 )
