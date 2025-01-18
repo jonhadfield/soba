@@ -7,15 +7,15 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"slices"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/go-co-op/gocron/v2"
+
 	"github.com/hashicorp/go-retryablehttp"
 
-	"github.com/carlescere/scheduler"
 	"github.com/jonhadfield/githosts-utils"
 	"github.com/pkg/errors"
 )
@@ -401,12 +401,30 @@ func run() error {
 	if backupInterval != 0 {
 		logger.Printf("scheduling to run every %s", formatIntervalDuration(backupInterval))
 
-		_, err = scheduler.Every(int(time.Duration(backupInterval))).Minutes().Run(execProviderBackups)
+		var s gocron.Scheduler
+
+		s, err = gocron.NewScheduler()
 		if err != nil {
-			return errors.Wrapf(err, "scheduler failed")
+			return errors.Wrap(err, "failed to create scheduler")
 		}
 
-		runtime.Goexit()
+		_, err = s.NewJob(
+			gocron.DurationJob(
+				time.Duration(backupInterval)*time.Minute,
+			),
+			gocron.NewTask(
+				execProviderBackups,
+			),
+			gocron.WithSingletonMode(gocron.LimitModeReschedule),
+			gocron.WithStartAt(gocron.WithStartImmediately()),
+		)
+		if err != nil {
+			return errors.Wrap(err, "failed to create job")
+		}
+
+		s.Start()
+
+		select {}
 	} else {
 		execProviderBackups()
 	}
@@ -578,11 +596,8 @@ func execProviderBackups() {
 		}
 
 		logger.Printf("next run scheduled for: %s", nextBackupTime.Format("2006-01-02 15:04:05 -0700 MST"))
-	} else {
-		// if no interval is set then exit
-		if failed > 0 {
-			os.Exit(1)
-		}
+	} else if failed > 0 { // if no interval is set then exit
+		os.Exit(1)
 	}
 }
 
