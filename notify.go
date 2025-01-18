@@ -18,7 +18,7 @@ import (
 const (
 	envSobaNtfyURL      = "SOBA_NTFY_URL"
 	envSlackChannelID   = "SLACK_CHANNEL_ID"
-	envSlackAPIToken    = "SLACK_API_TOKEN"
+	envSlackAPIToken    = "SLACK_API_TOKEN" //nolint:gosec
 	envTelegramBotToken = "SOBA_TELEGRAM_BOT_TOKEN"
 	envTelegramChatID   = "SOBA_TELEGRAM_CHAT_ID"
 )
@@ -68,6 +68,7 @@ func notify(backupResults BackupResults, succeeded int, failed int) {
 
 	telegramBotToken := os.Getenv(envTelegramBotToken)
 	telegramChatID := os.Getenv(envTelegramChatID)
+
 	if telegramBotToken != "" && telegramChatID != "" {
 		sendTelegramMessage(httpClient, telegramBotToken, telegramChatID, succeeded, failed, errs)
 	}
@@ -75,15 +76,16 @@ func notify(backupResults BackupResults, succeeded int, failed int) {
 
 func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succeeded, failed int, errs []errors.E) {
 	var text string
+
 	switch {
 	case succeeded > 0 && failed == 0:
 		text = "🚀 soba backups succeeded"
 	case failed > 0 && succeeded > 0:
-
 		text = "️⚠️ soba backups completed with errors"
 	default:
 		text = "️🚨 soba backups failed"
 	}
+
 	text += fmt.Sprintf("\ncompleted: %d, failed: %d",
 		succeeded, failed)
 
@@ -179,6 +181,7 @@ func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs
 
 func sendSlackMessage(slackChannelID string, succeeded, failed int, errs []errors.E) {
 	errorMsgs := make([]string, 0)
+
 	for _, err := range errs {
 		if err != nil {
 			errorMsgs = append(errorMsgs, err.Error())
@@ -186,11 +189,11 @@ func sendSlackMessage(slackChannelID string, succeeded, failed int, errs []error
 	}
 
 	var title string
+
 	switch {
 	case succeeded > 0 && failed == 0:
 		title = "🚀 soba backups succeeded"
 	case failed > 0 && succeeded > 0:
-
 		title = "️⚠️ soba backups completed with errors"
 	default:
 		title = "️🚨 soba backups failed"
