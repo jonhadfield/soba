@@ -314,17 +314,20 @@ func TestAzureDevOpsRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 
 func TestGetRequestTimeout(t *testing.T) {
 	t.Setenv(envGitRequestTimeout, "600")
+
 	ok, timeout, err := getRequestTimeout()
 	require.NoError(t, err)
 	require.True(t, ok)
 	require.Equal(t, 600*time.Second, timeout)
 
 	t.Setenv(envGitRequestTimeout, "invalid")
+
 	ok, _, err = getRequestTimeout()
 	require.False(t, ok)
 	require.Error(t, err)
 
 	t.Setenv(envGitRequestTimeout, "")
+
 	ok, timeout, err = getRequestTimeout()
 	require.NoError(t, err)
 	require.False(t, ok)
