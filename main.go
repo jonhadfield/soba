@@ -41,6 +41,7 @@ const (
 	envSobaWebHookURL      = "SOBA_WEBHOOK_URL"
 	envSobaWebHookFormat   = "SOBA_WEBHOOK_FORMAT"
 	envGitBackupInterval   = "GIT_BACKUP_INTERVAL"
+	envGitBackupCron       = "GIT_BACKUP_CRON"
 	envGitBackupDir        = "GIT_BACKUP_DIR"
 	envGitRequestTimeout   = "GIT_REQUEST_TIMEOUT"
 	envGitHubAPIURL        = "GITHUB_APIURL"
@@ -344,6 +345,8 @@ func displayStartupConfig() {
 	}
 }
 
+var job gocron.Job
+
 func run() error {
 	gitExecPath := gitInstallPath()
 	if gitExecPath == "" {
@@ -397,18 +400,20 @@ func run() error {
 	}
 
 	backupInterval := getBackupInterval()
+	backupCron := os.Getenv(envGitBackupCron)
 
-	if backupInterval != 0 {
+	var s gocron.Scheduler
+
+	s, err = gocron.NewScheduler()
+	if err != nil {
+		return errors.Wrap(err, "failed to create scheduler")
+	}
+
+	switch {
+	case backupInterval != 0:
 		logger.Printf("scheduling to run every %s", formatIntervalDuration(backupInterval))
 
-		var s gocron.Scheduler
-
-		s, err = gocron.NewScheduler()
-		if err != nil {
-			return errors.Wrap(err, "failed to create scheduler")
-		}
-
-		_, err = s.NewJob(
+		job, err = s.NewJob(
 			gocron.DurationJob(
 				time.Duration(backupInterval)*time.Minute,
 			),
@@ -425,7 +430,27 @@ func run() error {
 		s.Start()
 
 		select {}
-	} else {
+	case backupCron != "":
+		logger.Printf("scheduling to run with cron '%s'", backupCron)
+
+		job, err = s.NewJob(
+			gocron.CronJob(
+				backupCron,
+				false,
+			),
+			gocron.NewTask(
+				execProviderBackups,
+			),
+			gocron.WithSingletonMode(gocron.LimitModeReschedule),
+		)
+		if err != nil {
+			return errors.Wrap(err, "failed to create job")
+		}
+
+		s.Start()
+
+		select {}
+	default:
 		execProviderBackups()
 	}
 
@@ -510,8 +535,6 @@ func getHTTPClient(logLevel string) *retryablehttp.Client {
 }
 
 func execProviderBackups() {
-	startTime := time.Now()
-
 	backupDir := os.Getenv(envGitBackupDir)
 
 	if httpClient == nil {
@@ -577,25 +600,9 @@ func execProviderBackups() {
 
 	notify(backupResults, succeeded, failed)
 
-	var backupInterval int
-
-	if backupInterval = getBackupInterval(); backupInterval > 0 {
-		// help avoid thrashing provider apis if job auto-restartsrestarts
-		// after an early failure by adding delay if backup took less than 10 seconds
-		if time.Since(startTime) < time.Second*defaultEarlyErrorBackOffSeconds {
-			logger.Printf("backup took less than 10 seconds, "+
-				"waiting %d seconds before next run to avoid thrashing"+
-				" provider apis", defaultEarlyErrorBackOffSeconds)
-
-			time.Sleep(time.Second * defaultEarlyErrorBackOffSeconds)
-		}
-
-		nextBackupTime := startTime.Add(time.Duration(backupInterval) * time.Minute)
-		if nextBackupTime.Before(time.Now()) {
-			logger.Fatal("error: backup took longer than scheduled interval")
-		}
-
-		logger.Printf("next run scheduled for: %s", nextBackupTime.Format("2006-01-02 15:04:05 -0700 MST"))
+	if job != nil {
+		nextRun, _ := job.NextRun()
+		logger.Printf("next run scheduled for: %s", nextRun.Format("2006-01-02 15:04:05 -0700 MST"))
 	} else if failed > 0 { // if no interval is set then exit
 		os.Exit(1)
 	}
