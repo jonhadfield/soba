@@ -38,6 +38,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.3.1 release 2025-01-27
+
+- Support cron syntax for backup interval
+
 ### 1.2.20 release 2024-10-08
 
 - Add Telegram notifications
@@ -49,14 +53,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.18 release 2024-08-24
 
 - Increase clone timeout to allow for larger repos and slower connections
-
-### 1.2.17 release 2024-07-29
-
-- Performance improvement
-
-### 1.2.16 release 2024-06-09
-
-- Add Slack notifications
 
 See full changelog [here](./CHANGELOG.md).
 
@@ -140,7 +136,10 @@ For instructions on how to run soba on Kubernetes, see [here](kubernetes/README.
 
 ## scheduling backups
 
-Backups can be scheduled to run by setting an additional environment variable: `GIT_BACKUP_INTERVAL`. The value can be specified in hours (default) or minutes. For example, this will run the backup daily:
+Backups can be scheduled to run by setting an interval or by using a cron syntax.
+
+### interval syntax
+Environment variable: `GIT_BACKUP_INTERVAL` can be specified in hours or minutes. For example, this will run the backup daily:
 
 ```bash
 export GIT_BACKUP_INTERVAL=24h
@@ -152,23 +151,28 @@ and this will run the backup every 45 minutes:
 export GIT_BACKUP_INTERVAL=45m
 ```
 
-note:
-- if you don't specify the trailing 'm' or 'h' then hours are assumed.  
-- the interval is added to the start of the last backup and not the time it finished, therefore ensure the interval is greater than the duration of a backup.  
+note: if you don't specify the trailing 'm' or 'h' then hours are assumed.
+
+### cron syntax
+Alternatively, you can schedule backups using a cron syntax. For example, to run every day at 3am:
+
+```bash
+export GIT_BACKUP_CRON='0 3 * * *'
+```
 
 ## rotating backups
 
 A new bundle is created every time a change is detected in the repository. To keep only the _x_ most recent, use the
-following provider specific environment variables:  
-`GITEA_BACKUPS=x`  
-`GITHUB_BACKUPS=x`  
-`GITLAB_BACKUPS=x`  
-`BITBUCKET_BACKUPS=x`  
+following provider specific environment variables:
+`GITEA_BACKUPS=x`
+`GITHUB_BACKUPS=x`
+`GITLAB_BACKUPS=x`
+`BITBUCKET_BACKUPS=x`
 
 ## setting the request timeout
 
-By default, soba will wait up to five minutes for a response to complete. This could be anything from an API call to discover repositories to a clone of a large repository.  
-If you have a slow connection or very large repositories, you may want to increase this. To do so, set the environment variable `GIT_REQUEST_TIMEOUT` to the number of seconds you wish to wait. For example, to wait up to ten minutes:  
+By default, soba will wait up to five minutes for a response to complete. This could be anything from an API call to discover repositories to a clone of a large repository.
+If you have a slow connection or very large repositories, you may want to increase this. To do so, set the environment variable `GIT_REQUEST_TIMEOUT` to the number of seconds you wish to wait. For example, to wait up to ten minutes:
 ```bash
 export GIT_REQUEST_TIMEOUT=600
 ```
@@ -176,64 +180,64 @@ export GIT_REQUEST_TIMEOUT=600
 ## notifications
 
 ### Telegram
-*(since release 1.2.20)*  
-To send a Telegram message on completion, set the environment variables:  
-`SOBA_TELEGRAM_BOT_TOKEN` with the bot token  
-`SOBA_TELEGRAM_CHAT_ID` with the chat/group id  
-  
-To get the bot token:  
-- send a message to @BotFather of /newbot  
-- submit a name, e.g. soba-notifier  
-- submit a username for the bot  
-- record bot token  
-  
-To get the chat id:  
-- add the bot user to the group (get group info and click Add)  
-- run command:`curl -s -X POST https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`  
-- record the chat id in the response 
+*(since release 1.2.20)*
+To send a Telegram message on completion, set the environment variables:
+`SOBA_TELEGRAM_BOT_TOKEN` with the bot token
+`SOBA_TELEGRAM_CHAT_ID` with the chat/group id
+
+To get the bot token:
+- send a message to @BotFather of /newbot
+- submit a name, e.g. soba-notifier
+- submit a username for the bot
+- record bot token
+
+To get the chat id:
+- add the bot user to the group (get group info and click Add)
+- run command:`curl -s -X POST https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates`
+- record the chat id in the response
 
 ### Slack
-*(since release 1.2.16)*  
-To send a Slack message on completion, set the environment variables:  
-`SLACK_CHANNEL_ID` with the channel id  
-`SLACK_API_TOKEN` with the token for the Slack app  
-For example:  
-`$ export SLACK_CHANNEL_ID=C12345678`  
-`$ export SLACK_API_TOKEN=xoxb-***********-************-************************`  
+*(since release 1.2.16)*
+To send a Slack message on completion, set the environment variables:
+`SLACK_CHANNEL_ID` with the channel id
+`SLACK_API_TOKEN` with the token for the Slack app
+For example:
+`$ export SLACK_CHANNEL_ID=C12345678`
+`$ export SLACK_API_TOKEN=xoxb-***********-************-************************`
 
 #### note
-- channel id can be in `About` section at bottom of the channel details  
-- the app needs to be added under `Apps` in the `Integrations` section of channel details  
-- use the token starting with `xoxb-` and not the one starting with `xoxp-`  
+- channel id can be in `About` section at bottom of the channel details
+- the app needs to be added under `Apps` in the `Integrations` section of channel details
+- use the token starting with `xoxb-` and not the one starting with `xoxp-`
 
 ### webhooks
-*(since release 1.2.8)*  
-To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint.  
-For example:  
-`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`  
+*(since release 1.2.8)*
+To send a webhook on completion of a run: set the environment variable `SOBA_WEBHOOK_URL` with the url of the endpoint.
+For example:
+`$ export SOBA_WEBHOOK_URL=https://api.example.com/webhook`
 
 #### webhook payload
-The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup.  You can see an example [here](examples/webhook.json).  
-For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBHOOK_FORMAT`.  
-For example:  
-`$ export SOBA_WEBHOOK_FORMAT=short`  
-You can see a sample [here](examples/webhook-short.json).  
-*The default format (if not specified) is `long`*  
+The payload is a JSON document containing details of the backup run.  The default format lists each repository and the success or failure of its backup.  You can see an example [here](examples/webhook.json).
+For a shorter format, with just stats on the success and failure counts, use the environment variable `SOBA_WEBHOOK_FORMAT`.
+For example:
+`$ export SOBA_WEBHOOK_FORMAT=short`
+You can see a sample [here](examples/webhook-short.json).
+*The default format (if not specified) is `long`*
 
 > NOTE: The long format webhook will contain a list of your repos and, if there's an error, may contain other details including URLs. Please keep this in mind when sending to endpoints that may be insecure.
 
 ### ntfy
-*(since release 1.2.10)*  
-ntfy is a popular service that enables push notifications for desktop and mobile apps.  
-To send a message on completion of a run: set the environment variable `SOBA_NTFY_URL` with the url of the endpoint.  
-For example:  
+*(since release 1.2.10)*
+ntfy is a popular service that enables push notifications for desktop and mobile apps.
+To send a message on completion of a run: set the environment variable `SOBA_NTFY_URL` with the url of the endpoint.
+For example:
 `$ export SOBA_NTFY_URL=https://ntfy.sh/example-topic`
 
 ## logging
 
 ### persistence
 
-Messages are written to stdout and can be persisted by directing to a file, e.g.  
+Messages are written to stdout and can be persisted by directing to a file, e.g.
 `soba > soba.log`
 
 #### logging to /var/log/soba
@@ -251,7 +255,7 @@ run soba and direct output:
 
 ### rotation
 
-[Logrotate](https://linux.die.net/man/8/logrotate) is a utility that comes with most Linux distributions and removes and/or compresses messages older than a certain number of hours or days.  
+[Logrotate](https://linux.die.net/man/8/logrotate) is a utility that comes with most Linux distributions and removes and/or compresses messages older than a certain number of hours or days.
 This example assumes you persist the log file to /var/log/soba/soba.log
 create a file in /etc/logrotate.d/soba with the following content:
 
@@ -286,7 +290,7 @@ ensure the user running soba has an entry in `/etc/cron.allow`.
 
 run `crontab -e`
 
-add the following (assuming you have a user called soba with a script to run it called backup in their home directory):  
+add the following (assuming you have a user called soba with a script to run it called backup in their home directory):
 `* * * * * /usr/bin/flock -n /tmp/soba.lockfile /home/soba/backup >> /var/log/soba/soba.log 2>&1`
 
 note: A useful tool for testing cron jobs is [crontab guru](https://crontab.guru/).
