@@ -7,7 +7,7 @@ toolchain go1.22.0
 //replace github.com/jonhadfield/githosts-utils => ../githosts-utils
 
 require (
-	github.com/go-co-op/gocron/v2 v2.14.2
+	github.com/go-co-op/gocron/v2 v2.15.0
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jonhadfield/githosts-utils v0.0.0-20250118115311-9861a45f01df
 	github.com/pkg/errors v0.9.1
