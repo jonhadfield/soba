@@ -1,3 +1,7 @@
+### 1.3.1 release 2025-01-27
+
+- Support cron syntax for backup interval
+
 ### 1.2.20 release 2024-10-08
 
 - Add Telegram notifications
