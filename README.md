@@ -267,6 +267,9 @@ create a file in /etc/logrotate.d/soba with the following content:
     }
 
 Each day, this copy the latest logs to a new file that is then compressed. The existing log file is then truncated. Any backups older than seven days are then removed.
+### log level
+Set `SOBA_LOG` to a number to control verbosity. Higher values increase output.
+
 
 ### keep running after reboot
 
@@ -322,6 +325,7 @@ source /home/<your-user-id>/.bashrc
 | Azure DevOps | AZURE\_DEVOPS\_USERNAME                   | [instructions](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops)       |
 |           | AZURE\_DEVOPS\_PAT                   |                                                                                                     |
 |           | AZURE\_DEVOPS\_ORGS             |                                                                                                          |
+|           | AZURE_DEVOPS_BACKUPS          |
 | BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
@@ -364,6 +368,7 @@ Environment variable: BITBUCKET_COMPARE
 |:----------------|:---------------------------------------------------------------|
 | clone (default) | Clone the remote and compare latest bundle                     |
 | refs            | Compare refs without downloading (available since soba 1.1.4)  |
+To use Bitbucket Server or another custom endpoint, set `BITBUCKET_APIURL` with the API URL.
 
 ### Gitea
 
@@ -428,6 +433,7 @@ Environment variable: GITHUB_COMPARE
 |:----------------|:--------------------------------------------------------------|
 | clone (default) | Clone the remote and compare latest bundle                    |
 | refs            | Compare refs without downloading (available since soba 1.1.4) |
+To use GitHub Enterprise or other API endpoints, set `GITHUB_APIURL`.
 
 ### GitLab
 
@@ -455,6 +461,7 @@ Environment variable: GITLAB_COMPARE
 |:----------------|:--------------------------------------------------------------|
 | clone (default) | Clone the remote and compare latest bundle                    |
 | refs            | Compare refs without downloading (available since soba 1.1.4) |
+To use a self-hosted GitLab instance, set `GITLAB_APIURL` with the API URL.
 
 ### Comparing remote repository with local backup
 
@@ -483,6 +490,10 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** GIT\_BACKUP\_DIR **Value** /backup
     - **variable** GIT\_BACKUP\_INTERVAL **Value** (hours between backups)
 13. Also under 'Environment' click '+' to add the relevant provider specific configuration:
+    - **variable** AZURE_DEVOPS_USERNAME **Value**
+    - **variable** AZURE_DEVOPS_PAT **Value**
+    - **variable** AZURE_DEVOPS_ORGS **Value**
+    - **variable** AZURE_DEVOPS_BACKUPS **Value** (Number of backups to keep for each repo)
     - **variable** BITBUCKET_USER **Value**
     - **variable** BITBUCKET_KEY **Value**
     - **variable** BITBUCKET_SECRET **Value**

@@ -609,37 +609,11 @@ func execProviderBackups() {
 }
 
 func getProjectMinimumAccessLevel() int {
-	if os.Getenv(envGitLabMinAccessLevel) == "" {
-		logger.Printf("environment variable %s not set, using default of %d", envGitLabMinAccessLevel, defaultGitLabMinimumProjectAccessLevel)
-
-		return defaultGitLabMinimumProjectAccessLevel
-	}
-
-	minimumProjectAccessLevel, err := strconv.Atoi(os.Getenv(envGitLabMinAccessLevel))
-	if err != nil {
-		logger.Printf("error converting environment variable %s to int so defaulting to: %d", envGitLabMinAccessLevel, defaultGitLabMinimumProjectAccessLevel)
-
-		return defaultGitLabMinimumProjectAccessLevel
-	}
-
-	return minimumProjectAccessLevel
+	return getEnvIntDefault(envGitLabMinAccessLevel, defaultGitLabMinimumProjectAccessLevel)
 }
 
 func getBackupsToRetain(envVar string) int {
-	if os.Getenv(envVar) == "" {
-		logger.Printf("environment variable %s not set, using default of %d", envVar, defaultBackupsToRetain)
-
-		return defaultBackupsToRetain
-	}
-
-	backupsToKeep, err := strconv.Atoi(os.Getenv(envVar))
-	if err != nil {
-		logger.Printf("error converting environment variable %s to int so defaulting to: %d", envVar, defaultBackupsToRetain)
-
-		return defaultBackupsToRetain
-	}
-
-	return backupsToKeep
+	return getEnvIntDefault(envVar, defaultBackupsToRetain)
 }
 
 func isInt(i string) (int, bool) {
@@ -648,6 +622,26 @@ func isInt(i string) (int, bool) {
 	}
 
 	return 0, false
+}
+
+// getEnvIntDefault returns an integer value from the specified environment
+// variable, or the provided default if the variable is unset or invalid.
+func getEnvIntDefault(envVar string, def int) int {
+	val := os.Getenv(envVar)
+	if val == "" {
+		logger.Printf("environment variable %s not set, using default of %d", envVar, def)
+
+		return def
+	}
+
+	i, err := strconv.Atoi(val)
+	if err != nil {
+		logger.Printf("error converting environment variable %s to int so defaulting to: %d", envVar, def)
+
+		return def
+	}
+
+	return i
 }
 
 var lookPath = exec.LookPath
