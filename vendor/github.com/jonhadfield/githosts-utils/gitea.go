@@ -968,23 +968,9 @@ func (g *GiteaHost) diffRemoteMethod() string {
 
 func giteaWorker(token string, logLevel int, backupDIR, diffRemoteMethod string, backupsToKeep int, jobs <-chan repository, results chan<- RepoBackupResults) {
 	for repo := range jobs {
-		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		repo.URLWithToken = fmt.Sprintf("%s%s@%s", repo.HTTPSUrl[:firstPos+2], token, repo.HTTPSUrl[firstPos+2:])
+		repo.URLWithToken = urlWithToken(repo.HTTPSUrl, token)
 		err := processBackup(logLevel, repo, backupDIR, backupsToKeep, diffRemoteMethod)
-
-		backupResult := RepoBackupResults{
-			Repo: repo.PathWithNameSpace,
-		}
-
-		status := statusOk
-		if err != nil {
-			status = statusFailed
-			backupResult.Error = err
-		}
-
-		backupResult.Status = status
-
-		results <- backupResult
+		results <- repoBackupResult(repo, err)
 	}
 }
 

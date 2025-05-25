@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/hashicorp/go-retryablehttp"
 	"gitlab.com/tozd/go/errors"
 	"io"
@@ -489,23 +488,9 @@ func removeDuplicates(repos []repository) []repository {
 
 func gitHubWorker(logLevel int, token, backupDIR, diffRemoteMethod string, backupsToKeep int, jobs <-chan repository, results chan<- RepoBackupResults) {
 	for repo := range jobs {
-		firstPos := strings.Index(repo.HTTPSUrl, "//")
-		repo.URLWithToken = fmt.Sprintf("%s%s@%s", repo.HTTPSUrl[:firstPos+2], stripTrailing(token, "\n"), repo.HTTPSUrl[firstPos+2:])
+		repo.URLWithToken = urlWithToken(repo.HTTPSUrl, stripTrailing(token, "\n"))
 		err := processBackup(logLevel, repo, backupDIR, backupsToKeep, diffRemoteMethod)
-
-		backupResult := RepoBackupResults{
-			Repo: repo.PathWithNameSpace,
-		}
-
-		status := statusOk
-		if err != nil {
-			status = statusFailed
-			backupResult.Error = err
-		}
-
-		backupResult.Status = status
-
-		results <- backupResult
+		results <- repoBackupResult(repo, err)
 	}
 }
 
