@@ -1,0 +1,69 @@
+# github.com/davecgh/go-spew v1.1.1
+## explicit
+github.com/davecgh/go-spew/spew
+# github.com/go-co-op/gocron/v2 v2.16.2
+## explicit; go 1.23.0
+github.com/go-co-op/gocron/v2
+# github.com/google/uuid v1.6.0
+## explicit
+github.com/google/uuid
+# github.com/gorilla/websocket v1.5.3
+## explicit; go 1.12
+github.com/gorilla/websocket
+# github.com/h2non/parth v0.0.0-20190131123155-b4df798d6542
+## explicit
+github.com/h2non/parth
+# github.com/hashicorp/go-cleanhttp v0.5.2
+## explicit; go 1.13
+github.com/hashicorp/go-cleanhttp
+# github.com/hashicorp/go-retryablehttp v0.7.7
+## explicit; go 1.19
+github.com/hashicorp/go-retryablehttp
+# github.com/jonboulle/clockwork v0.5.0
+## explicit; go 1.21
+github.com/jonboulle/clockwork
+# github.com/jonhadfield/githosts-utils v0.0.0-20250511181120-cdb3c92e9a50
+## explicit; go 1.22
+github.com/jonhadfield/githosts-utils
+# github.com/microsoft/azure-devops-go-api/azuredevops/v7 v7.1.0
+## explicit; go 1.12
+github.com/microsoft/azure-devops-go-api/azuredevops/v7
+github.com/microsoft/azure-devops-go-api/azuredevops/v7/core
+github.com/microsoft/azure-devops-go-api/azuredevops/v7/delegatedauthorization
+github.com/microsoft/azure-devops-go-api/azuredevops/v7/identity
+github.com/microsoft/azure-devops-go-api/azuredevops/v7/operations
+github.com/microsoft/azure-devops-go-api/azuredevops/v7/system
+github.com/microsoft/azure-devops-go-api/azuredevops/v7/webapi
+# github.com/peterhellberg/link v1.2.0
+## explicit; go 1.17
+github.com/peterhellberg/link
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/pmezard/go-difflib v1.0.0
+## explicit
+github.com/pmezard/go-difflib/difflib
+# github.com/robfig/cron/v3 v3.0.1
+## explicit; go 1.12
+github.com/robfig/cron/v3
+# github.com/slack-go/slack v0.16.0
+## explicit; go 1.16
+github.com/slack-go/slack
+github.com/slack-go/slack/internal/backoff
+github.com/slack-go/slack/internal/errorsx
+github.com/slack-go/slack/internal/timex
+github.com/slack-go/slack/slackutilsx
+# github.com/stretchr/testify v1.10.0
+## explicit; go 1.17
+github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
+github.com/stretchr/testify/require
+# gitlab.com/tozd/go/errors v0.10.0
+## explicit; go 1.17
+gitlab.com/tozd/go/errors
+# gopkg.in/h2non/gock.v1 v1.1.2
+## explicit; go 1.13
+gopkg.in/h2non/gock.v1
+# gopkg.in/yaml.v3 v3.0.1
+## explicit
+gopkg.in/yaml.v3

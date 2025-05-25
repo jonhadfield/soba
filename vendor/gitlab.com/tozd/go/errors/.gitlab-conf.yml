@@ -1,0 +1,348 @@
+project:
+  # Set whether or not merge requests can be merged with skipped jobs. Type: boolean
+  allow_merge_on_skipped_pipeline: null
+  # Set whether or not a pipeline triggerer is allowed to approve deployments. Type:
+  # boolean
+  allow_pipeline_trigger_approve_deployment: false
+  # One of disabled, private or enabled. Type: string
+  analytics_access_level: enabled
+  # Auto-cancel pending pipelines. This action toggles between an enabled state and
+  # a disabled state; it is not a boolean. Type: string
+  auto_cancel_pending_pipelines: enabled
+  # Auto Deploy strategy (continuous, manual, or timed_incremental). Type: string
+  auto_devops_deploy_strategy: continuous
+  # Enable Auto DevOps for this project. Type: boolean
+  auto_devops_enabled: false
+  # Set whether auto-closing referenced issues on default branch. Type: boolean
+  autoclose_referenced_issues: true
+  # The Git strategy. Defaults to fetch. Type: string
+  build_git_strategy: fetch
+  # The maximum amount of time, in seconds, that a job can run. Type: integer
+  build_timeout: 3600
+  # One of disabled, private, or enabled. Type: string
+  builds_access_level: enabled
+  # Enable or disable running pipelines in the parent project for merge requests
+  # from forks. (Introduced in GitLab 15.3.) Type: boolean
+  ci_allow_fork_pipelines_to_run_in_parent_project: true
+  # The path to CI configuration file. Type: string
+  ci_config_path: ""
+  # Default number of revisions for shallow cloning. Type: integer
+  ci_default_git_depth: 50
+  # Enable or disable prevent outdated deployment jobs. Type: boolean
+  ci_forward_deployment_enabled: true
+  # Enable or disable allow job retries for rollback deployments. Type: boolean
+  ci_forward_deployment_rollback_allowed: true
+  # Set whether or not caches should be separated by branch protection status. Type:
+  # boolean
+  ci_separated_caches: true
+  # Update the image cleanup policy for this project. Accepts: cadence (string),
+  # keep_n (integer), older_than (string), name_regex (string), name_regex_delete
+  # (string), name_regex_keep (string), enabled (boolean). Type: hash
+  container_expiration_policy:
+    cadence: 1d
+    enabled: false
+    keep_n: 10
+    name_regex_delete: .*
+    name_regex_keep: null
+    older_than: 90d
+  # Set visibility of container registry, for this project, to one of disabled,
+  # private or enabled. Type: string
+  container_registry_access_level: disabled
+  # The default branch name. Type: string
+  default_branch: main
+  # Short project description. Type: string
+  description: A Go package providing errors with a stack trace and structured details. https://pkg.go.dev/gitlab.com/tozd/go/errors
+  # Enable email notifications. Type: boolean
+  emails_enabled: true
+  # Enforce auth checks on uploads. Type: boolean
+  enforce_auth_checks_on_uploads: true
+  # One of disabled, private, or enabled. Type: string
+  environments_access_level: disabled
+  # The classification label for the project. Type: string
+  external_authorization_classification_label: ""
+  # One of disabled, private, or enabled. Type: string
+  feature_flags_access_level: disabled
+  # One of disabled, private, or enabled. Type: string
+  forking_access_level: enabled
+  # Enable group runners for this project. Type: boolean
+  group_runners_enabled: true
+  # URL the repository was imported from. Type: string
+  import_url: null
+  # One of disabled, private, or enabled. Type: string
+  infrastructure_access_level: disabled
+  # Template used to suggest names for branches created from issues. (Introduced in
+  # GitLab 15.6.) Type: string
+  issue_branch_template: null
+  # One of disabled, private, or enabled. Type: string
+  issues_access_level: enabled
+  # Default description for Issues. Description is parsed with GitLab Flavored
+  # Markdown. See Templates for issues and merge requests. Type: string
+  issues_template: null
+  # Disable or enable the ability to keep the latest artifact for this project.
+  # Type: boolean
+  keep_latest_artifact: true
+  # Enable LFS. Type: boolean
+  lfs_enabled: true
+  # Template used to create merge commit message in merge requests. (Introduced in
+  # GitLab 14.5.) Type: string
+  merge_commit_template: null
+  # Set the merge method used. Type: string
+  merge_method: merge
+  # Enable or disable merge pipelines. Type: boolean
+  merge_pipelines_enabled: false
+  # One of disabled, private, or enabled. Type: string
+  merge_requests_access_level: enabled
+  # Default description for merge requests. Description is parsed with GitLab
+  # Flavored Markdown. See Templates for issues and merge requests. Type: string
+  merge_requests_template: null
+  # Enable or disable merge trains. Type: boolean
+  merge_trains_enabled: false
+  # One of disabled, private, or enabled. Type: string
+  monitor_access_level: disabled
+  # Set whether merge requests can only be merged when all the discussions are
+  # resolved. Type: boolean
+  only_allow_merge_if_all_discussions_are_resolved: false
+  # Indicates that merges of merge requests should be blocked unless all status
+  # checks have passed. Defaults to false.Introduced in GitLab 15.5 with feature
+  # flag only_allow_merge_if_all_status_checks_passed disabled by default. The
+  # feature flag was enabled by default in GitLab 15.9. Type: boolean
+  only_allow_merge_if_all_status_checks_passed: false
+  # Set whether merge requests can only be merged with successful jobs. Type:
+  # boolean
+  only_allow_merge_if_pipeline_succeeds: false
+  # Enable or disable packages repository feature. Type: boolean
+  packages_enabled: false
+  # One of disabled, private, enabled, or public. Type: string
+  pages_access_level: enabled
+  # Show link to create/view merge request when pushing from the command line. Type:
+  # boolean
+  printing_merge_request_link_enabled: true
+  # If true, jobs can be viewed by non-project members. Type: boolean
+  public_jobs: true
+  # One of disabled, private, or enabled. Type: string
+  releases_access_level: enabled
+  # Enable Delete source branch option by default for all new merge requests. Type:
+  # boolean
+  remove_source_branch_after_merge: true
+  # One of disabled, private, or enabled. Type: string
+  repository_access_level: enabled
+  # Allow users to request member access. Type: boolean
+  request_access_enabled: true
+  # One of disabled, private, enabled or public. Type: string
+  requirements_access_level: disabled
+  # Automatically resolve merge request diffs discussions on lines changed with a
+  # push. Type: boolean
+  resolve_outdated_diff_discussions: false
+  # Allow only users with the Maintainer role to pass user-defined variables when
+  # triggering a pipeline. For example when the pipeline is triggered in the UI,
+  # with the API, or by a trigger token. Type: boolean
+  restrict_user_defined_variables: false
+  # (GitLab 14.9 and later) Security and compliance access level. One of disabled,
+  # private, or enabled. Type: string
+  security_and_compliance_access_level: disabled
+  # Enable or disable Service Desk feature. Type: boolean
+  service_desk_enabled: false
+  # Enable shared runners for this project. Type: boolean
+  shared_runners_enabled: true
+  # One of disabled, private, or enabled. Type: string
+  snippets_access_level: disabled
+  # Template used to create squash commit message in merge requests. (Introduced in
+  # GitLab 14.6.) Type: string
+  squash_commit_template: null
+  # One of never, always, default_on, or default_off. Type: string
+  squash_option: default_off
+  # The commit message used to apply merge request suggestions. Type: string
+  suggestion_commit_message: null
+  # The list of topics for the project. This replaces any existing topics that are
+  # already added to the project. (Introduced in GitLab 14.0.) Type: array
+  topics:
+    - errors
+    - go
+  # One of disabled, private, or enabled. Type: string
+  wiki_access_level: disabled
+avatar: ""
+# expires_at: Share expiration date in ISO 8601 format: 2016-09-26. Type: string
+# group_access: The role (access_level) to grant the group. Type: integer
+# group_id: The ID of the group to share with. Type: integer
+shared_with_groups: []
+approvals:
+  # Allow or prevent overriding approvers per merge request. Type: boolean
+  disable_overriding_approvers_per_merge_request: false
+  # Allow or prevent authors from self approving merge requests; true means authors
+  # can self approve. Type: boolean
+  merge_requests_author_approval: false
+  # Allow or prevent committers from self approving merge requests. Type: boolean
+  merge_requests_disable_committers_approval: false
+  # Require approver to enter a password to authenticate before adding the approval.
+  # Type: boolean
+  require_password_to_approve: false
+  # Reset approvals on a new push. Type: boolean
+  reset_approvals_on_push: true
+  # Reset approvals from Code Owners if their files changed. Can be enabled only if
+  # reset_approvals_on_push is disabled. Type: boolean
+  selective_code_owner_removals: false
+# applies_to_all_protected_branches: Whether the rule is applied to all protected
+# branches. If set to true, the value of protected_branch_ids is ignored. Default
+# is false. Introduced in GitLab 15.3. Type: boolean
+# approvals_required: The number of required approvals for this rule. Type:
+# integer
+# group_ids: The IDs of groups as approvers. Type: Array
+# id: The ID of a approval rule. Type: integer
+# name: The name of the approval rule. Type: string
+# protected_branch_ids: The IDs of protected branches to scope the rule by. To
+# identify the ID, use the API. Type: Array
+# rule_type: The type of rule. any_approver is a pre-configured default rule with
+# approvals_required at 0. Other rules are regular and report_approver. Type:
+# string
+# user_ids: The IDs of users as approvers. If you provide both user_ids and
+# usernames, both lists of users are added. Type: Array
+approval_rules: []
+push_rules:
+  # All commit author emails must match this, for example @my-company.com$. Type:
+  # string
+  author_email_regex: ""
+  # All branch names must match this, for example `(feature. Type: string
+  branch_name_regex: null
+  # Users can only push commits to this repository if the committer email is one of
+  # their own verified emails. Type: boolean
+  commit_committer_check: null
+  # No commit message is allowed to match this, for example ssh\:\/\/. Type: string
+  commit_message_negative_regex: null
+  # All commit messages must match this, for example Fixed \d+\..*. Type: string
+  commit_message_regex: ""
+  # Deny deleting a tag. Type: boolean
+  deny_delete_tag: false
+  # All committed filenames must not match this, for example `(jar. Type: string
+  file_name_regex: ""
+  # Maximum file size (MB). Type: integer
+  max_file_size: 0
+  # Restrict commits by author (email) to existing GitLab users. Type: boolean
+  member_check: false
+  # GitLab rejects any files that are likely to contain secrets. Type: boolean
+  prevent_secrets: false
+  # Reject commits when they are not GPG signed. Type: boolean
+  reject_unsigned_commits: null
+forked_from_project: 0
+# color: The color of the label given in 6-digit hex notation with leading '#'
+# sign (for example, #FFAABB) or one of the CSS color names. Type: string
+# description: The description of the label. Type: string
+# id: The ID or title of a group's label. Type: integer or string
+# name: The name of the label. Type: string
+# priority: The priority of the label. Must be greater or equal than zero or null
+# to remove the priority. Type: integer
+labels: []
+# allow_force_push: When enabled, members who can push to this branch can also
+# force push. Type: boolean
+# allowed_to_merge: Array of merge access levels, with each described by a hash of
+# the form {user_id: integer}, {group_id: integer}, or {access_level: integer}.
+# Type: array
+# allowed_to_push: Array of push access levels, with each described by a hash of
+# the form {user_id: integer}, {group_id: integer}, or {access_level: integer}.
+# Type: array
+# allowed_to_unprotect: Array of unprotect access levels, with each described by a
+# hash of the form {user_id: integer}, {group_id: integer}, {access_level:
+# integer}, or {id: integer, _destroy: true} to destroy an existing access level.
+# The access level No access is not available for this field. Type: array
+# code_owner_approval_required: Prevent pushes to this branch if it matches an
+# item in the CODEOWNERS file. Type: boolean
+# name: The name of the branch or wildcard. Type: string
+protected_branches:
+  - allow_force_push: false
+    allowed_to_merge:
+      # Maintainers
+      - access_level: 40
+        group_id: null
+        id: 49721959
+        user_id: null
+    allowed_to_push:
+      # Maintainers
+      - access_level: 40
+        deploy_key_id: null
+        group_id: null
+        id: 50089748
+        user_id: null
+    allowed_to_unprotect:
+      # Maintainers
+      - access_level: 40
+        group_id: null
+        id: 17641597
+        user_id: null
+    code_owner_approval_required: false
+    name: main
+# allowed_to_create: Array of access levels allowed to create tags, with each
+# described by a hash of the form {user_id: integer}, {group_id: integer}, or
+# {access_level: integer}. Type: array
+# name: The name of the tag or wildcard. Type: string
+protected_tags:
+  - allowed_to_create:
+      # Maintainers
+      - access_level: 40
+        deploy_key_id: null
+        group_id: null
+        user_id: null
+    name: v*
+# description: The description of the variable. Default: null. Introduced in
+# GitLab 16.2. Type: string
+# environment_scope: The environment_scope of the variable. Default: *. Type:
+# string
+# key: The key of a variable; must have no more than 255 characters; only A-Z,
+# a-z, 0-9, and _ are allowed. Type: string
+# masked: Whether the variable is masked. Default: false. Type: boolean
+# protected: Whether the variable is protected. Default: false. Type: boolean
+# raw: Whether the variable is treated as a raw string. Default: false. When true,
+# variables in the value are not expanded. Type: boolean
+# value: The value of a variable. Type: string
+# variable_type: The type of a variable. Available types are: env_var (default)
+# and file. Type: string
+variables:
+  - description: null
+    environment_scope: '*'
+    key: GITLAB_API_TOKEN
+    masked: true
+    protected: true
+    raw: true
+    # sops:enc
+    value: ENC[AES256_GCM,data:6cBgSaUKJXVudNfiNQnzYk5+SOudnHFnhHc=,iv:cnhdb2RqbfmWGtuuHk+k6qTzzR01xfRkc+Z3efmgOR4=,tag:/n3j2qT8pyIE/lZpPGsaLw==,type:str]
+    variable_type: env_var
+  - description: null
+    environment_scope: '*'
+    key: SOPS_AGE_KEY_FILE
+    masked: false
+    protected: true
+    raw: true
+    # sops:enc
+    value: ENC[AES256_GCM,data:SMB8z4uSa6QlBV2s52Bki+l/KRFuae69oj7KlDAwuQKxIkzNVi+N1dMG8WJdiEQw6STB+7ILraoToTWvBM3RYfqeLSncjm6+YFms05+r2pONnDeYM7Ydq6WXQn/dikY5/+ud6vgP+76NHxKNXBupu8GiDglh/4AtvgwliHI9OOctyGKglDgJ7xCfJCmMSRo+Bzy6WI4+9egI6Hvjk4LC2yC8q8pDE+wwxhTZxQPkr6e5tJ2X3P2TOJvJx4v5,iv:Jmx1P9Hg86JGCcYVew1LMkHPPVaQukzD8ALzwsEfPIU=,tag:B+tRfvM3oRnmC0kT5OkgiA==,type:str]
+    variable_type: file
+# active: The activation of pipeline schedule. If false is set, the pipeline
+# schedule is initially deactivated. Type: boolean
+# cron: The cron schedule, for example: 0 1 * * *. Type: string
+# cron_timezone: The time zone supported by ActiveSupport::TimeZone (for example
+# Pacific Time (US & Canada)), or TZInfo::Timezone (for example
+# America/Los_Angeles). Type: string
+# description: The description of the pipeline schedule. Type: string
+# id: The pipeline schedule ID. Type: integer
+# ref: The branch or tag name that is triggered. Type: string
+# variables: Array of variables, with each described by a hash of the form {key:
+# string, value: string, variable_type: string}. Type: array
+pipeline_schedules: []
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1nm9ws84l7vrphftwewfks90647jg6tagk3efa4a2nk2ptkck3pgq43wdr8
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBMOFkydWxOaW5odU5iTGtQ
+        aDZxcHZyaCtsVlIrSEV6ZSt4UlhEaGZpcFhBCkhkZFVaKy9oKzhKMGRrOHZRS09t
+        eTd6Vk8wMGs4WEl4M3ZGV3o2TXBQWncKLS0tIEpqRS9HeHRJTUxPbjl2ZkRWd1Vp
+        ZDlHSTNKa0FTZDhFOHVsU1R0WVY4d00KbVxNpB3GewKK8cJ0M5wDYypWszOaraqp
+        JSFlCjgY0B/ZWoE9q3GpJwXLGuVFHoSfizWrGIxIH4kfRga0ezDUUA==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2023-10-05T19:03:44Z"
+  mac: ENC[AES256_GCM,data:Wvju5WKtHd0gLGQ6D6EF1ZlbT6EvI3Xu2ngI22d1E40PX1UqQBgn0eObZL0+OhWiP9wx+ZDqgreJ/VOcdU6zToM4+S1uG+L8ALEOfwZLp1S/Cihx5TybwxLInZBIpaFAUIDV0PuSceHAT1+q5W66s+8CtiFtv18i+rT7hr8Yb2o=,iv:3oDKjjwPMAp773bT8b3gASi+G5rQtvxBR/gebBlwhKE=,tag:hBQs2HaLSdhdUxY9WbzvGg==,type:str]
+  pgp: []
+  encrypted_comment_regex: sops:enc
+  mac_only_encrypted: true
+  version: 3.7.3

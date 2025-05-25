@@ -1,0 +1,159 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  # We want full history so that "git describe" always works correctly.
+  GIT_DEPTH: 0
+  FF_ENABLE_BASH_EXIT_CODE_CHECK: "true"
+  # We always want to run with the Go version installed in a Docker image.
+  GOTOOLCHAIN: local
+
+test:
+  stage: test
+
+  image: golang:$IMAGE_TAG
+
+  before_script:
+    - apk --update add make bash gcc musl-dev
+    - (cd /go; go install gotest.tools/gotestsum@v1.12.0)
+    - (cd /go; go install github.com/boumenot/gocover-cobertura@v1.2.0)
+    - go version
+
+  script:
+    - make test-ci
+
+  artifacts:
+    when: always
+    reports:
+      junit: tests.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths:
+      - tests.xml
+      - coverage.html
+      - coverage.xml
+    expire_in: never
+
+  coverage: '/coverage: \d+\.\d+% of statements/'
+
+  parallel:
+    matrix:
+      - IMAGE_TAG: ['1.18-alpine3.17', '1.19-alpine3.18', '1.20-alpine3.18', '1.21-alpine3.18', '1.22-alpine3.18', '1.23-alpine3.19']
+
+lint:
+  stage: test
+
+  image: golang:1.23-alpine3.19
+
+  before_script:
+    - apk --update add make bash gcc musl-dev
+    - wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.60.3
+
+  script:
+    - make lint-ci
+
+  artifacts:
+    when: always
+    reports:
+      codequality: codeclimate.json
+    expire_in: never
+
+fmt:
+  stage: test
+
+  image: golang:1.23-alpine3.19
+
+  before_script:
+    - apk --update add make bash git gcc musl-dev grep
+    - go install mvdan.cc/gofumpt@v0.7.0
+    - go install golang.org/x/tools/cmd/goimports@v0.24.0
+
+  script:
+    - make fmt-ci
+
+lint_docs:
+  stage: test
+
+  image: node:20.17-alpine3.19
+
+  before_script:
+    - apk --update add make bash
+
+  script:
+    - make lint-docs
+
+audit:
+  stage: test
+
+  image: golang:1.23-alpine3.19
+
+  before_script:
+    - apk --update add make bash git gcc musl-dev
+    - go install github.com/sonatype-nexus-community/nancy@v1.0.46
+
+  script:
+    - make audit
+
+commits:
+  stage: test
+
+  image: golang:1.23-alpine3.19
+
+  variables:
+    GIT_DEPTH: "0"
+
+  before_script:
+    - apk --update add git
+
+  script:
+    - '! git log --oneline "-G^(<<<<<<<|=======|>>>>>>>)" | grep "^"'
+
+publish:
+  stage: deploy
+
+  image: golang:1.23-alpine3.19
+
+  script:
+    - GOPROXY=proxy.golang.org go list -m "gitlab.com/tozd/go/errors@$CI_COMMIT_REF_NAME"
+
+  rules:
+    # Only on protected tags on main repository. Protected tags start with "v".
+    - if: '$CI_COMMIT_TAG && $CI_COMMIT_REF_NAME =~ /^v/ && $CI_PROJECT_PATH == "tozd/go/errors"'
+
+  # We do not need build artifacts in this job.
+  dependencies: []
+
+sync_releases:
+  stage: deploy
+
+  image:
+    name: registry.gitlab.com/tozd/gitlab/release/tag/v0-6-0:latest-debug
+    entrypoint: [""]
+
+  script:
+    # On branch jobs, just update or remove releases, thus releases are created only on tag jobs.
+    - /gitlab-release ${CI_COMMIT_BRANCH:+--no-create}
+
+  rules:
+    # Protected tags start with "v".
+    - if: '$GITLAB_API_TOKEN && ($CI_COMMIT_BRANCH == "main" || ($CI_COMMIT_TAG && $CI_COMMIT_REF_NAME =~ /^v/))'
+
+  # We do not need build artifacts in this job.
+  dependencies: []
+
+sync_config:
+  stage: deploy
+
+  image:
+    name: registry.gitlab.com/tozd/gitlab/config/tag/v0-5-0:latest-debug
+    entrypoint: [""]
+
+  script:
+    - /gitlab-config set
+
+  rules:
+    - if: '$GITLAB_API_TOKEN && $SOPS_AGE_KEY_FILE && $CI_COMMIT_BRANCH == "main"'
+      changes:
+        - .gitlab-conf.yml
+
+  # We do not need build artifacts in this job.
+  dependencies: []
