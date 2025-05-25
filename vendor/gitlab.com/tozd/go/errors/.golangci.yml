@@ -1,0 +1,188 @@
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+  gocritic:
+    disabled-checks:
+      - ifElseChain
+  godot:
+    scope: all
+  goimports:
+    local-prefixes: gitlab.com/tozd/go/errors
+  gosimple:
+    checks:
+      - all
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+  lll:
+    line-length: 170
+  nestif:
+    min-complexity: 15
+  nolintlint:
+    allow-unused: false
+    require-specific: true
+  stylecheck:
+    checks:
+      - all
+  staticcheck:
+    checks:
+      - all
+  tagalign:
+    strict: true
+  testifylint:
+    require-error:
+      fn-pattern: ^(NoError|NotErrorIs)$
+
+linters:
+  disable-all: true
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - decorder
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exportloopref
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - goconst
+    - gocritic
+    - godot
+    - gofmt
+    - gofumpt
+    - goheader
+    - goimports
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - gosmopolitan
+    - govet
+    - grouper
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - ireturn
+    - lll
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - stylecheck
+    - tagalign
+    - tagliatelle
+    - tenv
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - zerologlint
+    # - cyclop
+    # - depguard
+    # - funlen
+    # - gci
+    # - gocognit
+    # - gocyclo
+    # - godox
+    # - nlreturn
+    # - varnamelen
+    # - wsl
+
+issues:
+  exclude-rules:
+    - path: stack_test\.go
+      linters:
+        - gochecknoglobals
+        - goconst
+        - testpackage
+    - path: json_test\.go
+      linters:
+        - lll
+    - path: (errors|format)_.*test\.go
+      linters:
+        - errcheck
+        - errname
+        - gochecknoglobals
+        - gochecknoinits
+        - goconst
+        - gocritic
+        - godot
+        - err113
+        - lll
+        - maintidx
+        - revive
+        - staticcheck
+    - path: example_test\.go
+      linters:
+        - goconst
+        - godot
+        - testableexamples
+    - path: stdlib\.go
+      linters:
+        - err113
+    - path: example_join_test\.go
+      linters:
+        - godot
+        - nonamedreturns
+    - path: example_stack_test\.go
+      linters:
+        - testableexamples
+    - path: private_test\.go
+      linters:
+        - testpackage

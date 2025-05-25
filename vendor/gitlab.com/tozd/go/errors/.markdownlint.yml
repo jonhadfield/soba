@@ -1,0 +1,12 @@
+# markdownlint configuration.
+
+# For more information, see:
+# https://github.com/DavidAnson/markdownlint#optionsconfig.
+
+# Enable all rules.
+default: true
+
+line-length:
+  line_length: 120
+  # Allow longer lines for code blocks.
+  code_block_line_length: 200
