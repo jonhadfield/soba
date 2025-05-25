@@ -50,6 +50,24 @@ func stripTrailing(input string, toStrip string) string {
 	return input
 }
 
+func urlWithToken(httpsURL, token string) string {
+	pos := strings.Index(httpsURL, "//")
+	if pos == -1 {
+		return httpsURL
+	}
+
+	return fmt.Sprintf("%s%s@%s", httpsURL[:pos+2], stripTrailing(token, "\n"), httpsURL[pos+2:])
+}
+
+func urlWithBasicAuth(httpsURL, user, password string) string {
+	parts := strings.SplitN(httpsURL, "//", 2)
+	if len(parts) != 2 {
+		return httpsURL
+	}
+
+	return fmt.Sprintf("%s//%s:%s@%s", parts[0], user, password, parts[1])
+}
+
 func isEmpty(clonedRepoPath string) (bool, errors.E) {
 	remoteHeadsCmd := exec.Command("git", "count-objects", "-v")
 	remoteHeadsCmd.Dir = clonedRepoPath

@@ -223,23 +223,9 @@ func (bb BitbucketHost) getAPIURL() string {
 
 func bitBucketWorker(logLevel int, user, token, backupDIR, diffRemoteMethod string, backupsToKeep int, jobs <-chan repository, results chan<- RepoBackupResults) {
 	for repo := range jobs {
-		parts := strings.Split(repo.HTTPSUrl, "//")
-		repo.URLWithBasicAuth = parts[0] + "//" + user + ":" + token + "@" + parts[1]
+		repo.URLWithBasicAuth = urlWithBasicAuth(repo.HTTPSUrl, user, token)
 		err := processBackup(logLevel, repo, backupDIR, backupsToKeep, diffRemoteMethod)
-
-		backupResult := RepoBackupResults{
-			Repo: repo.PathWithNameSpace,
-		}
-
-		status := statusOk
-		if err != nil {
-			status = statusFailed
-			backupResult.Error = err
-		}
-
-		backupResult.Status = status
-
-		results <- backupResult
+		results <- repoBackupResult(repo, err)
 	}
 }
 

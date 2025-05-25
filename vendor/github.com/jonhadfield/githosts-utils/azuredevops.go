@@ -81,20 +81,7 @@ func azureDevOpsWorker(logLevel int, backupDIR, diffRemoteMethod string, backups
 ) {
 	for repo := range jobs {
 		err := processBackup(logLevel, repo, backupDIR, backupsToKeep, diffRemoteMethod)
-
-		backupResult := RepoBackupResults{
-			Repo: repo.PathWithNameSpace,
-		}
-
-		status := statusOk
-		if err != nil {
-			status = statusFailed
-			backupResult.Error = err
-		}
-
-		backupResult.Status = status
-
-		results <- backupResult
+		results <- repoBackupResult(repo, err)
 	}
 }
 

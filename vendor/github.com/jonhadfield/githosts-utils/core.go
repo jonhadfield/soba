@@ -53,6 +53,16 @@ type ProviderBackupResult struct {
 	Error         errors.E
 }
 
+func repoBackupResult(repo repository, err errors.E) RepoBackupResults {
+	result := RepoBackupResults{Repo: repo.PathWithNameSpace, Status: statusOk}
+	if err != nil {
+		result.Status = statusFailed
+		result.Error = err
+	}
+
+	return result
+}
+
 type gitProvider interface {
 	getAPIURL() string
 	describeRepos() (describeReposOutput, errors.E)
