@@ -1,3 +1,15 @@
+### 1.3.4 release 2025-05-26
+
+- Introduce delay between GitHub API calls to avoid rate limiting
+
+### 1.3.3 release 2025-05-11
+
+- Minor fixes
+
+### 1.3.2 release 2025-04-27
+
+- Minor fixes
+
 ### 1.3.1 release 2025-01-27
 
 - Support cron syntax for backup interval

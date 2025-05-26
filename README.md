@@ -38,6 +38,18 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.3.4 release 2025-05-26
+
+- Introduce delay between GitHub API calls to avoid rate limiting
+
+### 1.3.3 release 2025-05-11
+
+- Minor fixes
+
+### 1.3.2 release 2025-04-27
+
+- Minor fixes
+
 ### 1.3.1 release 2025-01-27
 
 - Support cron syntax for backup interval
@@ -45,14 +57,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.2.20 release 2024-10-08
 
 - Add Telegram notifications
-
-### 1.2.19 release 2024-09-02
-
-- Let user define the request timeout
-
-### 1.2.18 release 2024-08-24
-
-- Increase clone timeout to allow for larger repos and slower connections
 
 See full changelog [here](./CHANGELOG.md).
 
