@@ -318,6 +318,7 @@ type MultiSelectBlockElement struct {
 	InitialUsers         []string                  `json:"initial_users,omitempty"`
 	InitialConversations []string                  `json:"initial_conversations,omitempty"`
 	InitialChannels      []string                  `json:"initial_channels,omitempty"`
+	Filter               *SelectBlockElementFilter `json:"filter,omitempty"`
 	MinQueryLength       *int                      `json:"min_query_length,omitempty"`
 	MaxSelectedItems     *int                      `json:"max_selected_items,omitempty"`
 	Confirm              *ConfirmationBlockObject  `json:"confirm,omitempty"`
@@ -490,6 +491,7 @@ type DateTimePickerBlockElement struct {
 	ActionID        string                   `json:"action_id,omitempty"`
 	InitialDateTime int64                    `json:"initial_date_time,omitempty"`
 	Confirm         *ConfirmationBlockObject `json:"confirm,omitempty"`
+	FocusOnLoad     bool                     `json:"focus_on_load,omitempty"`
 }
 
 // ElementType returns the type of the Element

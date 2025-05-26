@@ -1,9 +1,5 @@
 package slack
 
-// @NOTE: Blocks are in beta and subject to change.
-
-// More Information: https://api.slack.com/block-kit
-
 // MessageBlockType defines a named string type to define each block type
 // as a constant for use within the package.
 type MessageBlockType string
@@ -20,6 +16,7 @@ const (
 	MBTRichText MessageBlockType = "rich_text"
 	MBTCall     MessageBlockType = "call"
 	MBTVideo    MessageBlockType = "video"
+	MBTMarkdown MessageBlockType = "markdown"
 )
 
 // Block defines an interface all block types should implement
@@ -61,6 +58,7 @@ type BlockAction struct {
 	InitialConversation   string              `json:"initial_conversation"`
 	InitialDate           string              `json:"initial_date"`
 	InitialTime           string              `json:"initial_time"`
+	RichTextValue         RichTextBlock       `json:"rich_text_value"`
 }
 
 // actionType returns the type of the action
