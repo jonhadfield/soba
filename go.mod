@@ -9,7 +9,7 @@ require (
 	github.com/hashicorp/go-retryablehttp v0.7.7
 	github.com/jonhadfield/githosts-utils v0.0.0-20250525140009-85953397d510
 	github.com/pkg/errors v0.9.1
-	github.com/slack-go/slack v0.16.0
+	github.com/slack-go/slack v0.17.0
 	github.com/stretchr/testify v1.10.0
 	gitlab.com/tozd/go/errors v0.10.0
 	gopkg.in/h2non/gock.v1 v1.1.2
