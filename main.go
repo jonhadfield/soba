@@ -27,9 +27,20 @@ const (
 	defaultBackupsToRetain                 = 2
 	defaultGitLabMinimumProjectAccessLevel = 20
 	defaultEarlyErrorBackOffSeconds        = 5
-	defaultHTTPClientRequestTimeout        = 300 * time.Second
 
-	pathSep = string(os.PathSeparator)
+	defaultHTTPClientRequestTimeout = 300 * time.Second
+
+	// general constants
+	pathSep        = string(os.PathSeparator)
+	minutesPerHour = 60
+
+	// retry settings
+	httpRetryWaitMax    = 120 * time.Second
+	httpRetryWaitMin    = 60 * time.Second
+	httpRetryMax        = 2
+	webhookRetryWaitMin = 1 * time.Second
+	webhookRetryWaitMax = 3 * time.Second
+	webhookRetryMax     = 3
 
 	// http
 	maxIdleConns    = 10
@@ -138,12 +149,12 @@ func getBackupInterval() int {
 	switch {
 	case isHour:
 		// an int represents hours
-		return hours * 60
+		return hours * minutesPerHour
 	case strings.HasSuffix(backupIntervalEnv, "h"):
 		// a string ending in h represents hours
 		hours, isHour = isInt(backupIntervalEnv[:len(backupIntervalEnv)-1])
 		if isHour {
-			return hours * 60
+			return hours * minutesPerHour
 		}
 	case strings.HasSuffix(backupIntervalEnv, "m"):
 		// a string ending in m represents minutes
@@ -462,8 +473,8 @@ func formatIntervalDuration(m int) string {
 		return ""
 	}
 
-	if m%60 == 0 {
-		return fmt.Sprintf("%dh", m/60)
+	if m%minutesPerHour == 0 {
+		return fmt.Sprintf("%dh", m/minutesPerHour)
 	}
 
 	return time.Duration(int64(m) * int64(time.Minute)).String()
@@ -527,9 +538,9 @@ func getHTTPClient(logLevel string) *retryablehttp.Client {
 		rc.Logger = nil
 	}
 
-	rc.RetryWaitMax = 120 * time.Second
-	rc.RetryWaitMin = 60 * time.Second
-	rc.RetryMax = 2
+	rc.RetryWaitMax = httpRetryWaitMax
+	rc.RetryWaitMin = httpRetryWaitMin
+	rc.RetryMax = httpRetryMax
 
 	return rc
 }

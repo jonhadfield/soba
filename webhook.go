@@ -44,9 +44,9 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 	}
 
 	// send to webhook
-	c.RetryMax = 3
-	c.RetryWaitMin = 1 * time.Second
-	c.RetryWaitMax = 3 * time.Second
+	c.RetryMax = webhookRetryMax
+	c.RetryWaitMin = webhookRetryWaitMin
+	c.RetryWaitMax = webhookRetryWaitMax
 
 	var req *retryablehttp.Request
 
