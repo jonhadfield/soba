@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"net/url"
 	"testing"
 	"time"
@@ -61,7 +62,7 @@ func TestWebhookLongFormat(t *testing.T) {
 		MatchHeader("Content-Type", "application/json").
 		MatchType("json").
 		JSON(json).
-		Reply(200)
+		Reply(http.StatusOK)
 
 	gock.Observe(gock.DumpRequest)
 
@@ -101,7 +102,7 @@ func TestWebhookShortFormat(t *testing.T) {
 		MatchHeader("Content-Type", "application/json").
 		MatchType("json").
 		JSON(json).
-		Reply(200)
+		Reply(http.StatusOK)
 
 	gock.Observe(gock.DumpRequest)
 
