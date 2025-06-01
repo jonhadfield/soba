@@ -126,7 +126,7 @@ func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succ
 		return
 	}
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		logger.Printf("telegram failed to send message - code [%d] - msg [%s]", resp.StatusCode, string(buf))
 
 		return
