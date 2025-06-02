@@ -12,6 +12,7 @@ func Gitea(backupDir string) *ProviderBackupResults {
 
 	giteaHost, err := githosts.NewGiteaHost(githosts.NewGiteaHostInput{
 		Caller:           appName,
+		BackupDir:        backupDir,
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envGiteaAPIURL),
 		DiffRemoteMethod: os.Getenv(envGiteaCompare),
