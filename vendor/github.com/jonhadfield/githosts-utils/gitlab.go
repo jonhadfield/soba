@@ -439,15 +439,5 @@ func (gl *GitLabHost) Backup() ProviderBackupResult {
 
 // return normalised method.
 func (gl *GitLabHost) diffRemoteMethod() string {
-	switch strings.ToLower(gl.DiffRemoteMethod) {
-	case refsMethod:
-		return refsMethod
-	case cloneMethod:
-		return cloneMethod
-	default:
-		logger.Printf("unexpected diff remote method: %s", gl.DiffRemoteMethod)
-
-		// default to bundle as safest
-		return cloneMethod
-	}
+	return canonicalDiffRemoteMethod(gl.DiffRemoteMethod)
 }

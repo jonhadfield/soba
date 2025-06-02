@@ -77,39 +77,40 @@ func isEmpty(clonedRepoPath string) (bool, errors.E) {
 		return true, errors.Wrapf(err, "failed to count objects in %s", clonedRepoPath)
 	}
 
-	cmdOutput := strings.Split(string(out), "\n")
+	loose, packed, parseErr := parseCountObjectsOutput(string(out))
+	if parseErr != nil {
+		return false, errors.Wrapf(parseErr, "failed to get object counts from %s", clonedRepoPath)
+	}
 
-	var looseObjects bool
+	if !loose && !packed {
+		return true, nil
+	}
 
-	var inPackObjects bool
+	return false, nil
+}
 
-	var matchingLinesFound int
-
-	for _, line := range cmdOutput {
+func parseCountObjectsOutput(out string) (looseObjects, inPackObjects bool, err errors.E) {
+	lines := strings.Split(out, "\n")
+	var found int
+	for _, line := range lines {
 		fields := strings.Fields(line)
 		if len(fields) >= 2 {
 			switch fields[0] {
 			case "count:":
-				matchingLinesFound++
-
+				found++
 				looseObjects = fields[1] != "0"
 			case "in-pack:":
-				matchingLinesFound++
-
+				found++
 				inPackObjects = fields[1] != "0"
 			}
 		}
 	}
 
-	if matchingLinesFound != 2 {
-		return false, errors.Errorf("failed to get object counts from %s", clonedRepoPath)
+	if found != 2 {
+		return false, false, errors.New("failed to get object counts")
 	}
 
-	if !looseObjects && !inPackObjects {
-		return true, nil
-	}
-
-	return false, nil
+	return looseObjects, inPackObjects, nil
 }
 
 func getResponseBody(resp *http.Response) ([]byte, error) {
@@ -208,4 +209,12 @@ func remove(s []string, r string) []string {
 	}
 
 	return s
+}
+
+func canonicalDiffRemoteMethod(method string) string {
+	if strings.EqualFold(method, refsMethod) {
+		return refsMethod
+	}
+
+	return cloneMethod
 }

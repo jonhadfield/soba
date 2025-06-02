@@ -551,20 +551,9 @@ func (gh *GitHubHost) Backup() ProviderBackupResult {
 
 // return normalised method.
 func (gh *GitHubHost) diffRemoteMethod() string {
-	switch strings.ToLower(gh.DiffRemoteMethod) {
-	case refsMethod:
-		return refsMethod
-	case cloneMethod:
-		return cloneMethod
-	case "":
-		logger.Printf("diff remote method not specified. defaulting to: %s", cloneMethod)
-
-		// default to bundle as safest
-		return cloneMethod
-	default:
-		logger.Printf("unexpected diff remote method: %s", gh.DiffRemoteMethod)
-
-		// default to bundle as safest
-		return cloneMethod
+	if gh.DiffRemoteMethod == "" {
+		logger.Printf("diff remote method not specified. defaulting to:%s", cloneMethod)
 	}
+
+	return canonicalDiffRemoteMethod(gh.DiffRemoteMethod)
 }
