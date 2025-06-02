@@ -57,10 +57,12 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 
 	req.Header.Set("Content-Type", "application/json")
 
-	_, err = c.Do(req)
+	resp, err := c.Do(req)
 	if err != nil {
 		fmt.Printf("error: %s\n", err)
 	}
+
+	defer resp.Body.Close()
 
 	return nil
 }
@@ -76,7 +78,7 @@ type sobaTime struct {
 }
 
 func (j sobaTime) format() string {
-	return j.Time.Format(j.f)
+	return j.Format(j.f)
 }
 
 func (j sobaTime) MarshalText() ([]byte, error) { // nolint: unparam

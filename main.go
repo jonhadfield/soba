@@ -201,23 +201,18 @@ func checkProviderFactory(provider string) func() {
 
 		// userAndPasswordProviders
 		if slices.Contains(userAndPasswordProviders, provider) {
-			var firstParamFound bool
-
 			for _, param := range enabledProviderAuth[provider] {
 				val, exists := os.LookupEnv(param)
-				if firstParamFound && !exists {
-					_, _ = fmt.Fprintf(&outputErrs, "all parameters for '%s' are required.\n", provider)
-				}
 
-				if exists {
-					firstParamFound = true
-
-					if val == "" {
-						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
-					} else {
-						numUserDefinedProviders++
-					}
+				if exists && val != "" {
+					numUserDefinedProviders++
+				} else {
+					_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
 				}
+			}
+
+			if numUserDefinedProviders == 0 {
+				_, _ = fmt.Fprintf(&outputErrs, "all parameters for '%s' are required.\n", provider)
 			}
 		}
 
@@ -312,21 +307,23 @@ func displayStartupConfig() {
 
 	// output gitlab config
 	if glToken := os.Getenv(envGitLabToken); glToken != "" {
-		if glProjectMinAccessLevel := os.Getenv(envGitLabMinAccessLevel); glProjectMinAccessLevel != "" {
-			logger.Printf("GitLab project minimum access level: %s", glProjectMinAccessLevel)
-		} else {
+		glProjectMinAccessLevel := os.Getenv(envGitLabMinAccessLevel)
+		if glProjectMinAccessLevel == "" {
 			logger.Printf("GitLab project minimum access level: %d", githosts.GitLabDefaultMinimumProjectAccessLevel)
+		} else {
+			logger.Printf("GitLab project minimum access level: %s", glProjectMinAccessLevel)
 		}
 
 		if glBackups := os.Getenv(envGitLabBackups); glBackups != "" {
 			logger.Printf("GitLab backups to keep: %s", glBackups)
 		}
 
+		compareMethod := "clone"
 		if strings.EqualFold(os.Getenv(envGitLabCompare), compareTypeRefs) {
-			logger.Print("GitLab compare method: refs")
-		} else {
-			logger.Print("GitLab compare method: clone")
+			compareMethod = "refs"
 		}
+
+		logger.Printf("GitLab compare method: %s", compareMethod)
 	}
 
 	// output bitbucket config

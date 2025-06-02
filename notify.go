@@ -112,12 +112,7 @@ func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succ
 		return
 	}
 
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-			logger.Printf("telegram failed to close response body - error: %s", err)
-		}
-	}(resp.Body)
+	defer resp.Body.Close()
 
 	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -171,10 +166,12 @@ func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs
 
 	req.Header.Set("Tags", "soba,backup,git")
 
-	_, err = hc.Do(req)
+	resp, err := hc.Do(req)
 	if err != nil {
 		logger.Printf("error: %s", err)
 	}
+
+	defer resp.Body.Close()
 
 	logger.Println("ntfy publish sent")
 }
