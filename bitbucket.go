@@ -16,10 +16,9 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envBitBucketAPIURL),
 		DiffRemoteMethod: os.Getenv(envBitBucketCompare),
-		BackupDir:        backupDir,
-		User:             os.Getenv(envBitBucketUser),
-		Key:              os.Getenv(envBitBucketKey),
-		Secret:           os.Getenv(envBitBucketSecret),
+		User:             getEnvOrFile(envBitBucketUser),
+		Key:              getEnvOrFile(envBitBucketKey),
+		Secret:           getEnvOrFile(envBitBucketSecret),
 		BackupsToRetain:  getBackupsToRetain(envBitBucketBackups),
 		LogLevel:         getLogLevel(),
 	})

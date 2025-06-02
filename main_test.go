@@ -900,3 +900,43 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 		require.Regexp(t, regexp.MustCompile(`^repo[0,1]\.\d{14}\.bundle$`), entries[0].Name())
 	}
 }
+
+func TestAzureDevOpsCredentialsFileSupport(t *testing.T) {
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	preflight()
+	resetGlobals()
+	defer resetBackups()
+
+	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsBackups, envAzureDevOpsCompare})
+
+	tempDir := t.TempDir()
+
+	// Write username and PAT to files
+	usernameFile := filepath.Join(tempDir, "az_username")
+	patFile := filepath.Join(tempDir, "az_pat")
+	os.WriteFile(usernameFile, []byte("fileuser"), 0o600)
+	os.WriteFile(patFile, []byte("filepat"), 0o600)
+
+	os.Setenv(envAzureDevOpsUserName+"_FILE", usernameFile)
+	os.Setenv(envAzureDevOpsPAT+"_FILE", patFile)
+	os.Setenv(envAzureDevOpsOrgs, "dummyorg")
+	os.Setenv(envAzureDevOpsBackups, "1")
+	os.Setenv(envAzureDevOpsCompare, "refs")
+
+	// Should pick up credentials from files
+	user := getEnvOrFile(envAzureDevOpsUserName)
+	pat := getEnvOrFile(envAzureDevOpsPAT)
+	require.Equal(t, "fileuser", user)
+	require.Equal(t, "filepat", pat)
+
+	// Now set env vars directly, which should take precedence
+	os.Setenv(envAzureDevOpsUserName, "envuser")
+	os.Setenv(envAzureDevOpsPAT, "envpat")
+
+	user = getEnvOrFile(envAzureDevOpsUserName)
+	pat = getEnvOrFile(envAzureDevOpsPAT)
+	require.Equal(t, "envuser", user)
+	require.Equal(t, "envpat", pat)
+}
