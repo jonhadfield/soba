@@ -730,7 +730,10 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 	cmd.Env = append(os.Environ(), "BE_CRASHER=1")
 
 	err := cmd.Run()
-	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
+
+	var e *exec.ExitError
+
+	if errors.As(err, &e) && !e.Success() {
 		return
 	}
 
@@ -809,7 +812,9 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 
 	result := githubHost.Backup()
 
-	out, _ := json.MarshalIndent(result, "", "  ")
+	out, err := json.MarshalIndent(result, "", "  ")
+	require.NoError(t, err)
+
 	fmt.Println(string(out))
 
 	for _, repoName := range []string{"public1", "public2"} {
