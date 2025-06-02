@@ -954,16 +954,7 @@ func (g *GiteaHost) getAPIURL() string {
 
 // return normalised method.
 func (g *GiteaHost) diffRemoteMethod() string {
-	switch strings.ToLower(g.DiffRemoteMethod) {
-	case refsMethod:
-		return refsMethod
-	case cloneMethod:
-		return cloneMethod
-	default:
-		logger.Printf("unexpected diff remote method: %s", g.DiffRemoteMethod)
-
-		return "invalid remote comparison method"
-	}
+	return canonicalDiffRemoteMethod(g.DiffRemoteMethod)
 }
 
 func giteaWorker(token string, logLevel int, backupDIR, diffRemoteMethod string, backupsToKeep int, jobs <-chan repository, results chan<- RepoBackupResults) {

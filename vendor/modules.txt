@@ -22,7 +22,7 @@ github.com/hashicorp/go-retryablehttp
 # github.com/jonboulle/clockwork v0.5.0
 ## explicit; go 1.21
 github.com/jonboulle/clockwork
-# github.com/jonhadfield/githosts-utils v0.0.0-20250525140009-85953397d510
+# github.com/jonhadfield/githosts-utils v0.0.0-20250601122759-82c634da6f5e
 ## explicit; go 1.22
 github.com/jonhadfield/githosts-utils
 # github.com/microsoft/azure-devops-go-api/azuredevops/v7 v7.1.0
@@ -46,8 +46,8 @@ github.com/pmezard/go-difflib/difflib
 # github.com/robfig/cron/v3 v3.0.1
 ## explicit; go 1.12
 github.com/robfig/cron/v3
-# github.com/slack-go/slack v0.16.0
-## explicit; go 1.16
+# github.com/slack-go/slack v0.17.0
+## explicit; go 1.22
 github.com/slack-go/slack
 github.com/slack-go/slack/internal/backoff
 github.com/slack-go/slack/internal/errorsx

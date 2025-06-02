@@ -84,29 +84,13 @@ func getBundleRefs(bundlePath string) (gitRefs, error) {
 }
 
 func dirHasBundles(dir string) bool {
-	f, err := os.Open(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return false
 	}
 
-	defer func() {
-		if err = f.Close(); err != nil {
-			logger.Print(err.Error())
-		}
-	}()
-
-	// TODO: why limit to 1?
-	names, err := f.Readdirnames(1)
-	if errors.Is(err, io.EOF) {
-		return false
-	}
-
-	if err != nil {
-		logger.Printf("failed to read bundle directory contents: %s", err.Error())
-	}
-
-	for _, name := range names {
-		if strings.HasSuffix(name, bundleExtension) {
+	for _, entry := range entries {
+		if strings.HasSuffix(entry.Name(), bundleExtension) {
 			return true
 		}
 	}

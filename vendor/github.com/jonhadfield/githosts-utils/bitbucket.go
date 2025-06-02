@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 
 	"gitlab.com/tozd/go/errors"
 
@@ -331,17 +330,5 @@ type bitbucketGetProjectsResponse struct {
 
 // return normalised method.
 func (bb BitbucketHost) diffRemoteMethod() string {
-	switch strings.ToLower(bb.DiffRemoteMethod) {
-	case refsMethod:
-		return refsMethod
-	case cloneMethod:
-		return cloneMethod
-	case "":
-		return cloneMethod
-	default:
-		logger.Printf("unexpected diff remote method: %s", bb.DiffRemoteMethod)
-
-		// default to bundle as safest
-		return cloneMethod
-	}
+	return canonicalDiffRemoteMethod(bb.DiffRemoteMethod)
 }
