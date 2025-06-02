@@ -339,6 +339,14 @@ source /home/<your-user-id>/.bashrc
 | GitLab    | GITLAB_TOKEN                    | [instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)                                       |
 |           | GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
 
+You can now also provide these credentials via files using the *_FILE environment variable pattern. For example:
+
+```bash
+GITHUB_TOKEN_FILE=/run/secrets/my_github_token
+```
+
+If both the variable and *_FILE are set, the variable takes precedence.
+
 ## additional options
 
 ### Azure DevOps
@@ -420,7 +428,7 @@ list of organisations in the environment variable: GITHUB_ORGS.
 #### Skipping User repository backups
 
 By default, all users' repositories will be backed up, even when specifying organisations.
-To skip user repositories set environment variable: GITHUB\_SKIP\_USER_REPOS to true.
+To skip user repositories set environment variable: GITHUB\_SKIP\_USER\_REPOS to true.
 
 #### Limit user repo backups to those owned by the user
 
