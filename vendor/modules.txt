@@ -22,8 +22,8 @@ github.com/hashicorp/go-retryablehttp
 # github.com/jonboulle/clockwork v0.5.0
 ## explicit; go 1.21
 github.com/jonboulle/clockwork
-# github.com/jonhadfield/githosts-utils v0.0.0-20250601122759-82c634da6f5e
-## explicit; go 1.22
+# github.com/jonhadfield/githosts-utils v0.0.0-20250611163743-2c6baebb1b24
+## explicit; go 1.24
 github.com/jonhadfield/githosts-utils
 # github.com/microsoft/azure-devops-go-api/azuredevops/v7 v7.1.0
 ## explicit; go 1.12

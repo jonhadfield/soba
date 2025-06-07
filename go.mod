@@ -7,7 +7,7 @@ go 1.24.0
 require (
 	github.com/go-co-op/gocron/v2 v2.16.2
 	github.com/hashicorp/go-retryablehttp v0.7.7
-	github.com/jonhadfield/githosts-utils v0.0.0-20250601122759-82c634da6f5e
+	github.com/jonhadfield/githosts-utils v0.0.0-20250611163743-2c6baebb1b24
 	github.com/pkg/errors v0.9.1
 	github.com/slack-go/slack v0.17.1
 	github.com/stretchr/testify v1.10.0
