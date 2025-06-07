@@ -446,7 +446,8 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 	if dialErr != nil {
 		t.Skipf("Skipping GitHub invalid credential test: %v", dialErr)
 	}
-	_ = conn.Close()
+
+	require.NoError(t, conn.Close())
 
 	result := githubHost.Backup()
 	require.NotNil(t, result.Error)
