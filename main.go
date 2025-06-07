@@ -204,11 +204,13 @@ func checkProviderFactory(provider string) func() {
 			var foundCount, totalCount int
 			for _, param := range enabledProviderAuth[provider] {
 				totalCount++
+
 				val, exists := GetEnvOrFile(param)
 				if exists && strings.Trim(val, " ") != "" {
 					foundCount++
 				}
 			}
+
 			if foundCount > 0 && foundCount < totalCount {
 				for _, param := range enabledProviderAuth[provider] {
 					val, exists := GetEnvOrFile(param)
@@ -217,6 +219,7 @@ func checkProviderFactory(provider string) func() {
 					}
 				}
 			}
+
 			if foundCount == totalCount {
 				numUserDefinedProviders++
 			}
@@ -327,6 +330,7 @@ func displayStartupConfig() {
 		}
 
 		compareMethod := "clone"
+
 		var compare string
 		if compare, exists = GetEnvOrFile(envGitLabCompare); exists && strings.EqualFold(compare, compareTypeRefs) {
 			compareMethod = "refs"

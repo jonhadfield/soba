@@ -30,9 +30,11 @@ func GetEnvOrFile(envVar string) (string, bool) {
 
 		if os.IsNotExist(err) {
 			fmt.Printf("File %s does not exist, returning empty string\n", filePath)
+
 			return "", false
 		} else {
 			fmt.Printf("Error reading file %s: %v\n", filePath, err)
+
 			return "", false
 		}
 	}

@@ -13,6 +13,7 @@ func Gitea(backupDir string) *ProviderBackupResults {
 	giteaToken, exists := GetEnvOrFile(envGiteaToken)
 	if !exists || giteaToken == "" {
 		logger.Println("Skipping Gitea backup as", envGiteaToken, "is missing")
+
 		return &ProviderBackupResults{
 			Provider: providerNameGitea,
 			Results: githosts.ProviderBackupResult{

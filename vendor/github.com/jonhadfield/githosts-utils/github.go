@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/hashicorp/go-retryablehttp"
-	"gitlab.com/tozd/go/errors"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +11,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"gitlab.com/tozd/go/errors"
 )
 
 const (

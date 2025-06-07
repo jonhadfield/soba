@@ -14,6 +14,7 @@ func GitHub(backupDir string) *ProviderBackupResults {
 	ghToken, exists := GetEnvOrFile(envGitHubToken)
 	if !exists || ghToken == "" {
 		logger.Println("Skipping GitHub backup as", envGitHubToken, "is missing")
+
 		return &ProviderBackupResults{
 			Provider: providerNameGitHub,
 			Results: githosts.ProviderBackupResult{
