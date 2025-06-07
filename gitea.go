@@ -10,13 +10,25 @@ import (
 func Gitea(backupDir string) *ProviderBackupResults {
 	logger.Println("backing up Gitea repos")
 
+	giteaToken, exists := GetEnvOrFile(envGiteaToken)
+	if !exists || giteaToken == "" {
+		logger.Println("Skipping Gitea backup as", envGiteaToken, "is missing")
+		return &ProviderBackupResults{
+			Provider: providerNameGitea,
+			Results: githosts.ProviderBackupResult{
+				BackupResults: []githosts.RepoBackupResults{},
+				Error:         errors.New("Gitea token is not set"),
+			},
+		}
+	}
+
 	giteaHost, err := githosts.NewGiteaHost(githosts.NewGiteaHostInput{
 		Caller:           appName,
 		BackupDir:        backupDir,
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envGiteaAPIURL),
 		DiffRemoteMethod: os.Getenv(envGiteaCompare),
-		Token:            getEnvOrFile(envGiteaToken),
+		Token:            giteaToken,
 		Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
 		BackupsToRetain:  getBackupsToRetain(envGiteaBackups),
 		LogLevel:         getLogLevel(),

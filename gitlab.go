@@ -13,12 +13,24 @@ func Gitlab(backupDir string) *ProviderBackupResults {
 
 	var gitlabHost *githosts.GitLabHost
 
+	glToken, exists := GetEnvOrFile(envGitLabToken)
+	if !exists || glToken == "" {
+		logger.Println("Skipping GitLab backup as", envGitLabToken, "is missing")
+		return &ProviderBackupResults{
+			Provider: providerNameGitLab,
+			Results: githosts.ProviderBackupResult{
+				BackupResults: []githosts.RepoBackupResults{},
+				Error:         errors.New("GitLab token is not set"),
+			},
+		}
+	}
+
 	gitlabHost, err := githosts.NewGitLabHost(githosts.NewGitLabHostInput{
 		Caller:                appName,
 		HTTPClient:            httpClient,
 		APIURL:                os.Getenv(envGitLabAPIURL),
 		DiffRemoteMethod:      os.Getenv(envGitLabCompare),
-		Token:                 getEnvOrFile(envGitLabToken),
+		Token:                 glToken,
 		BackupDir:             backupDir,
 		BackupsToRetain:       getBackupsToRetain(envGitLabBackups),
 		ProjectMinAccessLevel: getProjectMinimumAccessLevel(),

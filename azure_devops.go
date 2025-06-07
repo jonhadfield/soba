@@ -10,13 +10,37 @@ import (
 func AzureDevOps(backupDir string) *ProviderBackupResults {
 	logger.Println("backing up Azure DevOps repos")
 
+	adou, exists := GetEnvOrFile(envAzureDevOpsUserName)
+	if !exists || adou == "" {
+		logger.Println("Skipping Azure DevOps backup as", envAzureDevOpsUserName, "is missing")
+		return &ProviderBackupResults{
+			Provider: providerNameAzureDevOps,
+			Results: githosts.ProviderBackupResult{
+				BackupResults: []githosts.RepoBackupResults{},
+				Error:         errors.New("Azure DevOps username is not set"),
+			},
+		}
+	}
+
+	pat, exists := GetEnvOrFile(envAzureDevOpsPAT)
+	if !exists || pat == "" {
+		logger.Println("Skipping Azure DevOps backup as", envAzureDevOpsPAT, "is missing")
+		return &ProviderBackupResults{
+			Provider: providerNameAzureDevOps,
+			Results: githosts.ProviderBackupResult{
+				BackupResults: []githosts.RepoBackupResults{},
+				Error:         errors.New("Azure DevOps PAT is not set"),
+			},
+		}
+	}
+
 	azureDevOpsHost, err := githosts.NewAzureDevOpsHost(githosts.NewAzureDevOpsHostInput{
 		Caller:           appName,
 		HTTPClient:       httpClient,
 		BackupDir:        backupDir,
 		DiffRemoteMethod: os.Getenv(envAzureDevOpsCompare),
-		UserName:         getEnvOrFile(envAzureDevOpsUserName),
-		PAT:              getEnvOrFile(envAzureDevOpsPAT),
+		UserName:         adou,
+		PAT:              pat,
 		Orgs:             getOrgsListFromEnvVar(envAzureDevOpsOrgs),
 		BackupsToRetain:  getBackupsToRetain(envAzureDevOpsBackups),
 		LogLevel:         getLogLevel(),
