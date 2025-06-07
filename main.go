@@ -200,7 +200,7 @@ func checkProviderFactory(provider string) func() {
 		}
 
 		// userAndPasswordProviders
-		if slices.Contains(userAndPasswordProviders, provider) {
+		if slices.Contains(userAndPasswordProviders, provider) { // nolint: nestif
 			var foundCount, totalCount int
 			for _, param := range enabledProviderAuth[provider] {
 				totalCount++
