@@ -14,6 +14,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 	bbUser, exists := GetEnvOrFile(envBitBucketUser)
 	if !exists || bbUser == "" {
 		logger.Println("Skipping BitBucket backup as", envBitBucketUser, "is missing")
+
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
 			Results: githosts.ProviderBackupResult{
@@ -26,6 +27,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 	bbKey, exists := GetEnvOrFile(envBitBucketKey)
 	if !exists || bbKey == "" {
 		logger.Println("Skipping BitBucket backup as", envBitBucketKey, "is missing")
+
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
 			Results: githosts.ProviderBackupResult{
@@ -38,6 +40,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 	bbSecret, exists := GetEnvOrFile(envBitBucketSecret)
 	if !exists || bbSecret == "" {
 		logger.Println("Skipping BitBucket backup as", envBitBucketSecret, "is missing")
+
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
 			Results: githosts.ProviderBackupResult{
