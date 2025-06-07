@@ -1,3 +1,7 @@
+### 1.3.5 release 2025-06-07
+
+- Environment variables can be loaded from files using the `_FILE` suffix
+
 ### 1.3.4 release 2025-05-26
 
 - Introduce delay between GitHub API calls to avoid rate limiting

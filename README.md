@@ -38,6 +38,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.3.5 release 2025-06-07
+
+- Environment variables can be loaded from files using the `_FILE` suffix
+
 ### 1.3.4 release 2025-05-26
 
 - Introduce delay between GitHub API calls to avoid rate limiting
@@ -89,6 +93,17 @@ On Linux and MacOS you would set these using:
 ```bash
 export GIT_BACKUP_DIR="/repo-backups/"
 ```
+
+You can also source values from files by specifying the same variable name with
+the suffix `_FILE`. soba will read the contents of the referenced file and use
+that as the value. For example:
+
+```bash
+export GIT_BACKUP_DIR_FILE=/run/secrets/backup_dir
+```
+
+If both the variable and `_FILE` version are set, the variable value takes
+precedence.
 
 To set provider credentials see [below](#setting-provider-credentials).
 
