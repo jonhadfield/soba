@@ -11,9 +11,6 @@ setup:
 test:
 	echo 'mode: atomic' > coverage.txt && go list ./... | grep -v testing.go | xargs -n1 -I{} sh -c 'go test -v -failfast -p 1 -parallel 1 -timeout=600s -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
 
-find-updates:
-	go list -u -m -json all | go-mod-outdated -update -direct
-
 cover: test
 	go tool cover -html=coverage.txt
     # don't open browser...	go tool cover -html=coverage.txt -o coverage.html
@@ -22,7 +19,7 @@ fmt:
 	goimports -w . && gofumpt -l -w .
 
 lint:
-	golangci-lint run --disable lll --disable interfacer --disable gochecknoglobals --disable exhaustivestruct --disable tagliatelle
+	golangci-lint run --config .golangci.yml
 
 ci: lint test
 

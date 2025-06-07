@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"gitlab.com/tozd/go/errors"
 
@@ -73,10 +72,10 @@ func NewBitBucketHost(input NewBitBucketHostInput) (*BitbucketHost, error) {
 	}, nil
 }
 
-func (bb BitbucketHost) auth(key, secret string) (string, error) {
+func (bb BitbucketHost) auth() (string, error) {
 	b, _, _, err := httpRequest(httpRequestInput{
 		client: bb.HttpClient,
-		url:    fmt.Sprintf("https://%s:%s@bitbucket.org/site/oauth2/access_token", key, secret),
+		url:    fmt.Sprintf("https://%s:%s@bitbucket.org/site/oauth2/access_token", bb.Key, bb.Secret),
 		method: http.MethodPost,
 		headers: http.Header{
 			"Host":         []string{"bitbucket.org"},
@@ -84,9 +83,9 @@ func (bb BitbucketHost) auth(key, secret string) (string, error) {
 			"Accept":       []string{"*/*"},
 		},
 		reqBody:           []byte("grant_type=client_credentials"),
-		basicAuthUser:     key,
-		basicAuthPassword: secret,
-		secrets:           []string{key, secret},
+		basicAuthUser:     bb.Key,
+		basicAuthPassword: bb.Secret,
+		secrets:           []string{bb.Key, bb.Secret},
 		timeout:           defaultHttpRequestTimeout,
 	})
 	if err != nil {
@@ -133,12 +132,9 @@ func (bb BitbucketHost) describeRepos() (describeReposOutput, errors.E) {
 
 	var err error
 
-	key := os.Getenv(bitbucketEnvVarKey)
-	secret := os.Getenv(bitbucketEnvVarSecret)
-
 	var token string
 
-	token, err = bb.auth(key, secret)
+	token, err = bb.auth()
 	if err != nil {
 		return describeReposOutput{}, errors.Wrap(err, "failed to get bitbucket auth token")
 	}
@@ -241,7 +237,7 @@ func (bb BitbucketHost) Backup() ProviderBackupResult {
 
 	var token string
 
-	token, err = bb.auth(bb.Key, bb.Secret)
+	token, err = bb.auth()
 	if err != nil {
 		return ProviderBackupResult{
 			Error: errors.Errorf("failed to get bitbucket auth token: %s", err),

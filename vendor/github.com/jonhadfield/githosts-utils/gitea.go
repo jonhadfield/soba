@@ -438,7 +438,7 @@ func (g *GiteaHost) getAllUsers() ([]giteaUser, errors.E) {
 		}
 
 		if g.LogLevel > 0 {
-			logger.Printf(string(body))
+			logger.Print(string(body))
 		}
 
 		switch resp.StatusCode {
