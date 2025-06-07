@@ -910,7 +910,7 @@ func TestAzureDevOpsCredentialsFileSupport(t *testing.T) {
 
 	defer resetBackups()
 
-	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsBackups, envAzureDevOpsCompare})
+	unsetEnvVarsExcept([]string{envPath, envGitBackupDir})
 
 	tempDir := t.TempDir()
 
@@ -927,19 +927,23 @@ func TestAzureDevOpsCredentialsFileSupport(t *testing.T) {
 	_ = os.Setenv(envAzureDevOpsCompare, "refs")
 
 	// Should pick up credentials from files
-	user := getEnvOrFile(envAzureDevOpsUserName)
+	user, exists := GetEnvOrFile(envAzureDevOpsUserName)
 	require.Equal(t, "fileuser", user)
+	require.True(t, exists)
 
-	pat := getEnvOrFile(envAzureDevOpsPAT)
+	pat, exists := GetEnvOrFile(envAzureDevOpsPAT)
 	require.Equal(t, "filepat", pat)
+	require.True(t, exists)
 
 	// Now set env vars directly, which should take precedence
 	_ = os.Setenv(envAzureDevOpsUserName, "envuser")
 	_ = os.Setenv(envAzureDevOpsPAT, "envpat")
 
-	user = getEnvOrFile(envAzureDevOpsUserName)
+	user, exists = GetEnvOrFile(envAzureDevOpsUserName)
 	require.Equal(t, "envuser", user)
+	require.True(t, exists)
 
-	pat = getEnvOrFile(envAzureDevOpsPAT)
+	pat, exists = GetEnvOrFile(envAzureDevOpsPAT)
 	require.Equal(t, "envpat", pat)
+	require.True(t, exists)
 }

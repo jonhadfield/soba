@@ -188,7 +188,7 @@ func checkProviderFactory(provider string) func() {
 		// tokenOnlyProviders
 		if slices.Contains(justTokenProviders, provider) {
 			for _, param := range enabledProviderAuth[provider] {
-				val, exists := os.LookupEnv(param)
+				val, exists := GetEnvOrFile(param)
 				if exists {
 					if strings.Trim(val, " ") == "" {
 						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
@@ -201,18 +201,24 @@ func checkProviderFactory(provider string) func() {
 
 		// userAndPasswordProviders
 		if slices.Contains(userAndPasswordProviders, provider) {
+			var foundCount, totalCount int
 			for _, param := range enabledProviderAuth[provider] {
-				val, exists := os.LookupEnv(param)
-
-				if exists && val != "" {
-					numUserDefinedProviders++
-				} else {
-					_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+				totalCount++
+				val, exists := GetEnvOrFile(param)
+				if exists && strings.Trim(val, " ") != "" {
+					foundCount++
 				}
 			}
-
-			if numUserDefinedProviders == 0 {
-				_, _ = fmt.Fprintf(&outputErrs, "all parameters for '%s' are required.\n", provider)
+			if foundCount > 0 && foundCount < totalCount {
+				for _, param := range enabledProviderAuth[provider] {
+					val, exists := GetEnvOrFile(param)
+					if !exists || strings.Trim(val, " ") == "" {
+						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+					}
+				}
+			}
+			if foundCount == totalCount {
+				numUserDefinedProviders++
 			}
 		}
 
@@ -267,21 +273,22 @@ func envTrue(envVar string) bool {
 }
 
 func displayStartupConfig() {
-	if backupDIR := os.Getenv(envGitBackupDir); backupDIR != "" {
+	if backupDIR, exists := GetEnvOrFile(envGitBackupDir); exists && backupDIR != "" {
 		logger.Printf("root backup directory: %s", backupDIR)
 	}
 
 	// output github config
-	if ghToken := os.Getenv(envGitHubToken); ghToken != "" {
-		if ghOrgs := strings.ToLower(os.Getenv(envGitHubOrgs)); ghOrgs != "" {
-			logger.Printf("GitHub Organistations: %s", ghOrgs)
+	if ghToken, exists := GetEnvOrFile(envGitHubToken); exists && ghToken != "" {
+		if ghOrgs, orgsExists := GetEnvOrFile(envGitHubOrgs); orgsExists && strings.ToLower(ghOrgs) != "" {
+			logger.Printf("GitHub Organistations: %s", strings.ToLower(ghOrgs))
 		}
 
-		if envTrue(envGitHubSkipUserRepos) {
+		if _, exists = GetEnvOrFile(envGitHubSkipUserRepos); exists && envTrue(envGitHubSkipUserRepos) {
 			logger.Printf("GitHub skipping user repos: true")
 		}
 
-		if strings.EqualFold(os.Getenv(envGitHubCompare), compareTypeRefs) {
+		var compare string
+		if compare, exists = GetEnvOrFile(envGitHubCompare); exists && strings.EqualFold(compare, compareTypeRefs) {
 			logger.Print("GitHub compare method: refs")
 		} else {
 			logger.Print("GitHub compare method: clone")
@@ -289,16 +296,17 @@ func displayStartupConfig() {
 	}
 
 	// output gitea config
-	if giteaToken := os.Getenv(envGiteaToken); giteaToken != "" {
-		if giteaOrgs := strings.ToLower(os.Getenv(envGiteaOrgs)); giteaOrgs != "" {
-			logger.Printf("Gitea Organistations: %s", giteaOrgs)
+	if giteaToken, exists := GetEnvOrFile(envGiteaToken); exists && giteaToken != "" {
+		if giteaOrgs, orgsExists := GetEnvOrFile(envGiteaOrgs); orgsExists && strings.ToLower(giteaOrgs) != "" {
+			logger.Printf("Gitea Organistations: %s", strings.ToLower(giteaOrgs))
 		}
 
-		if giteaBackups := os.Getenv(envGiteaBackups); giteaBackups != "" {
+		if giteaBackups, backupsExists := GetEnvOrFile(envGiteaBackups); backupsExists && giteaBackups != "" {
 			logger.Printf("Gitea backups to keep: %s", giteaBackups)
 		}
 
-		if strings.EqualFold(os.Getenv(envGiteaCompare), compareTypeRefs) {
+		var compare string
+		if compare, exists = GetEnvOrFile(envGiteaCompare); exists && strings.EqualFold(compare, compareTypeRefs) {
 			logger.Print("Gitea compare method: refs")
 		} else {
 			logger.Print("Gitea compare method: clone")
@@ -306,20 +314,21 @@ func displayStartupConfig() {
 	}
 
 	// output gitlab config
-	if glToken := os.Getenv(envGitLabToken); glToken != "" {
-		glProjectMinAccessLevel := os.Getenv(envGitLabMinAccessLevel)
-		if glProjectMinAccessLevel == "" {
+	if glToken, exists := GetEnvOrFile(envGitLabToken); exists && glToken != "" {
+		glProjectMinAccessLevel, minAccessExists := GetEnvOrFile(envGitLabMinAccessLevel)
+		if !minAccessExists || glProjectMinAccessLevel == "" {
 			logger.Printf("GitLab project minimum access level: %d", githosts.GitLabDefaultMinimumProjectAccessLevel)
 		} else {
 			logger.Printf("GitLab project minimum access level: %s", glProjectMinAccessLevel)
 		}
 
-		if glBackups := os.Getenv(envGitLabBackups); glBackups != "" {
+		if glBackups, backupsExists := GetEnvOrFile(envGitLabBackups); backupsExists && glBackups != "" {
 			logger.Printf("GitLab backups to keep: %s", glBackups)
 		}
 
 		compareMethod := "clone"
-		if strings.EqualFold(os.Getenv(envGitLabCompare), compareTypeRefs) {
+		var compare string
+		if compare, exists = GetEnvOrFile(envGitLabCompare); exists && strings.EqualFold(compare, compareTypeRefs) {
 			compareMethod = "refs"
 		}
 
@@ -327,12 +336,12 @@ func displayStartupConfig() {
 	}
 
 	// output bitbucket config
-	if bbUser := os.Getenv(envBitBucketUser); bbUser != "" {
-		if bbBackups := os.Getenv(envBitBucketBackups); bbBackups != "" {
+	if bbUser, exists := GetEnvOrFile(envBitBucketUser); exists && bbUser != "" {
+		if bbBackups, backupsExists := GetEnvOrFile(envBitBucketBackups); backupsExists && bbBackups != "" {
 			logger.Printf("BitBucket backups to keep: %s", bbBackups)
 		}
 
-		if strings.ToLower(os.Getenv(envBitBucketCompare)) == compareTypeRefs {
+		if compare, exists := GetEnvOrFile(envBitBucketCompare); exists && strings.ToLower(compare) == compareTypeRefs {
 			logger.Printf("BitBucket compare method: %s", compareTypeRefs)
 		} else {
 			logger.Printf("BitBucket compare method: %s", compareTypeClone)
@@ -340,12 +349,12 @@ func displayStartupConfig() {
 	}
 
 	// output azure devops config
-	if azureDevOpsUserName := os.Getenv(envAzureDevOpsUserName); azureDevOpsUserName != "" {
-		if ghOrgs := strings.ToLower(os.Getenv(envAzureDevOpsOrgs)); ghOrgs != "" {
-			logger.Printf("Azure DevOps Organistations: %s", ghOrgs)
+	if azureDevOpsUserName, exists := GetEnvOrFile(envAzureDevOpsUserName); exists && azureDevOpsUserName != "" {
+		if ghOrgs, orgsExists := GetEnvOrFile(envAzureDevOpsOrgs); orgsExists && strings.ToLower(ghOrgs) != "" {
+			logger.Printf("Azure DevOps Organistations: %s", strings.ToLower(ghOrgs))
 		}
 
-		if strings.EqualFold(os.Getenv(envAzureDevOpsCompare), compareTypeRefs) {
+		if compare, exists := GetEnvOrFile(envAzureDevOpsCompare); exists && strings.EqualFold(compare, compareTypeRefs) {
 			logger.Print("Azure DevOps compare method: refs")
 		} else {
 			logger.Print("Azure DevOps compare method: clone")
@@ -381,8 +390,11 @@ func run() error {
 		return fmt.Errorf("environment variable %s must be set", envGitBackupDir)
 	}
 
-	if _, githubOrgsKeyExists := os.LookupEnv(envGitHubOrgs); githubOrgsKeyExists {
-		if _, githubTokenExists := os.LookupEnv(envGitHubToken); !githubTokenExists {
+	_, ghOrgsExists := GetEnvOrFile(envGitHubOrgs)
+	_, githubTokenExists := GetEnvOrFile(envGitHubToken)
+
+	if ghOrgsExists {
+		if !githubTokenExists {
 			return fmt.Errorf("environment variable %s must be set if %s is set", envGitHubToken, envGitHubOrgs)
 		}
 	}
@@ -543,7 +555,7 @@ func getHTTPClient(logLevel string) *retryablehttp.Client {
 }
 
 func execProviderBackups() {
-	backupDir := os.Getenv(envGitBackupDir)
+	backupDir, _ := GetEnvOrFile(envGitBackupDir)
 
 	if httpClient == nil {
 		httpClient = getHTTPClient(os.Getenv(envSobaLogLevel))
@@ -558,36 +570,33 @@ func execProviderBackups() {
 
 	var providerBackupResults []ProviderBackupResults
 
-	if os.Getenv(envBitBucketUser) != "" {
+	if bbUser, exists := GetEnvOrFile(envBitBucketUser); exists && bbUser != "" {
 		providerBackupResults = append(providerBackupResults, *Bitbucket(backupDir))
 	}
 
-	if os.Getenv(envGiteaToken) != "" {
+	if giteaToken, exists := GetEnvOrFile(envGiteaToken); exists && giteaToken != "" {
 		providerBackupResults = append(providerBackupResults, *Gitea(backupDir))
 	}
 
-	if os.Getenv(envGitHubToken) != "" {
+	if ghToken, exists := GetEnvOrFile(envGitHubToken); exists && ghToken != "" {
 		providerBackupResults = append(providerBackupResults, *GitHub(backupDir))
 	}
 
-	if os.Getenv(envGitLabToken) != "" {
+	if glToken, exists := GetEnvOrFile(envGitLabToken); exists && glToken != "" {
 		providerBackupResults = append(providerBackupResults, *Gitlab(backupDir))
 	}
 
-	if os.Getenv(envAzureDevOpsUserName) != "" {
+	if azureDevOpsUserName, exists := GetEnvOrFile(envAzureDevOpsUserName); exists && azureDevOpsUserName != "" {
 		providerBackupResults = append(providerBackupResults, *AzureDevOps(backupDir))
 	}
 
 	logger.Println("cleaning up")
 
-	// startFileRemovals := time.Now()
 	delErr := os.RemoveAll(backupDir + pathSep + workingDIRName + pathSep)
 	if delErr != nil {
 		logger.Printf("failed to delete working directory: %s",
 			backupDir+pathSep+workingDIRName)
 	}
-
-	// logger.Printf("file removals took %s", time.Since(startFileRemovals).String())
 
 	backupResults.Results = &providerBackupResults
 	backupResults.FinishedAt = sobaTime{
