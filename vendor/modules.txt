@@ -48,7 +48,7 @@ github.com/pmezard/go-difflib/difflib
 github.com/robfig/cron/v3
 # github.com/rogpeppe/go-internal v1.14.1
 ## explicit; go 1.23
-# github.com/slack-go/slack v0.17.0
+# github.com/slack-go/slack v0.17.1
 ## explicit; go 1.22
 github.com/slack-go/slack
 github.com/slack-go/slack/internal/backoff

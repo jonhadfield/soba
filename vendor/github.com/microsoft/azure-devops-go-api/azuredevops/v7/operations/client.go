@@ -10,11 +10,10 @@ package operations
 
 import (
 	"context"
-	"net/http"
-	"net/url"
-
 	"github.com/google/uuid"
 	"github.com/microsoft/azure-devops-go-api/azuredevops/v7"
+	"net/http"
+	"net/url"
 )
 
 type Client interface {
