@@ -42,6 +42,10 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 - Environment variables can be loaded from files using the `_FILE` suffix
 
+### 1.3.6 release 2025-06-11
+
+- Dependency updates and minor improvements
+
 ### 1.3.4 release 2025-05-26
 
 - Introduce delay between GitHub API calls to avoid rate limiting
@@ -460,6 +464,12 @@ Environment variable: GITHUB_COMPARE
 |:----------------|:--------------------------------------------------------------|
 | clone (default) | Clone the remote and compare latest bundle                    |
 | refs            | Compare refs without downloading (available since soba 1.1.4) |
+#### Adjust GitHub call behaviour
+
+Environment variables:
+- `GITHUB_CALL_SIZE` - number of repositories returned per API call (default 100)
+- `GITHUB_WORKER_DELAY` - delay in milliseconds between API workers starting (default 500)
+
 To use GitHub Enterprise or other API endpoints, set `GITHUB_APIURL`.
 
 ### GitLab
