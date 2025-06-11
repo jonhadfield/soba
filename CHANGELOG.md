@@ -1,3 +1,7 @@
+### 1.3.6 release 2025-06-11
+
+- Dependency updates and minor improvements
+
 ### 1.3.5 release 2025-06-07
 
 - Environment variables can be loaded from files using the `_FILE` suffix
