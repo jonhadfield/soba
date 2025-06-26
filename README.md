@@ -1,4 +1,10 @@
-# soba: backup hosted git repositories
+# soba
+
+back up hosted git repositories
+
+<img src="docs/logo.png" alt="logo" width="200"/>
+
+---
 
 [![GitHub Release][release-img]][release]
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://app.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)[![CodeQL](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml)
@@ -67,7 +73,7 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 - Add Telegram notifications
 
-See full changelog [here](./CHANGELOG.md).
+See full changelog [here](docs/CHANGELOG.md).
 
 ## supported OSes
 
