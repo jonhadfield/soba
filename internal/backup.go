@@ -2,10 +2,6 @@ package internal
 
 import (
 	"fmt"
-	"github.com/go-co-op/gocron/v2"
-	"github.com/hashicorp/go-retryablehttp"
-	"github.com/jonhadfield/githosts-utils"
-	"gitlab.com/tozd/go/errors"
 	"log"
 	"net/http"
 	"os"
@@ -15,6 +11,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-co-op/gocron/v2"
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/jonhadfield/githosts-utils"
+	"gitlab.com/tozd/go/errors"
 )
 
 type BackupResults struct {
@@ -100,7 +101,7 @@ func displayStartupConfig() {
 	}
 
 	// output github config
-	if ghToken, exists := GetEnvOrFile(envGitHubToken); exists && ghToken != "" {
+	if ghToken, exists := GetEnvOrFile(envGitHubToken); exists && ghToken != "" { // nolint: nestif
 		if ghOrgs, orgsExists := GetEnvOrFile(envGitHubOrgs); orgsExists && strings.ToLower(ghOrgs) != "" {
 			logger.Printf("GitHub Organistations: %s", strings.ToLower(ghOrgs))
 		}
@@ -122,7 +123,7 @@ func displayStartupConfig() {
 	}
 
 	// output gitea config
-	if giteaToken, exists := GetEnvOrFile(envGiteaToken); exists && giteaToken != "" {
+	if giteaToken, exists := GetEnvOrFile(envGiteaToken); exists && giteaToken != "" { // nolint: nestif
 		if giteaOrgs, orgsExists := GetEnvOrFile(envGiteaOrgs); orgsExists && strings.ToLower(giteaOrgs) != "" {
 			logger.Printf("Gitea Organistations: %s", strings.ToLower(giteaOrgs))
 		}
@@ -144,7 +145,7 @@ func displayStartupConfig() {
 	}
 
 	// output gitlab config
-	if glToken, exists := GetEnvOrFile(envGitLabToken); exists && glToken != "" {
+	if glToken, exists := GetEnvOrFile(envGitLabToken); exists && glToken != "" { // nolint: nestif
 		glProjectMinAccessLevel, minAccessExists := GetEnvOrFile(envGitLabMinAccessLevel)
 		if !minAccessExists || glProjectMinAccessLevel == "" {
 			logger.Printf("GitLab project minimum access level: %d", githosts.GitLabDefaultMinimumProjectAccessLevel)

@@ -363,7 +363,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
 	require.Len(t, files, 2)
+
 	r := regexp.MustCompile(`repo0\.[0-9]{14}\.(bundle|lfs\.tar\.gz)$`)
+
 	for _, file := range files {
 		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
 	}
@@ -371,8 +373,11 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	require.NoError(t, Run())
 	// check only one bundle exists
 	files, err = os.ReadDir(dfDir)
+
 	require.NoError(t, err)
+
 	require.Len(t, files, 2)
+
 	for _, file := range files {
 		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
 	}
@@ -412,7 +417,9 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
 	require.Len(t, files, 3)
+
 	r := regexp.MustCompile(`repo0\.[0-9]{14}\.(bundle|bundle\.invalid|lfs\.tar\.gz)$`)
+
 	for _, file := range files {
 		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
 	}

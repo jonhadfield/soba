@@ -49,7 +49,6 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 		LogLevel:         getLogLevel(),
 		BackupLFS:        envTrue(envBitBucketBackupLFS),
 	})
-
 	if err != nil {
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
