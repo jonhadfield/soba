@@ -19,27 +19,34 @@ func TestFormatIntervalDurationAdditional(t *testing.T) {
 
 func TestGetOrgsListFromEnvVarAdditional(t *testing.T) {
 	t.Setenv("TEST_ORGS", "alpha,beta")
+
 	list := getOrgsListFromEnvVar("TEST_ORGS")
+
 	require.Equal(t, []string{"alpha", "beta"}, list)
 
 	t.Setenv("TEST_ORGS", "")
+
 	list = getOrgsListFromEnvVar("TEST_ORGS")
 	require.Empty(t, list)
 }
 
 func TestGetRequestTimeoutAdditional(t *testing.T) {
 	t.Setenv(envGitRequestTimeout, "600")
+
 	ok, timeout, err := getRequestTimeout()
+
 	require.NoError(t, err)
 	require.True(t, ok)
 	require.Equal(t, 600, int(timeout.Seconds()))
 
 	t.Setenv(envGitRequestTimeout, "invalid")
+
 	ok, _, err = getRequestTimeout()
 	require.Error(t, err)
 	require.False(t, ok)
 
 	t.Setenv(envGitRequestTimeout, "")
+
 	ok, timeout, err = getRequestTimeout()
 	require.NoError(t, err)
 	require.False(t, ok)
@@ -49,10 +56,12 @@ func TestGetRequestTimeoutAdditional(t *testing.T) {
 func TestGitInstallPathAdditional(t *testing.T) {
 	// ensure we detect git when exec.LookPath succeeds
 	lookPath = func(file string) (string, error) { return "/usr/bin/git", nil }
+
 	require.Equal(t, "/usr/bin/git", gitInstallPath())
 
 	// when exec.LookPath fails, empty string returned
 	lookPath = func(file string) (string, error) { return "", errors.New("missing") }
+
 	require.Empty(t, gitInstallPath())
 
 	lookPath = exec.LookPath

@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/jonhadfield/soba/internal"
 	"log"
 	"os"
+
+	"github.com/jonhadfield/soba/internal"
 )
 
 var (

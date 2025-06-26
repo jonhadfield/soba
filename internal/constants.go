@@ -1,10 +1,11 @@
 package internal
 
 import (
-	"github.com/hashicorp/go-retryablehttp"
 	"log"
 	"os"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
 )
 
 const (

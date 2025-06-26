@@ -111,6 +111,7 @@ func getBackupsStats(br BackupResults) (ok, failed int) {
 		}
 
 		providerOk := 0
+
 		for _, r := range pr.Results.BackupResults {
 			// catch error from repository backup
 			if r.Error != nil {
