@@ -2,7 +2,7 @@
 
 back up hosted git repositories
 
-<img src="docs/logo.png" alt="logo" width="200"/>
+<img src="docs/soba.png" alt="logo" width="200"/>
 
 ---
 
