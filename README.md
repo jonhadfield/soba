@@ -45,13 +45,17 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
-### 1.3.5 release 2025-06-07
+### 1.3.7 release 2025-06-26
 
-- Environment variables can be loaded from files using the `_FILE` suffix
+- Add support for Git LFS
 
 ### 1.3.6 release 2025-06-11
 
 - Dependency updates and minor improvements
+
+### 1.3.5 release 2025-06-07
+
+- Environment variables can be loaded from files using the `_FILE` suffix
 
 ### 1.3.4 release 2025-05-26
 
