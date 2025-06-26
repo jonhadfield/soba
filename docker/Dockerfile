@@ -5,7 +5,7 @@ LABEL maintainer="Jon Hadfield jon@lessknown.co.uk"
 RUN addgroup -S nonroot \
     && adduser -S nonroot -G nonroot
 
-RUN apk add --update --no-cache ca-certificates bash curl git jq grep \
+RUN apk add --update --no-cache ca-certificates bash curl git git-lfs jq grep \
     && rm -f "/var/cache/apk/*"
 
 ARG TAG
