@@ -12,6 +12,7 @@
 - [run on Kubernetes](kubernetes/README.md)
 - [scheduling backups](#scheduling-backups)
 - [rotating backups](#rotating-backups)
+- [git lfs backups](#git-lfs-backups)
 - [notifications](#notifications)
 - [logging](#logging)
 - [setting provider credentials](#setting-provider-credentials)
@@ -191,6 +192,14 @@ following provider specific environment variables:
 `GITHUB_BACKUPS=x`
 `GITLAB_BACKUPS=x`
 `BITBUCKET_BACKUPS=x`
+
+## git lfs backups
+
+To back up Git LFS objects, set the environment variable for your provider to `y` or `yes`:
+`GITHUB_BACKUP_LFS`, `GITLAB_BACKUP_LFS`, `GITEA_BACKUP_LFS`, `BITBUCKET_BACKUP_LFS`,
+and `AZURE_DEVOPS_BACKUP_LFS`.
+When enabled, soba stores LFS content in a `*.lfs.tar.gz` file alongside the repository bundle.
+The provided Docker image already includes `git-lfs`.
 
 ## setting the request timeout
 
