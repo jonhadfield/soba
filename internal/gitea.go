@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"os"
@@ -24,7 +24,7 @@ func Gitea(backupDir string) *ProviderBackupResults {
 	}
 
 	giteaHost, err := githosts.NewGiteaHost(githosts.NewGiteaHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		BackupDir:        backupDir,
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envGiteaAPIURL),

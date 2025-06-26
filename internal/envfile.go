@@ -1,6 +1,4 @@
-// GetEnvOrFile returns the value of the environment variable if set, otherwise if a corresponding _FILE variable is set, reads the value from the file at that path.
-// If both are set, the environment variable takes precedence.
-package main
+package internal
 
 import (
 	"fmt"

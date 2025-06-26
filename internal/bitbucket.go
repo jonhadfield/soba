@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"os"
@@ -38,7 +38,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 	}
 
 	bitbucketHost, err := githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envBitBucketAPIURL),
 		DiffRemoteMethod: os.Getenv(envBitBucketCompare),

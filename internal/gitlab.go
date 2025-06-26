@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"os"
@@ -27,7 +27,7 @@ func Gitlab(backupDir string) *ProviderBackupResults {
 	}
 
 	gitlabHost, err := githosts.NewGitLabHost(githosts.NewGitLabHostInput{
-		Caller:                appName,
+		Caller:                AppName,
 		HTTPClient:            httpClient,
 		APIURL:                os.Getenv(envGitLabAPIURL),
 		DiffRemoteMethod:      os.Getenv(envGitLabCompare),

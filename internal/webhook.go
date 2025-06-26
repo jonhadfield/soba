@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 	}
 
 	webhookData := WebhookData{
-		App:       appName,
+		App:       AppName,
 		Type:      "backups.complete",
 		Timestamp: sendTime,
 		Stats: BackupStats{

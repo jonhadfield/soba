@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"os"
@@ -37,7 +37,7 @@ func AzureDevOps(backupDir string) *ProviderBackupResults {
 	}
 
 	azureDevOpsHost, err := githosts.NewAzureDevOpsHost(githosts.NewAzureDevOpsHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		HTTPClient:       httpClient,
 		BackupDir:        backupDir,
 		DiffRemoteMethod: os.Getenv(envAzureDevOpsCompare),
