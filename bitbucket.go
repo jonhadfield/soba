@@ -11,9 +11,9 @@ import (
 func Bitbucket(backupDir string) *ProviderBackupResults {
 	logger.Println("backing up BitBucket repos")
 
-	bbUser, exists := GetEnvOrFile(envBitBucketUser)
-	if !exists || bbUser == "" {
-		logger.Println("Skipping BitBucket backup as", envBitBucketUser, "is missing")
+	bbEmail, exists := GetEnvOrFile(envBitBucketEmail)
+	if !exists || bbEmail == "" {
+		logger.Println("Skipping BitBucket backup as", envBitBucketEmail, "is missing")
 
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
@@ -24,44 +24,32 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 		}
 	}
 
-	bbKey, exists := GetEnvOrFile(envBitBucketKey)
-	if !exists || bbKey == "" {
-		logger.Println("Skipping BitBucket backup as", envBitBucketKey, "is missing")
+	bbToken, exists := GetEnvOrFile(envBitBucketAPIToken)
+	if !exists || bbToken == "" {
+		logger.Println("Skipping BitBucket backup as", envBitBucketAPIToken, "is missing")
 
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
 			Results: githosts.ProviderBackupResult{
 				BackupResults: []githosts.RepoBackupResults{},
-				Error:         errors.New("BitBucket key is not set"),
-			},
-		}
-	}
-
-	bbSecret, exists := GetEnvOrFile(envBitBucketSecret)
-	if !exists || bbSecret == "" {
-		logger.Println("Skipping BitBucket backup as", envBitBucketSecret, "is missing")
-
-		return &ProviderBackupResults{
-			Provider: providerNameBitBucket,
-			Results: githosts.ProviderBackupResult{
-				BackupResults: []githosts.RepoBackupResults{},
-				Error:         errors.New("BitBucket secret is not set"),
+				Error:         errors.New("BitBucket API token is not set"),
 			},
 		}
 	}
 
 	bitbucketHost, err := githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
 		Caller:           appName,
-		BackupDir:        backupDir,
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envBitBucketAPIURL),
 		DiffRemoteMethod: os.Getenv(envBitBucketCompare),
-		User:             bbUser,
-		Key:              bbKey,
-		Secret:           bbSecret,
+		BackupDir:        backupDir,
+		Token:            os.Getenv(envBitBucketAPIToken),
+		Email:            os.Getenv(envBitBucketEmail),
 		BackupsToRetain:  getBackupsToRetain(envBitBucketBackups),
 		LogLevel:         getLogLevel(),
+		BackupLFS:        envTrue(envBitBucketBackupLFS),
 	})
+
 	if err != nil {
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,

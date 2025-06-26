@@ -33,6 +33,7 @@ func Gitea(backupDir string) *ProviderBackupResults {
 		Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
 		BackupsToRetain:  getBackupsToRetain(envGiteaBackups),
 		LogLevel:         getLogLevel(),
+		BackupLFS:        envTrue(envGiteaBackupLFS),
 	})
 	if err != nil {
 		return &ProviderBackupResults{

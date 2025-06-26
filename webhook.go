@@ -110,6 +110,7 @@ func getBackupsStats(br BackupResults) (ok, failed int) {
 			continue
 		}
 
+		providerOk := 0
 		for _, r := range pr.Results.BackupResults {
 			// catch error from repository backup
 			if r.Error != nil {
@@ -119,6 +120,13 @@ func getBackupsStats(br BackupResults) (ok, failed int) {
 			}
 
 			ok++
+			providerOk++
+		}
+
+		// If provider has credentials configured but no successful backups,
+		// count it as a failure (likely authentication error)
+		if providerOk == 0 && len(pr.Results.BackupResults) == 0 {
+			failed++
 		}
 	}
 

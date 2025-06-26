@@ -46,6 +46,7 @@ func AzureDevOps(backupDir string) *ProviderBackupResults {
 		Orgs:             getOrgsListFromEnvVar(envAzureDevOpsOrgs),
 		BackupsToRetain:  getBackupsToRetain(envAzureDevOpsBackups),
 		LogLevel:         getLogLevel(),
+		BackupLFS:        envTrue(envAzureDevOpsBackupLFS),
 	})
 	if err != nil {
 		return &ProviderBackupResults{

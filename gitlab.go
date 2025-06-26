@@ -36,6 +36,7 @@ func Gitlab(backupDir string) *ProviderBackupResults {
 		BackupsToRetain:       getBackupsToRetain(envGitLabBackups),
 		ProjectMinAccessLevel: getProjectMinimumAccessLevel(),
 		LogLevel:              getLogLevel(),
+		BackupLFS:             envTrue(envGitLabBackupLFS),
 	})
 	if err != nil {
 		return &ProviderBackupResults{
