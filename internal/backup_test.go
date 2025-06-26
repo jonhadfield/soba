@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"encoding/json"
@@ -215,7 +215,7 @@ func TestGitHubEnvs(t *testing.T) {
 	require.NoError(t, os.Unsetenv(envGitLabToken))
 	require.NoError(t, os.Setenv(envGitHubOrgs, "example,example2"))
 
-	err := run()
+	err := Run()
 
 	require.NoError(t, os.Unsetenv(envGitHubOrgs))
 
@@ -253,7 +253,7 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	require.NoError(t, err)
 	require.NoError(t, os.Setenv(envGitHubBackups, "1"))
 	// run
-	require.NoError(t, run())
+	require.NoError(t, Run())
 	// check only one bundle remains
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
@@ -308,9 +308,9 @@ func TestAzureDevOpsRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	})
 
 	// run
-	require.NoError(t, run())
+	require.NoError(t, Run())
 
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestGetRequestTimeout(t *testing.T) {
@@ -358,7 +358,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	require.NoError(t, os.MkdirAll(dfDir, 0o755))
 	require.NoError(t, os.Setenv(envGitHubBackups, "1"))
 	// run
-	require.NoError(t, run())
+	require.NoError(t, Run())
 	// check only one bundle exists
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
@@ -368,7 +368,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
 	}
 	// run for a second time
-	require.NoError(t, run())
+	require.NoError(t, Run())
 	// check only one bundle exists
 	files, err = os.ReadDir(dfDir)
 	require.NoError(t, err)
@@ -407,7 +407,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
 	require.NoError(t, err)
 	// run
-	require.NoError(t, run())
+	require.NoError(t, Run())
 	// check both bundles remain
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
@@ -438,7 +438,7 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 	defer os.Unsetenv(envGitHubToken)
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		APIURL:           os.Getenv(envGitHubAPIURL),
 		DiffRemoteMethod: os.Getenv(envGitHubCompare),
 		BackupDir:        os.TempDir(),
@@ -482,7 +482,7 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 
 	// Unset Env Vars but exclude those defined
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
@@ -500,9 +500,9 @@ func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
 
 	// Unset Env Vars but exclude those defined
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
-	require.NoError(t, run())
+	require.NoError(t, Run())
 	// run for second time now we have existing bundles
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) {
@@ -522,9 +522,9 @@ func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) 
 
 	// Unset Env Vars but exclude those defined
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
-	require.NoError(t, run())
+	require.NoError(t, Run())
 	// run for second time now we have existing bundles
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
@@ -543,7 +543,7 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitLabToken})
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestPublicGitLabRepositoryBackup2(t *testing.T) {
@@ -562,7 +562,7 @@ func TestPublicGitLabRepositoryBackup2(t *testing.T) {
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitLabToken})
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestGiteaRepositoryBackup(t *testing.T) {
@@ -585,7 +585,7 @@ func TestGiteaRepositoryBackup(t *testing.T) {
 	defer resetBackups()
 
 	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGiteaToken, envGiteaAPIURL})
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestFormatIntervalDuration(t *testing.T) {
@@ -619,7 +619,7 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 	for _, org := range []string{sobaOrgTwo, "*"} {
 		require.NoError(t, os.Setenv(envGiteaOrgs, org))
 
-		require.NoError(t, run())
+		require.NoError(t, Run())
 
 		switch org {
 		case sobaOrgTwo:
@@ -710,9 +710,9 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 
 	defer os.Unsetenv(envBitBucketCompare)
 
-	require.NoError(t, run())
+	require.NoError(t, Run())
 
-	require.NoError(t, run())
+	require.NoError(t, Run())
 }
 
 func TestPublicBitBucketInvalidCredentials(t *testing.T) {
@@ -741,7 +741,7 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 	_ = os.Setenv(envBitBucketAPIToken, "invalid")
 
 	if os.Getenv("BE_CRASHER") == "1" {
-		_ = run()
+		_ = Run()
 
 		return
 	}
@@ -792,7 +792,7 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 
 	defer os.Unsetenv(envGitHubToken)
 
-	require.Errorf(t, run(), "expected: %s undefined error", envGitBackupDir)
+	require.Errorf(t, Run(), "expected: %s undefined error", envGitBackupDir)
 }
 
 func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
@@ -816,7 +816,7 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 	backupDir := os.Getenv(envGitBackupDir)
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		LogLevel:         1,
 		APIURL:           os.Getenv(envGitHubAPIURL),
 		DiffRemoteMethod: os.Getenv(envGitHubCompare),
@@ -870,7 +870,7 @@ func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
 	backupDir := os.Getenv(envGitBackupDir)
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		LogLevel:         1,
 		APIURL:           os.Getenv(envGitHubAPIURL),
 		DiffRemoteMethod: os.Getenv(envGitHubCompare),

@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"os"
@@ -25,7 +25,7 @@ func GitHub(backupDir string) *ProviderBackupResults {
 	}
 
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
-		Caller:           appName,
+		Caller:           AppName,
 		BackupDir:        backupDir,
 		HTTPClient:       httpClient,
 		APIURL:           os.Getenv(envGitHubAPIURL),
