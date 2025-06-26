@@ -23,7 +23,7 @@ import (
 var sobaEnvVarKeys = []string{
 	envPath, envGitBackupDir, envGitHubToken, envGitHubBackups, envGitLabToken, envGitLabBackups, envGitLabAPIURL,
 	envGitHubCompare, envGitLabCompare, envBitBucketCompare,
-	envBitBucketUser, envBitBucketKey, envBitBucketSecret, envBitBucketBackups,
+	envBitBucketEmail, envBitBucketAPIToken, envBitBucketBackups,
 	envGiteaAPIURL, envGiteaToken, envGiteaOrgs, envGiteaCompare, envGiteaBackups,
 	envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsCompare, envAzureDevOpsBackups,
 }
@@ -362,15 +362,20 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	// check only one bundle exists
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
-	firstBackupFileName := files[0].Name()
+	require.Len(t, files, 2)
+	r := regexp.MustCompile(`repo0\.[0-9]{14}\.(bundle|lfs\.tar\.gz)$`)
+	for _, file := range files {
+		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
+	}
 	// run for a second time
 	require.NoError(t, run())
 	// check only one bundle exists
 	files, err = os.ReadDir(dfDir)
 	require.NoError(t, err)
-	require.Len(t, files, 1)
-	require.Equal(t, firstBackupFileName, files[0].Name())
+	require.Len(t, files, 2)
+	for _, file := range files {
+		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
+	}
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
@@ -406,7 +411,11 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	// check both bundles remain
 	files, err := os.ReadDir(dfDir)
 	require.NoError(t, err)
-	require.Len(t, files, 2)
+	require.Len(t, files, 3)
+	r := regexp.MustCompile(`repo0\.[0-9]{14}\.(bundle|bundle\.invalid|lfs\.tar\.gz)$`)
+	for _, file := range files {
+		require.Regexp(t, r, file.Name(), fmt.Sprintf("unexpected file name: %s", file.Name()))
+	}
 }
 
 func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
@@ -678,8 +687,8 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 }
 
 func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
-	if os.Getenv(envBitBucketUser) == "" {
-		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketUser)
+	if os.Getenv(envBitBucketEmail) == "" {
+		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketEmail)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -689,7 +698,7 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
-	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
+	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envBitBucketEmail, envBitBucketAPIToken})
 
 	defer func() {
 		if err := os.Unsetenv(envBitBucketCompare); err != nil {
@@ -707,8 +716,8 @@ func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
 }
 
 func TestPublicBitBucketInvalidCredentials(t *testing.T) {
-	if os.Getenv(envBitBucketUser) == "" {
-		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketUser)
+	if os.Getenv(envBitBucketEmail) == "" {
+		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketEmail)
 	}
 
 	_ = os.Unsetenv(envSobaWebHookURL)
@@ -718,7 +727,7 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
 
-	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envBitBucketUser, envBitBucketKey, envBitBucketSecret})
+	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envBitBucketEmail, envBitBucketAPIToken})
 
 	defer func() {
 		if err := os.Unsetenv(envBitBucketCompare); err != nil {
@@ -728,8 +737,8 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 
 	_ = os.Setenv(envBitBucketCompare, compareTypeRefs)
 
-	// set invalid key
-	_ = os.Setenv(envBitBucketKey, "invalid")
+	// set invalid token
+	_ = os.Setenv(envBitBucketAPIToken, "invalid")
 
 	if os.Getenv("BE_CRASHER") == "1" {
 		_ = run()

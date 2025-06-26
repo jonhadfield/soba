@@ -47,21 +47,23 @@ const (
 	idleConnTimeout = 30 * time.Second
 
 	// env vars
-	envPath                = "PATH"
-	envSobaLogLevel        = "SOBA_LOG"
-	envSobaWebHookURL      = "SOBA_WEBHOOK_URL"
-	envSobaWebHookFormat   = "SOBA_WEBHOOK_FORMAT"
-	envGitBackupInterval   = "GIT_BACKUP_INTERVAL"
-	envGitBackupCron       = "GIT_BACKUP_CRON"
-	envGitBackupDir        = "GIT_BACKUP_DIR"
-	envGitRequestTimeout   = "GIT_REQUEST_TIMEOUT"
-	envGitHubAPIURL        = "GITHUB_APIURL"
-	envGitHubBackups       = "GITHUB_BACKUPS"
-	envAzureDevOpsOrgs     = "AZURE_DEVOPS_ORGS"
-	envAzureDevOpsUserName = "AZURE_DEVOPS_USERNAME"
-	envAzureDevOpsPAT      = "AZURE_DEVOPS_PAT"
-	envAzureDevOpsCompare  = "AZURE_DEVOPS_COMPARE"
-	envAzureDevOpsBackups  = "AZURE_DEVOPS_BACKUPS"
+	envPath                 = "PATH"
+	envSobaLogLevel         = "SOBA_LOG"
+	envSobaWebHookURL       = "SOBA_WEBHOOK_URL"
+	envSobaWebHookFormat    = "SOBA_WEBHOOK_FORMAT"
+	envGitBackupInterval    = "GIT_BACKUP_INTERVAL"
+	envGitBackupCron        = "GIT_BACKUP_CRON"
+	envGitBackupDir         = "GIT_BACKUP_DIR"
+	envGitRequestTimeout    = "GIT_REQUEST_TIMEOUT"
+	envGitHubAPIURL         = "GITHUB_APIURL"
+	envGitHubBackups        = "GITHUB_BACKUPS"
+	envGitHubBackupLFS      = "GITHUB_BACKUP_LFS"
+	envAzureDevOpsOrgs      = "AZURE_DEVOPS_ORGS"
+	envAzureDevOpsUserName  = "AZURE_DEVOPS_USERNAME"
+	envAzureDevOpsPAT       = "AZURE_DEVOPS_PAT"
+	envAzureDevOpsCompare   = "AZURE_DEVOPS_COMPARE"
+	envAzureDevOpsBackups   = "AZURE_DEVOPS_BACKUPS"
+	envAzureDevOpsBackupLFS = "AZURE_DEVOPS_BACKUP_LFS"
 	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
@@ -69,19 +71,21 @@ const (
 	envGitHubLimitUserOwned = "GITHUB_LIMIT_USER_OWNED"
 	envGitHubCompare        = "GITHUB_COMPARE"
 	envGitLabBackups        = "GITLAB_BACKUPS"
+	envGitLabBackupLFS      = "GITLAB_BACKUP_LFS"
 	envGitLabMinAccessLevel = "GITLAB_PROJECT_MIN_ACCESS_LEVEL"
 	envGitLabToken          = "GITLAB_TOKEN"
 	envGitLabAPIURL         = "GITLAB_APIURL"
 	envGitLabCompare        = "GITLAB_COMPARE"
-	envBitBucketUser        = "BITBUCKET_USER"
-	envBitBucketKey         = "BITBUCKET_KEY"
-	envBitBucketSecret      = "BITBUCKET_SECRET"
+	envBitBucketEmail       = "BITBUCKET_EMAIL"
+	envBitBucketAPIToken    = "BITBUCKET_API_TOKEN"
 	envBitBucketAPIURL      = "BITBUCKET_APIURL"
 	envBitBucketCompare     = "BITBUCKET_COMPARE"
 	envBitBucketBackups     = "BITBUCKET_BACKUPS"
+	envBitBucketBackupLFS   = "BITBUCKET_BACKUP_LFS"
 	envGiteaToken           = "GITEA_TOKEN"
 	envGiteaAPIURL          = "GITEA_APIURL"
 	envGiteaBackups         = "GITEA_BACKUPS"
+	envGiteaBackupLFS       = "GITEA_BACKUP_LFS"
 	envGiteaCompare         = "GITEA_COMPARE"
 	envGiteaOrgs            = "GITEA_ORGS"
 
@@ -116,9 +120,8 @@ var (
 			envGitLabToken,
 		},
 		providerNameBitBucket: {
-			envBitBucketUser,
-			envBitBucketKey,
-			envBitBucketSecret,
+			envBitBucketEmail,
+			envBitBucketAPIToken,
 		},
 		providerNameGitea: {
 			envGiteaAPIURL,
@@ -296,6 +299,10 @@ func displayStartupConfig() {
 		} else {
 			logger.Print("GitHub compare method: clone")
 		}
+
+		if _, exists = GetEnvOrFile(envGitHubBackupLFS); exists && envTrue(envGitHubBackupLFS) {
+			logger.Printf("GitHub backup LFS: true")
+		}
 	}
 
 	// output gitea config
@@ -313,6 +320,10 @@ func displayStartupConfig() {
 			logger.Print("Gitea compare method: refs")
 		} else {
 			logger.Print("Gitea compare method: clone")
+		}
+
+		if _, exists = GetEnvOrFile(envGiteaBackupLFS); exists && envTrue(envGiteaBackupLFS) {
+			logger.Printf("Gitea backup LFS: true")
 		}
 	}
 
@@ -337,10 +348,14 @@ func displayStartupConfig() {
 		}
 
 		logger.Printf("GitLab compare method: %s", compareMethod)
+
+		if _, exists = GetEnvOrFile(envGitLabBackupLFS); exists && envTrue(envGitLabBackupLFS) {
+			logger.Printf("Gitlab backup LFS: true")
+		}
 	}
 
 	// output bitbucket config
-	if bbUser, exists := GetEnvOrFile(envBitBucketUser); exists && bbUser != "" {
+	if bbUser, exists := GetEnvOrFile(envBitBucketEmail); exists && bbUser != "" {
 		if bbBackups, backupsExists := GetEnvOrFile(envBitBucketBackups); backupsExists && bbBackups != "" {
 			logger.Printf("BitBucket backups to keep: %s", bbBackups)
 		}
@@ -349,6 +364,10 @@ func displayStartupConfig() {
 			logger.Printf("BitBucket compare method: %s", compareTypeRefs)
 		} else {
 			logger.Printf("BitBucket compare method: %s", compareTypeClone)
+		}
+
+		if _, exists = GetEnvOrFile(envBitBucketBackupLFS); exists && envTrue(envBitBucketBackupLFS) {
+			logger.Printf("BitBucket backup LFS: true")
 		}
 	}
 
@@ -362,6 +381,10 @@ func displayStartupConfig() {
 			logger.Print("Azure DevOps compare method: refs")
 		} else {
 			logger.Print("Azure DevOps compare method: clone")
+		}
+
+		if _, exists = GetEnvOrFile(envAzureDevOpsBackupLFS); exists && envTrue(envAzureDevOpsBackupLFS) {
+			logger.Printf("Azure DevOps backup LFS: true")
 		}
 	}
 }
@@ -574,7 +597,7 @@ func execProviderBackups() {
 
 	var providerBackupResults []ProviderBackupResults
 
-	if bbUser, exists := GetEnvOrFile(envBitBucketUser); exists && bbUser != "" {
+	if bbToken, exists := GetEnvOrFile(envBitBucketAPIToken); exists && bbToken != "" {
 		providerBackupResults = append(providerBackupResults, *Bitbucket(backupDir))
 	}
 
