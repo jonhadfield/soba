@@ -48,6 +48,7 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.3.7 release 2025-06-26
 
 - Add support for Git LFS
+- Changes BitBucket auth to API Keys (OAuth2 will be supported also in next release)
 
 ### 1.3.6 release 2025-06-11
 
@@ -364,11 +365,13 @@ source /home/<your-user-id>/.bashrc
 
 | Provider  | Environment Variable(s)         | Generating token                                                                                         |
 |:----------|:--------------------------------|:---------------------------------------------------------------------------------------------------------|
-| Azure DevOps | AZURE\_DEVOPS\_USERNAME                   | [instructions](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops)       |
-|           | AZURE\_DEVOPS\_PAT                   |                                                                                                     |
+| Azure DevOps | AZURE\_DEVOPS\_USERNAME      | [instructions](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops)       |
+|           | AZURE\_DEVOPS\_PAT              |                                                                                                     |
 |           | AZURE\_DEVOPS\_ORGS             |                                                                                                          |
-|           | AZURE_DEVOPS_BACKUPS          |
-| BitBucket | BITBUCKET_USER                  | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
+|           | AZURE\_DEVOPS\_BACKUPS            |
+| BitBucket (API tokens)                      | BITBUCKET_EMAIL     | [instructions](https://id.atlassian.com/manage-profile/security/api-tokens)         |
+|           | BITBUCKET\_API\_TOKEN             |                                                                                                          |
+| BitBucket (OAuth2)                          | BITBUCKET_USER         | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
 | Gitea     | GITEA_APIURL                    | [instructions](#gitea-instructions) |
@@ -419,6 +422,9 @@ Environment variable: BITBUCKET_COMPARE
 | clone (default) | Clone the remote and compare latest bundle                     |
 | refs            | Compare refs without downloading (available since soba 1.1.4)  |
 To use Bitbucket Server or another custom endpoint, set `BITBUCKET_APIURL` with the API URL.
+When using API tokens as your auth method, only the following scopes are required:
+- `read:project:bitbucket`
+- `read:repository:bitbucket`
 
 ### Gitea
 
