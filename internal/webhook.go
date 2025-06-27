@@ -59,10 +59,14 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 
 	resp, err := c.Do(req)
 	if err != nil {
-		fmt.Printf("error: %s\n", err)
+		return fmt.Errorf("webhook request failed: %w", err)
 	}
 
 	defer resp.Body.Close()
+
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("webhook returned status %d", resp.StatusCode)
+	}
 
 	return nil
 }
