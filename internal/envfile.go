@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"fmt"
 	"os"
 	"strings"
 )
@@ -27,14 +26,14 @@ func GetEnvOrFile(envVar string) (string, bool) {
 		}
 
 		if os.IsNotExist(err) {
-			fmt.Printf("File %s does not exist, returning empty string\n", filePath)
-
-			return "", false
-		} else {
-			fmt.Printf("Error reading file %s: %v\n", filePath, err)
+			logger.Printf("file %s does not exist", filePath)
 
 			return "", false
 		}
+
+		logger.Printf("error reading file %s: %v", filePath, err)
+
+		return "", false
 	}
 
 	return "", false
