@@ -469,9 +469,13 @@ func getEnvIntDefault(envVar string, def int) int {
 var lookPath = exec.LookPath
 
 func gitInstallPath() string {
-	path, _ := lookPath("git")
+	p, err := lookPath("git")
+	if err != nil {
+		logger.Printf("git not found: %v", err)
+		return ""
+	}
 
-	return path
+	return p
 }
 
 func init() {
