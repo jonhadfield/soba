@@ -1,4 +1,4 @@
-FROM alpine:3
+FROM alpine:3:21
 
 LABEL maintainer="Jon Hadfield jon@lessknown.co.uk"
 
