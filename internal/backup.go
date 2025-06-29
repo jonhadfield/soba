@@ -40,7 +40,17 @@ func execProviderBackups() {
 
 	var providerBackupResults []ProviderBackupResults
 
-	if bbToken, exists := GetEnvOrFile(envBitBucketAPIToken); exists && bbToken != "" {
+	// BitBucket - check for API Token or OAuth2 authentication
+	bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
+	bbToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
+	bbUser, userExists := GetEnvOrFile(envBitBucketUser)
+	bbKey, keyExists := GetEnvOrFile(envBitBucketKey)
+	bbSecret, secretExists := GetEnvOrFile(envBitBucketSecret)
+
+	// Check if either authentication method is complete
+	apiTokenComplete := emailExists && bbEmail != "" && tokenExists && bbToken != ""
+	oauth2Complete := userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != ""
+	if apiTokenComplete || oauth2Complete {
 		providerBackupResults = append(providerBackupResults, *Bitbucket(backupDir))
 	}
 
@@ -498,8 +508,34 @@ func getLogLevel() int {
 }
 
 func checkProvidersDefined() error {
+	// Special handling for BitBucket since it has two authentication methods
+	// Check if either BitBucket auth method is complete before counting it
+	bitbucketAPITokenComplete := false
+
 	for provider := range enabledProviderAuth {
-		checkProviderFactory(provider)()
+		if provider == providerNameBitBucketAPIToken {
+			// Check if API Token method is complete
+			bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
+			bbToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
+			if emailExists && bbEmail != "" && tokenExists && bbToken != "" {
+				bitbucketAPITokenComplete = true
+				numUserDefinedProviders++
+			}
+		} else if provider == providerNameBitBucketOAuth {
+			// Check if OAuth2 method is complete
+			bbUser, userExists := GetEnvOrFile(envBitBucketUser)
+			bbKey, keyExists := GetEnvOrFile(envBitBucketKey)
+			bbSecret, secretExists := GetEnvOrFile(envBitBucketSecret)
+			if userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != "" {
+				// Only increment if API Token method wasn't already complete
+				if !bitbucketAPITokenComplete {
+					numUserDefinedProviders++
+				}
+			}
+		} else {
+			// Handle other providers normally
+			checkProviderFactory(provider)()
+		}
 	}
 
 	if numUserDefinedProviders == 0 {
