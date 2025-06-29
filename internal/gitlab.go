@@ -11,8 +11,6 @@ import (
 func Gitlab(backupDir string) *ProviderBackupResults {
 	logger.Println("backing up GitLab repos")
 
-	var gitlabHost *githosts.GitLabHost
-
 	glToken, exists := GetEnvOrFile(envGitLabToken)
 	if !exists || glToken == "" {
 		logger.Println("Skipping GitLab backup as", envGitLabToken, "is missing")

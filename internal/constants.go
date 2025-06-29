@@ -63,6 +63,9 @@ const (
 	envGitLabToken          = "GITLAB_TOKEN"
 	envGitLabAPIURL         = "GITLAB_APIURL"
 	envGitLabCompare        = "GITLAB_COMPARE"
+	envBitBucketUser        = "BITBUCKET_USER"
+	envBitBucketKey         = "BITBUCKET_KEY"
+	envBitBucketSecret      = "BITBUCKET_SECRET"
 	envBitBucketEmail       = "BITBUCKET_EMAIL"
 	envBitBucketAPIToken    = "BITBUCKET_API_TOKEN"
 	envBitBucketAPIURL      = "BITBUCKET_APIURL"
@@ -77,11 +80,13 @@ const (
 	envGiteaOrgs            = "GITEA_ORGS"
 
 	// provider names
-	providerNameAzureDevOps = "AzureDevOps"
-	providerNameBitBucket   = "BitBucket"
-	providerNameGitHub      = "GitHub"
-	providerNameGitLab      = "GitLab"
-	providerNameGitea       = "Gitea"
+	providerNameAzureDevOps       = "AzureDevOps"
+	providerNameBitBucket         = "BitBucket"
+	providerNameBitBucketOAuth    = "BitBucketOAuth"
+	providerNameBitBucketAPIToken = "BitBucketAPIToken"
+	providerNameGitHub            = "GitHub"
+	providerNameGitLab            = "GitLab"
+	providerNameGitea             = "Gitea"
 
 	// compare types
 	compareTypeRefs  = "refs"
@@ -104,9 +109,14 @@ var (
 		providerNameGitLab: {
 			envGitLabToken,
 		},
-		providerNameBitBucket: {
+		providerNameBitBucketAPIToken: {
 			envBitBucketEmail,
 			envBitBucketAPIToken,
+		},
+		providerNameBitBucketOAuth: {
+			envBitBucketUser,
+			envBitBucketKey,
+			envBitBucketSecret,
 		},
 		providerNameGitea: {
 			envGiteaAPIURL,
@@ -119,7 +129,8 @@ var (
 		providerNameGitea,
 	}
 	userAndPasswordProviders = []string{
-		providerNameBitBucket,
+		providerNameBitBucketAPIToken,
+		providerNameBitBucketOAuth,
 		providerNameAzureDevOps,
 	}
 	numUserDefinedProviders int64

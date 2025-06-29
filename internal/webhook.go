@@ -36,8 +36,6 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 		webhookData.Data.Results = nil
 	}
 
-	// o, err := json.MarshalIndent(webhookData, "", "  ")
-
 	o, err := json.Marshal(webhookData)
 	if err != nil {
 		return fmt.Errorf("error marshalling webhook data: %w", err)

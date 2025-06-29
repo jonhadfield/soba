@@ -23,7 +23,7 @@ import (
 var sobaEnvVarKeys = []string{
 	envPath, envGitBackupDir, envGitHubToken, envGitHubBackups, envGitLabToken, envGitLabBackups, envGitLabAPIURL,
 	envGitHubCompare, envGitLabCompare, envBitBucketCompare,
-	envBitBucketEmail, envBitBucketAPIToken, envBitBucketBackups,
+	envBitBucketEmail, envBitBucketAPIToken, envBitBucketSecret, envBitBucketKey, envBitBucketKey, envBitBucketBackups,
 	envGiteaAPIURL, envGiteaToken, envGiteaOrgs, envGiteaCompare, envGiteaBackups,
 	envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsCompare, envAzureDevOpsBackups,
 }
@@ -351,7 +351,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	defer resetBackups()
 
 	// Unset Env Vars but exclude those defined
-	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare})
+	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitHubToken, envGitHubCompare, envGitHubBackupLFS})
 	// create dummy bundle
 	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
@@ -693,7 +693,36 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 	}
 }
 
-func TestPublicBitBucketRepositoryBackupWithRefCompare(t *testing.T) {
+func TestPublicBitBucketRepositoryBackupWithRefCompareOAuth(t *testing.T) {
+	if os.Getenv(envBitBucketUser) == "" {
+		t.Skipf("Skipping BitBucket OAuth test as %s is missing", envBitBucketUser)
+	}
+
+	_ = os.Unsetenv(envSobaWebHookURL)
+
+	resetGlobals()
+
+	envBackup := backupEnvironmentVariables()
+	defer restoreEnvironmentVariables(envBackup)
+
+	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envBitBucketUser, envBitBucketSecret, envBitBucketKey, envBitBucketAPIToken})
+
+	defer func() {
+		if err := os.Unsetenv(envBitBucketCompare); err != nil {
+			panic(fmt.Sprintf("failed to unset envvar: %s", err.Error()))
+		}
+	}()
+
+	_ = os.Setenv(envBitBucketCompare, compareTypeRefs)
+
+	defer os.Unsetenv(envBitBucketCompare)
+
+	require.NoError(t, Run())
+
+	require.NoError(t, Run())
+}
+
+func TestPublicBitBucketRepositoryBackupWithRefCompareAPIToken(t *testing.T) {
 	if os.Getenv(envBitBucketEmail) == "" {
 		t.Skipf("Skipping BitBucket test as %s is missing", envBitBucketEmail)
 	}

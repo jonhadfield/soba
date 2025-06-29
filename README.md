@@ -369,9 +369,9 @@ source /home/<your-user-id>/.bashrc
 |           | AZURE\_DEVOPS\_PAT              |                                                                                                     |
 |           | AZURE\_DEVOPS\_ORGS             |                                                                                                          |
 |           | AZURE_DEVOPS_BACKUPS            |
-| BitBucket (API tokens)                      | BITBUCKET_EMAIL     | [instructions](https://id.atlassian.com/manage-profile/security/api-tokens)         |
+| BitBucket (API tokens)  | BITBUCKET_EMAIL   | [instructions](https://id.atlassian.com/manage-profile/security/api-tokens)         |
 |           | BITBUCKET_API_TOKEN             |                                                                                                          |
-| BitBucket (OAuth2)                          | BITBUCKET_USER         | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
+| BitBucket (OAuth2)      | BITBUCKET_USER    | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |                                                                                          |
 | Gitea     | GITEA_APIURL                    | [instructions](#gitea-instructions) |
@@ -423,11 +423,11 @@ Environment variable: BITBUCKET_COMPARE
 | refs            | Compare refs without downloading (available since soba 1.1.4)  |
 
 
-To use Bitbucket Server or another custom endpoint, set `BITBUCKET_APIURL` with the API URL.  
+To use Bitbucket Server or another custom endpoint, set `BITBUCKET_APIURL` with the API URL.
 
-When using API tokens as your auth method, only the following scopes are required:  
-- `read:project:bitbucket`  
-- `read:repository:bitbucket`  
+When using API tokens as your auth method, only the following scopes are required:
+- `read:project:bitbucket`
+- `read:repository:bitbucket`
 
 ### Gitea
 
