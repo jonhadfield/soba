@@ -50,6 +50,7 @@ func execProviderBackups() {
 	// Check if either authentication method is complete
 	apiTokenComplete := emailExists && bbEmail != "" && tokenExists && bbToken != ""
 	oauth2Complete := userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != ""
+
 	if apiTokenComplete || oauth2Complete {
 		providerBackupResults = append(providerBackupResults, *Bitbucket(backupDir))
 	}
@@ -482,6 +483,7 @@ func gitInstallPath() string {
 	p, err := lookPath("git")
 	if err != nil {
 		logger.Printf("git not found: %v", err)
+
 		return ""
 	}
 
@@ -513,10 +515,11 @@ func checkProvidersDefined() error {
 	bitbucketAPITokenComplete := false
 
 	for provider := range enabledProviderAuth {
-		if provider == providerNameBitBucketAPIToken {
+		if provider == providerNameBitBucketAPIToken { // nolint: gocritic,nestif,staticcheck
 			// Check if API Token method is complete
 			bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
 			bbToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
+
 			if emailExists && bbEmail != "" && tokenExists && bbToken != "" {
 				bitbucketAPITokenComplete = true
 				numUserDefinedProviders++
@@ -524,8 +527,11 @@ func checkProvidersDefined() error {
 		} else if provider == providerNameBitBucketOAuth {
 			// Check if OAuth2 method is complete
 			bbUser, userExists := GetEnvOrFile(envBitBucketUser)
+
 			bbKey, keyExists := GetEnvOrFile(envBitBucketKey)
+
 			bbSecret, secretExists := GetEnvOrFile(envBitBucketSecret)
+
 			if userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != "" {
 				// Only increment if API Token method wasn't already complete
 				if !bitbucketAPITokenComplete {

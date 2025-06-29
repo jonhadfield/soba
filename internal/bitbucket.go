@@ -42,9 +42,11 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 
 	if apiTokenComplete {
 		logger.Println("Using BitBucket API Token authentication")
+
 		authType = githosts.AuthTypeBitbucketAPIToken
 	} else {
 		logger.Println("Using BitBucket OAuth2 authentication")
+
 		authType = githosts.AuthTypeBitbucketOAuth2
 	}
 
@@ -65,7 +67,6 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 		LogLevel:         getLogLevel(),
 		BackupLFS:        envTrue(envBitBucketBackupLFS),
 	})
-
 	if err != nil {
 		return &ProviderBackupResults{
 			Provider: providerNameBitBucket,
