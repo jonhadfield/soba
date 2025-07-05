@@ -25,6 +25,8 @@ github.com/jonboulle/clockwork v0.5.0 h1:Hyh9A8u51kptdkR+cqRpT1EebBwTn1oK9YfGYbd
 github.com/jonboulle/clockwork v0.5.0/go.mod h1:3mZlmanh0g2NDKO5TWZVJAfofYk64M7XN3SzBPjZF60=
 github.com/jonhadfield/githosts-utils v0.0.0-20250705175712-fe3b23e5389b h1:SonYWEONUiS9D6b3/PinNarIZoilb8ofyjE34LvPpV4=
 github.com/jonhadfield/githosts-utils v0.0.0-20250705175712-fe3b23e5389b/go.mod h1:ksoCnVy5j6muVpacvgxZCMMYLINA9e/uJieSURWrmwc=
+github.com/jonhadfield/githosts-utils v0.0.0-20250705185938-cbe1c782cb3e h1:grQ1X9LCNY0d1e3GtiVUtHhdXg3RHUcH9kkw16bzWcQ=
+github.com/jonhadfield/githosts-utils v0.0.0-20250705185938-cbe1c782cb3e/go.mod h1:ksoCnVy5j6muVpacvgxZCMMYLINA9e/uJieSURWrmwc=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
