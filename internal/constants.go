@@ -15,7 +15,7 @@ const (
 	defaultBackupsToRetain                 = 2
 	defaultGitLabMinimumProjectAccessLevel = 20
 
-	defaultHTTPClientRequestTimeout = 300 * time.Second
+	defaultHTTPClientRequestTimeout = 600 * time.Second
 
 	// general constants
 	pathSep        = string(os.PathSeparator)
