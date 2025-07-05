@@ -49,6 +49,7 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 - Add support for Git LFS
 - Changes BitBucket auth to API Keys (OAuth2 will be supported also in next release)
+- Add Sourcehut as a supported provider
 
 ### 1.3.6 release 2025-06-11
 
@@ -92,6 +93,7 @@ Not tested, but should also work on builds for: Linux (386, arm386 and arm64), F
 - Gitea
 - GitHub
 - GitLab
+- Sourcehut
 
 ## configuration
 
@@ -379,6 +381,9 @@ source /home/<your-user-id>/.bashrc
 | GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
 | GitLab    | GITLAB_TOKEN                    | [instructions](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html)                                       |
 |           | GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL | [instructions](https://docs.gitlab.com/ee/user/permissions.html)                                       |
+| Sourcehut | SOURCEHUT_PAT                   | [instructions](https://man.sr.ht/accounts.md#api) |
+|           | SOURCEHUT_APIURL                | |
+|           | SOURCEHUT_BACKUPS               | |
 
 You can now also provide these credentials via files using the *_FILE environment variable pattern. For example:
 
@@ -527,6 +532,21 @@ Environment variable: GITLAB_COMPARE
 | clone (default) | Clone the remote and compare latest bundle                    |
 | refs            | Compare refs without downloading (available since soba 1.1.4) |
 To use a self-hosted GitLab instance, set `GITLAB_APIURL` with the API URL.
+### Sourcehut
+
+#### Repo/Bundle comparison method
+
+Environment variable: SOURCEHUT_COMPARE
+
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |   |
+|:----------------|:------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle |
+| refs            | Compare refs without downloading |
+
+To use a custom Sourcehut instance, set `SOURCEHUT_APIURL` with the API URL.
+
 
 ### Comparing remote repository with local backup
 
@@ -575,6 +595,9 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** GITLAB_TOKEN **Value**
     - **variable** GITLAB_BACKUPS **Value** (Number of backups to keep for each repo)
     - **variable** GITLAB\_PROJECT\_MIN\_ACCESS\_LEVEL **Value** (Optional - scope of repos to backup)
+    - **variable** SOURCEHUT_PAT **Value**
+    - **variable** SOURCEHUT_APIURL **Value** (Optional)
+    - **variable** SOURCEHUT_BACKUPS **Value** (Number of backups to keep for each repo)
 14. Click 'Apply'
 15. Leave settings as default and select 'Next'
 16. Check 'Run this container after the wizard is finished' and click 'Apply'

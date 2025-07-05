@@ -1,3 +1,9 @@
+### 1.3.7 release 2025-06-26
+
+- Add Sourcehut provider support
+- Add support for Git LFS
+- Changes BitBucket auth to API Keys (OAuth2 will be supported also in next release)
+
 ### 1.3.6 release 2025-06-11
 
 - Dependency updates and minor improvements
