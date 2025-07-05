@@ -40,7 +40,7 @@ func execProviderBackups() {
 
 	var providerBackupResults []ProviderBackupResults
 
-	// BitBucket - check for API Token or OAuth2 authentication
+	// BitBucket - check for API OAuthToken or OAuth2 authentication
 	bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
 	bbToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
 	bbUser, userExists := GetEnvOrFile(envBitBucketUser)
@@ -69,6 +69,10 @@ func execProviderBackups() {
 
 	if azureDevOpsUserName, exists := GetEnvOrFile(envAzureDevOpsUserName); exists && azureDevOpsUserName != "" {
 		providerBackupResults = append(providerBackupResults, *AzureDevOps(backupDir))
+	}
+
+	if shToken, exists := GetEnvOrFile(envSourcehutToken); exists && shToken != "" {
+		providerBackupResults = append(providerBackupResults, *Sourcehut(backupDir))
 	}
 
 	logger.Println("cleaning up")
@@ -516,7 +520,7 @@ func checkProvidersDefined() error {
 
 	for provider := range enabledProviderAuth {
 		if provider == providerNameBitBucketAPIToken { // nolint: gocritic,nestif,staticcheck
-			// Check if API Token method is complete
+			// Check if API OAuthToken method is complete
 			bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
 			bbToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
 
@@ -533,7 +537,7 @@ func checkProvidersDefined() error {
 			bbSecret, secretExists := GetEnvOrFile(envBitBucketSecret)
 
 			if userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != "" {
-				// Only increment if API Token method wasn't already complete
+				// Only increment if API OAuthToken method wasn't already complete
 				if !bitbucketAPITokenComplete {
 					numUserDefinedProviders++
 				}

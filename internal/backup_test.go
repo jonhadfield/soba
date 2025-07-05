@@ -26,6 +26,7 @@ var sobaEnvVarKeys = []string{
 	envBitBucketEmail, envBitBucketAPIToken, envBitBucketSecret, envBitBucketKey, envBitBucketKey, envBitBucketBackups,
 	envGiteaAPIURL, envGiteaToken, envGiteaOrgs, envGiteaCompare, envGiteaBackups,
 	envAzureDevOpsUserName, envAzureDevOpsPAT, envAzureDevOpsOrgs, envAzureDevOpsCompare, envAzureDevOpsBackups,
+	envSourcehutToken, envSourcehutBackups, envSourcehutAPIURL, envSourcehutCompare, envSourcehutBackupLFS,
 }
 
 const (
