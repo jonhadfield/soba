@@ -51,6 +51,12 @@ const (
 	envAzureDevOpsCompare   = "AZURE_DEVOPS_COMPARE"
 	envAzureDevOpsBackups   = "AZURE_DEVOPS_BACKUPS"
 	envAzureDevOpsBackupLFS = "AZURE_DEVOPS_BACKUP_LFS"
+	envSourcehutAPIURL      = "SOURCEHUT_APIURL"
+	envSourcehutToken       = "SOURCEHUT_PAT" // nolint:gosec
+	envSourcehutCompare     = "SOURCEHUT_COMPARE"
+	envSourcehutBackups     = "SOURCEHUT_BACKUPS"
+	envSourcehutBackupLFS   = "SOURCEHUT_BACKUP_LFS"
+
 	// nolint:gosec
 	envGitHubToken          = "GITHUB_TOKEN"
 	envGitHubOrgs           = "GITHUB_ORGS"
@@ -87,6 +93,7 @@ const (
 	providerNameGitHub            = "GitHub"
 	providerNameGitLab            = "GitLab"
 	providerNameGitea             = "Gitea"
+	providerNameSourcehut         = "Sourcehut"
 
 	// compare types
 	compareTypeRefs  = "refs"
@@ -122,11 +129,16 @@ var (
 			envGiteaAPIURL,
 			envGiteaToken,
 		},
+		providerNameSourcehut: {
+			envSourcehutAPIURL,
+			envSourcehutToken,
+		},
 	}
 	justTokenProviders = []string{
 		providerNameGitHub,
 		providerNameGitLab,
 		providerNameGitea,
+		providerNameSourcehut,
 	}
 	userAndPasswordProviders = []string{
 		providerNameBitBucketAPIToken,

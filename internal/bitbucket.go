@@ -11,7 +11,7 @@ import (
 func Bitbucket(backupDir string) *ProviderBackupResults {
 	logger.Println("backing up BitBucket repos")
 
-	// Check for API Token authentication (preferred method)
+	// Check for API OAuthToken authentication (preferred method)
 	bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
 	bbAPIToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
 
@@ -25,8 +25,8 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 	oauth2Complete := userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != ""
 
 	if !apiTokenComplete && !oauth2Complete {
-		logger.Println("Skipping BitBucket backup: neither API Token nor OAuth2 authentication is properly configured")
-		logger.Println("API Token method requires:", envBitBucketEmail, "and", envBitBucketAPIToken)
+		logger.Println("Skipping BitBucket backup: neither API OAuthToken nor OAuth2 authentication is properly configured")
+		logger.Println("API OAuthToken method requires:", envBitBucketEmail, "and", envBitBucketAPIToken)
 		logger.Println("OAuth2 method requires:", envBitBucketUser, ",", envBitBucketKey, "and", envBitBucketSecret)
 
 		return &ProviderBackupResults{
@@ -41,7 +41,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 	var authType string
 
 	if apiTokenComplete {
-		logger.Println("Using BitBucket API Token authentication")
+		logger.Println("Using BitBucket API OAuthToken authentication")
 
 		authType = githosts.AuthTypeBitbucketAPIToken
 	} else {
