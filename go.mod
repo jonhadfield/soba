@@ -2,7 +2,7 @@ module github.com/jonhadfield/soba
 
 go 1.24.4
 
-replace github.com/jonhadfield/githosts-utils => ../githosts-utils
+//replace github.com/jonhadfield/githosts-utils => ../githosts-utils
 
 require (
 	github.com/go-co-op/gocron/v2 v2.16.2
