@@ -1,3 +1,14 @@
+### 1.3.9 release 2025-07-05
+
+- Add Sourcehut provider support
+- Increase default HTTP request timeout to 10 minutes
+- Improve clone reliability and error handling
+- Update documentation
+
+### 1.3.8 release 2025-06-29
+
+- Fix Docker image reference
+
 ### 1.3.7 release 2025-06-26
 
 - Add Sourcehut provider support
