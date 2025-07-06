@@ -45,11 +45,21 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.3.9 release 2025-07-05
+
+- Add Sourcehut provider support
+- Improve clone reliability and error handling
+- Increase default HTTP request timeout to 10 minutes
+
+### 1.3.8 release 2025-06-29
+
+- Fix Docker image reference
+
 ### 1.3.7 release 2025-06-26
+- Add Sourcehut as a supported provider
 
 - Add support for Git LFS
 - Changes BitBucket auth to API Keys (OAuth2 will be supported also in next release)
-- Add Sourcehut as a supported provider
 
 ### 1.3.6 release 2025-06-11
 
@@ -62,22 +72,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.3.4 release 2025-05-26
 
 - Introduce delay between GitHub API calls to avoid rate limiting
-
-### 1.3.3 release 2025-05-11
-
-- Minor fixes
-
-### 1.3.2 release 2025-04-27
-
-- Minor fixes
-
-### 1.3.1 release 2025-01-27
-
-- Support cron syntax for backup interval
-
-### 1.2.20 release 2024-10-08
-
-- Add Telegram notifications
 
 See full changelog [here](docs/CHANGELOG.md).
 
@@ -209,14 +203,14 @@ following provider specific environment variables:
 ## git lfs backups
 
 To back up Git LFS objects, set the environment variable for your provider to `y` or `yes`:
-`GITHUB_BACKUP_LFS`, `GITLAB_BACKUP_LFS`, `GITEA_BACKUP_LFS`, `BITBUCKET_BACKUP_LFS`,
+`GITHUB_BACKUP_LFS`, `GITLAB_BACKUP_LFS`, `GITEA_BACKUP_LFS`, `BITBUCKET_BACKUP_LFS`, `SOURCEHUT_BACKUP_LFS`,
 and `AZURE_DEVOPS_BACKUP_LFS`.
 When enabled, soba stores LFS content in a `*.lfs.tar.gz` file alongside the repository bundle.
 The provided Docker image already includes `git-lfs`.
 
 ## setting the request timeout
 
-By default, soba will wait up to five minutes for a response to complete. This could be anything from an API call to discover repositories to a clone of a large repository.
+By default, soba will wait up to ten minutes for a response to complete. This could be anything from an API call to discover repositories to a clone of a large repository.
 If you have a slow connection or very large repositories, you may want to increase this. To do so, set the environment variable `GIT_REQUEST_TIMEOUT` to the number of seconds you wish to wait. For example, to wait up to ten minutes:
 ```bash
 export GIT_REQUEST_TIMEOUT=600
@@ -384,6 +378,7 @@ source /home/<your-user-id>/.bashrc
 | Sourcehut | SOURCEHUT_PAT                   | [instructions](https://man.sr.ht/accounts.md#api) |
 |           | SOURCEHUT_APIURL                | |
 |           | SOURCEHUT_BACKUPS               | |
+|           | SOURCEHUT_BACKUP_LFS               | |
 
 You can now also provide these credentials via files using the *_FILE environment variable pattern. For example:
 
@@ -598,6 +593,7 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** SOURCEHUT_PAT **Value**
     - **variable** SOURCEHUT_APIURL **Value** (Optional)
     - **variable** SOURCEHUT_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** SOURCEHUT_BACKUP_LFS **Value** (y/yes to also back up LFS objects)
 14. Click 'Apply'
 15. Leave settings as default and select 'Next'
 16. Check 'Run this container after the wizard is finished' and click 'Apply'
