@@ -45,6 +45,14 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 ## latest updates
 
+### 1.3.9 release 2025-07-05
+
+- Document Sourcehut support
+
+### 1.3.8 release 2025-06-29
+
+- Fix Docker image reference
+
 ### 1.3.7 release 2025-06-26
 
 - Add support for Git LFS
@@ -58,26 +66,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 ### 1.3.5 release 2025-06-07
 
 - Environment variables can be loaded from files using the `_FILE` suffix
-
-### 1.3.4 release 2025-05-26
-
-- Introduce delay between GitHub API calls to avoid rate limiting
-
-### 1.3.3 release 2025-05-11
-
-- Minor fixes
-
-### 1.3.2 release 2025-04-27
-
-- Minor fixes
-
-### 1.3.1 release 2025-01-27
-
-- Support cron syntax for backup interval
-
-### 1.2.20 release 2024-10-08
-
-- Add Telegram notifications
 
 See full changelog [here](docs/CHANGELOG.md).
 
@@ -210,7 +198,7 @@ following provider specific environment variables:
 
 To back up Git LFS objects, set the environment variable for your provider to `y` or `yes`:
 `GITHUB_BACKUP_LFS`, `GITLAB_BACKUP_LFS`, `GITEA_BACKUP_LFS`, `BITBUCKET_BACKUP_LFS`,
-and `AZURE_DEVOPS_BACKUP_LFS`.
+`SOURCEHUT_BACKUP_LFS`, and `AZURE_DEVOPS_BACKUP_LFS`.
 When enabled, soba stores LFS content in a `*.lfs.tar.gz` file alongside the repository bundle.
 The provided Docker image already includes `git-lfs`.
 
@@ -546,6 +534,8 @@ Environment variable: SOURCEHUT_COMPARE
 | refs            | Compare refs without downloading |
 
 To use a custom Sourcehut instance, set `SOURCEHUT_APIURL` with the API URL.
+Set `SOURCEHUT_BACKUP_LFS` to `y` or `yes` to include Git LFS objects in the backup.
+Use `SOURCEHUT_BACKUPS` to control how many backups are retained per repository.
 
 
 ### Comparing remote repository with local backup
@@ -598,6 +588,7 @@ This process is far quicker than cloning but should only be used if the followin
     - **variable** SOURCEHUT_PAT **Value**
     - **variable** SOURCEHUT_APIURL **Value** (Optional)
     - **variable** SOURCEHUT_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** SOURCEHUT_BACKUP_LFS **Value** (Optional - y/yes to include Git LFS)
 14. Click 'Apply'
 15. Leave settings as default and select 'Next'
 16. Check 'Run this container after the wizard is finished' and click 'Apply'

@@ -1,3 +1,11 @@
+### 1.3.9 release 2025-07-05
+
+- Document Sourcehut support
+
+### 1.3.8 release 2025-06-29
+
+- Fix Docker image reference
+
 ### 1.3.7 release 2025-06-26
 
 - Add Sourcehut provider support
