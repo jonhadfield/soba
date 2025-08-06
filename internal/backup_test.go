@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -459,7 +460,9 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 	require.NoError(t, err)
 
 	// skip if github.com is unreachable to avoid timeouts in restricted environments
-	conn, dialErr := net.DialTimeout("tcp", "github.com:443", time.Second)
+	dialer := &net.Dialer{}
+	conn, dialErr := dialer.DialContext(context.Background(), "tcp", "github.com:443")
+
 	if dialErr != nil {
 		t.Skipf("Skipping GitHub invalid credential test: %v", dialErr)
 	}
@@ -783,7 +786,7 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 		return
 	}
 
-	cmd := exec.Command(os.Args[0], "-test.run=TestPublicBitBucketInvalidCredentials") // nolint:gosec
+	cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run=TestPublicBitBucketInvalidCredentials") // nolint:gosec
 	cmd.Env = append(os.Environ(), "BE_CRASHER=1")
 
 	err := cmd.Run()
