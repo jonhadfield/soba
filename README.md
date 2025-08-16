@@ -1,8 +1,19 @@
 # soba
 
-back up hosted git repositories
+> 🔒 **Reliable, automated backup solution for your Git repositories**
 
 <img src="docs/soba.png" alt="logo" width="200"/>
+
+Soba ensures your code is never lost by automatically backing up repositories from GitHub, GitLab, Bitbucket, and other major Git hosting providers. It creates space-efficient git bundles, detecting and storing only changed repositories to minimize storage usage.
+
+**Key features:**
+- 🌐 **Multi-provider support** - Back up from GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, and Sourcehut
+- 💾 **Efficient storage** - Only stores new bundles when changes are detected  
+- ⏰ **Built-in scheduler** - Run backups automatically at custom intervals
+- 🔄 **Smart rotation** - Keep only the backups you need
+- 📦 **Git LFS support** - Back up large file storage objects
+- 📢 **Notifications** - Get alerts via Slack, Telegram, webhooks, and more
+- 🐳 **Runs anywhere** - Deploy as a binary, Docker container, or on Kubernetes
 
 ---
 
