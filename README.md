@@ -8,7 +8,7 @@ Soba ensures your code is never lost by automatically backing up repositories fr
 
 **Key features:**
 - 🌐 **Multi-provider support** - Back up from GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, and Sourcehut
-- 💾 **Efficient storage** - Only stores new bundles when changes are detected  
+- 💾 **Efficient storage** - Only stores new bundles when changes are detected
 - ⏰ **Built-in scheduler** - Run backups automatically at custom intervals
 - 🔄 **Smart rotation** - Keep only the backups you need
 - 📦 **Git LFS support** - Back up large file storage objects
@@ -71,18 +71,6 @@ $ docker run --rm -v ./soba-backups:/backups -e GITHUB_TOKEN=<token-here> -e GIT
 
 - Add support for Git LFS
 - Changes BitBucket auth to API Keys (OAuth2 will be supported also in next release)
-
-### 1.3.6 release 2025-06-11
-
-- Dependency updates and minor improvements
-
-### 1.3.5 release 2025-06-07
-
-- Environment variables can be loaded from files using the `_FILE` suffix
-
-### 1.3.4 release 2025-05-26
-
-- Introduce delay between GitHub API calls to avoid rate limiting
 
 See full changelog [here](docs/CHANGELOG.md).
 
