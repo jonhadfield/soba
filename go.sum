@@ -23,8 +23,8 @@ github.com/hashicorp/go-retryablehttp v0.7.8 h1:ylXZWnqa7Lhqpk0L1P1LzDtGcCR0rPVU
 github.com/hashicorp/go-retryablehttp v0.7.8/go.mod h1:rjiScheydd+CxvumBsIrFKlx3iS0jrZ7LvzFGFmuKbw=
 github.com/jonboulle/clockwork v0.5.0 h1:Hyh9A8u51kptdkR+cqRpT1EebBwTn1oK9YfGYbdFz6I=
 github.com/jonboulle/clockwork v0.5.0/go.mod h1:3mZlmanh0g2NDKO5TWZVJAfofYk64M7XN3SzBPjZF60=
-github.com/jonhadfield/githosts-utils v0.0.0-20250830100055-7e2e6bd0a496 h1:y0z7GnOK9rdIgxau7yRLDJ6iQhsN9d3lsGkpZxs8HmA=
-github.com/jonhadfield/githosts-utils v0.0.0-20250830100055-7e2e6bd0a496/go.mod h1:Rwi0wbKOG2dohubh67kmwqMUMLFJblzW7s54MWbqTW8=
+github.com/jonhadfield/githosts-utils v0.0.0-20250830113433-e1d0c211524c h1:YfU7kCkj7cShRDAohdiSFRZDKgu7xki4XkjpYOsspRg=
+github.com/jonhadfield/githosts-utils v0.0.0-20250830113433-e1d0c211524c/go.mod h1:Rwi0wbKOG2dohubh67kmwqMUMLFJblzW7s54MWbqTW8=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
