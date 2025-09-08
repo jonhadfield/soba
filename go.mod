@@ -5,7 +5,7 @@ go 1.24.4
 //replace github.com/jonhadfield/githosts-utils => ../githosts-utils
 
 require (
-	github.com/go-co-op/gocron/v2 v2.16.4
+	github.com/go-co-op/gocron/v2 v2.16.5
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jonhadfield/githosts-utils v0.0.0-20250830113433-e1d0c211524c
 	github.com/slack-go/slack v0.17.3
