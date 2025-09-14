@@ -41,6 +41,7 @@ const (
 	envGitBackupInterval    = "GIT_BACKUP_INTERVAL"
 	envGitBackupCron        = "GIT_BACKUP_CRON"
 	envGitBackupDir         = "GIT_BACKUP_DIR"
+	envGitWorkingDir        = "GIT_WORKING_DIR"
 	envGitRequestTimeout    = "GIT_REQUEST_TIMEOUT"
 	envGitHubAPIURL         = "GITHUB_APIURL"
 	envGitHubBackups        = "GITHUB_BACKUPS"
