@@ -77,10 +77,16 @@ func execProviderBackups() {
 
 	logger.Println("cleaning up")
 
-	delErr := os.RemoveAll(backupDir + pathSep + workingDIRName + pathSep)
+	// Use GIT_WORKING_DIR if set, otherwise use default
+	workingDirToDelete := os.Getenv(envGitWorkingDir)
+	if workingDirToDelete == "" {
+		workingDirToDelete = backupDir + pathSep + workingDIRName
+	}
+
+	delErr := os.RemoveAll(workingDirToDelete + pathSep)
 	if delErr != nil {
 		logger.Printf("failed to delete working directory: %s",
-			backupDir+pathSep+workingDIRName)
+			workingDirToDelete)
 	}
 
 	backupResults.Results = &providerBackupResults
@@ -344,7 +350,11 @@ func Run() error {
 		logger.Fatal("no providers defined")
 	}
 
-	workingDIR := filepath.Join(backupDIR, workingDIRName)
+	// Check if GIT_WORKING_DIR is set, otherwise use default
+	workingDIR := os.Getenv(envGitWorkingDir)
+	if workingDIR == "" {
+		workingDIR = filepath.Join(backupDIR, workingDIRName)
+	}
 
 	logger.Println("creating working directory:", workingDIR)
 	createWorkingDIRErr := os.MkdirAll(workingDIR, workingDIRMode)
