@@ -9,6 +9,7 @@ Soba ensures your code is never lost by automatically backing up repositories fr
 **Key features:**
 - 🌐 **Multi-provider support** - Back up from GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, and Sourcehut
 - 💾 **Efficient storage** - Only stores new bundles when changes are detected
+- 🔒 **Encryption support** - Optionally encrypt bundles with age encryption for security
 - ⏰ **Built-in scheduler** - Run backups automatically at custom intervals
 - 🔄 **Smart rotation** - Keep only the backups you need
 - 📦 **Git LFS support** - Back up large file storage objects
@@ -30,6 +31,7 @@ Soba ensures your code is never lost by automatically backing up repositories fr
 - [scheduling backups](#scheduling-backups)
 - [rotating backups](#rotating-backups)
 - [git lfs backups](#git-lfs-backups)
+- [encryption](#encryption)
 - [notifications](#notifications)
 - [logging](#logging)
 - [setting provider credentials](#setting-provider-credentials)
@@ -206,6 +208,106 @@ To back up Git LFS objects, set the environment variable for your provider to `y
 and `AZURE_DEVOPS_BACKUP_LFS`.
 When enabled, soba stores LFS content in a `*.lfs.tar.gz` file alongside the repository bundle.
 The provided Docker image already includes `git-lfs`.
+
+## encryption
+
+soba supports encrypting git bundles and manifests using [age encryption](https://age-encryption.org/). When enabled, backups are stored with the `.age` extension and are protected by a passphrase.
+
+### enabling encryption
+
+To enable encryption, set the `BUNDLE_PASSPHRASE` environment variable:
+
+```bash
+export BUNDLE_PASSPHRASE="your-secure-passphrase"
+```
+
+When this environment variable is set:
+- Git bundles are encrypted and saved with `.bundle.age` extension instead of `.bundle`
+- Manifest files are encrypted and saved with `.manifest.age` extension instead of `.manifest`
+- LFS archives are encrypted and saved with `.lfs.tar.gz.age` extension instead of `.lfs.tar.gz`
+
+### using with Docker
+
+```bash
+docker run --rm -t \
+             -v <your backup dir>:/backup \
+             -e GIT_BACKUP_DIR='/backup' \
+             -e GITHUB_TOKEN=$GITHUB_TOKEN \
+             -e BUNDLE_PASSPHRASE='your-secure-passphrase' \
+             ghcr.io/jonhadfield/soba
+```
+
+### security considerations
+
+- Store the passphrase securely - without it, your backups cannot be decrypted
+- Consider using the `_FILE` pattern to read the passphrase from a secure file:
+  ```bash
+  export BUNDLE_PASSPHRASE_FILE=/run/secrets/bundle_passphrase
+  ```
+- Encrypted backups are protected with age encryption, which uses modern cryptographic standards
+
+### restoring encrypted backups
+
+Encrypted bundles must be decrypted before they can be used. First, install the `age` command-line tool:
+
+#### installing age
+
+**On macOS:**
+```bash
+brew install age
+```
+
+**On Ubuntu/Debian:**
+```bash
+sudo apt install age
+```
+
+**On other systems:**
+Download from the [age releases page](https://github.com/FiloSottile/age/releases)
+
+#### decrypting files
+
+**Decrypt a git bundle:**
+```bash
+age -d -o repository.bundle repository.bundle.age
+```
+You'll be prompted to enter the passphrase used during encryption.
+
+**Decrypt a manifest file:**
+```bash
+age -d -o repository.manifest repository.manifest.age
+```
+
+**Decrypt an LFS archive:**
+```bash
+age -d -o repository.lfs.tar.gz repository.lfs.tar.gz.age
+```
+
+#### restoring from decrypted bundle
+
+Once decrypted, you can clone the bundle as a normal git repository:
+
+```bash
+git clone repository.bundle repository
+cd repository
+git remote set-url origin <original-repo-url>
+```
+
+#### batch decryption
+
+To decrypt multiple files at once, you can use a script:
+
+```bash
+#!/bin/bash
+read -s -p "Enter passphrase: " PASSPHRASE
+echo
+
+for file in *.age; do
+    output="${file%.age}"
+    echo "Decrypting $file to $output..."
+    echo "$PASSPHRASE" | age -d -o "$output" "$file"
+done
+```
 
 ## setting the request timeout
 
