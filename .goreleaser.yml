@@ -39,7 +39,7 @@ builds:
             application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
           }
           zip {
-            output_path = "./dist/soba_darwin_arm64.zip"
+            output_path = "./dist/soba_darwin_arm64_signed.zip"
           }
           EOF
           gon /tmp/soba_gon_arm64.hcl
@@ -59,7 +59,7 @@ builds:
             application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
           }
           zip {
-            output_path = "./dist/soba_darwin_amd64_v1.zip"
+            output_path = "./dist/soba_darwin_amd64_signed.zip"
           }
           EOF
           echo $?
@@ -86,13 +86,10 @@ builds:
       - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
 
 archives:
-  - id: default
+  - id: regular
     name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
     files:
       - none*
-    formats:
-      - tar.gz
-      - zip
 
 release:
   github:
@@ -101,7 +98,7 @@ release:
   prerelease: auto
   name_template: '{{ .Tag }}'
   extra_files:
-    - glob: ./dist/soba_darwin*.zip
+    - glob: ./dist/soba_darwin*_signed.zip
 
 announce:
   skip: true
