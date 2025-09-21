@@ -1,3 +1,5 @@
+version: 2
+
 project_name: soba
 
 env:
@@ -9,89 +11,88 @@ before:
   hooks:
     - make clean
     - go mod tidy
+
 builds:
--
-  id: macos-soba
-  binary: soba
-  goos:
-    - darwin
-  goarch:
-    - amd64
-    - arm64
-  flags:
-    - -trimpath
-  ldflags:
-    - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
-  hooks:
-    post:
-      - |
-        sh -c '
-        cat > /tmp/soba_gon_arm64.hcl << EOF
-        source = ["./dist/macos-soba_darwin_arm64/soba"]
-        bundle_id = "uk.co.lessknown.soba"
-        apple_id {
-          username = "jon@lessknown.co.uk"
-          password = "@env:AC_PASSWORD"
-        }
-        sign {
-          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-        }
-        zip {
-          output_path = "./dist/soba_darwin_arm64.zip"
-        }
-        EOF
-        gon /tmp/soba_gon_arm64.hcl
-        echo $?
-        '
-        echo $?
-      - |
-        sh -c '
-        cat > /tmp/soba_gon_amd64.hcl << EOF
-        source = ["./dist/macos-soba_darwin_amd64_v1/soba"]
-        bundle_id = "uk.co.lessknown.soba"
-        apple_id {
-          username = "jon@lessknown.co.uk"
-          password = "@env:AC_PASSWORD"
-        }
-        sign {
-          application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-        }
-        zip {
-          output_path = "./dist/soba_darwin_amd64_v1.zip"
-        }
-        EOF
-        echo $?
-        gon /tmp/soba_gon_amd64.hcl
-        echo $?
-        '
--
-  id: soba
-  binary: soba
-  env:
-    - CGO_ENABLED=0
-  goos:
-    - linux
-    - windows
-    - freebsd
-  goarch:
-    - amd64
-    - arm
-    - arm64
-  flags:
-    - -trimpath
-  ldflags:
-    - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+  - id: macos-soba
+    binary: soba
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
+    hooks:
+      post:
+        - |
+          sh -c '
+          cat > /tmp/soba_gon_arm64.hcl << EOF
+          source = ["./dist/macos-soba_darwin_arm64_v8.0/soba"]
+          bundle_id = "uk.co.lessknown.soba"
+          apple_id {
+            username = "jon@lessknown.co.uk"
+            password = "@env:AC_PASSWORD"
+          }
+          sign {
+            application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+          }
+          zip {
+            output_path = "./dist/soba_darwin_arm64.zip"
+          }
+          EOF
+          gon /tmp/soba_gon_arm64.hcl
+          echo $?
+          '
+          echo $?
+        - |
+          sh -c '
+          cat > /tmp/soba_gon_amd64.hcl << EOF
+          source = ["./dist/macos-soba_darwin_amd64_v1/soba"]
+          bundle_id = "uk.co.lessknown.soba"
+          apple_id {
+            username = "jon@lessknown.co.uk"
+            password = "@env:AC_PASSWORD"
+          }
+          sign {
+            application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
+          }
+          zip {
+            output_path = "./dist/soba_darwin_amd64_v1.zip"
+          }
+          EOF
+          echo $?
+          gon /tmp/soba_gon_amd64.hcl
+          echo $?
+          '
+
+  - id: soba
+    binary: soba
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - freebsd
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - "7"
+    flags:
+      - -trimpath
+    ldflags:
+      - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
 
 archives:
-- name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-  builds:
-    - soba
-  format: tar.gz
-  format_overrides:
-    - goos: windows
-      format: zip
-  files:
-    - none*
+  - id: default
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - none*
+    formats:
+      - tar.gz
+      - zip
 
 release:
   github:
@@ -100,21 +101,21 @@ release:
   prerelease: auto
   name_template: '{{ .Tag }}'
   extra_files:
-   - glob: ./dist/soba_darwin*.zip
+    - glob: ./dist/soba_darwin*.zip
 
 announce:
   skip: true
 
 snapshot:
-  name_template: "{{ .Tag }}-devel"
+  version_template: "{{ .Tag }}-devel"
 
 changelog:
   sort: asc
   filters:
     exclude:
-    - README
-    - test
-    - ignore
+      - README
+      - test
+      - ignore
 
 checksum:
   name_template: 'checksums.txt'
