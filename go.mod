@@ -1,13 +1,13 @@
 module github.com/jonhadfield/soba
 
-go 1.24.4
+go 1.25.1
 
 //replace github.com/jonhadfield/githosts-utils => ../githosts-utils
 
 require (
 	github.com/go-co-op/gocron/v2 v2.16.5
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/jonhadfield/githosts-utils v0.0.0-20250830113433-e1d0c211524c
+	github.com/jonhadfield/githosts-utils v0.0.0-20250921072822-d7b2c9c88870
 	github.com/slack-go/slack v0.17.3
 	github.com/stretchr/testify v1.11.1
 	gitlab.com/tozd/go/errors v0.10.0
@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	filippo.io/age v1.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
@@ -27,6 +28,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
-	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/crypto v0.42.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+//replace github.com/jonhadfield/githosts-utils => ../githosts-utils
