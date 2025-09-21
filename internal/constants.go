@@ -101,7 +101,7 @@ const (
 	compareTypeClone = "clone"
 
 	// encryption
-	envVarBundlePassphrase = "BUNDLE_PASSPHRASE"
+	envVarBundlePassphrase = "BUNDLE_PASSPHRASE" // nolint:gosec
 )
 
 var (

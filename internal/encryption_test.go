@@ -38,7 +38,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
-		require.NoError(t, os.MkdirAll(backupDir, 0755))
+		require.NoError(t, os.MkdirAll(backupDir, 0o755))
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
@@ -66,7 +66,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
-		require.NoError(t, os.MkdirAll(backupDir, 0755))
+		require.NoError(t, os.MkdirAll(backupDir, 0o755))
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
@@ -93,7 +93,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
-		require.NoError(t, os.MkdirAll(backupDir, 0755))
+		require.NoError(t, os.MkdirAll(backupDir, 0o755))
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
@@ -120,7 +120,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
-		require.NoError(t, os.MkdirAll(backupDir, 0755))
+		require.NoError(t, os.MkdirAll(backupDir, 0o755))
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
@@ -150,7 +150,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
-		require.NoError(t, os.MkdirAll(backupDir, 0755))
+		require.NoError(t, os.MkdirAll(backupDir, 0o755))
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
@@ -179,7 +179,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
-		require.NoError(t, os.MkdirAll(backupDir, 0755))
+		require.NoError(t, os.MkdirAll(backupDir, 0o755))
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
@@ -219,7 +219,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 
 		passphraseFile := filepath.Join(tempDir, "passphrase.txt")
 		filePassphrase := "file-based-passphrase-456"
-		require.NoError(t, os.WriteFile(passphraseFile, []byte(filePassphrase), 0600))
+		require.NoError(t, os.WriteFile(passphraseFile, []byte(filePassphrase), 0o600))
 
 		// Set the environment variable to point to the file
 		os.Setenv("BUNDLE_PASSPHRASE_FILE", passphraseFile)
@@ -260,7 +260,6 @@ func TestProviderIntegrationWithEncryption(t *testing.T) {
 		t.Run(provider.name+"_Integration", func(t *testing.T) {
 			// The actual provider functions (GitHub, GitLab, etc.) will read BUNDLE_PASSPHRASE
 			// when they call GetEnvOrFile(envVarBundlePassphrase)
-
 			// Verify the env var is set
 			value, exists := GetEnvOrFile(envVarBundlePassphrase)
 			assert.True(t, exists, provider.name+" should see BUNDLE_PASSPHRASE")
@@ -298,10 +297,12 @@ func TestEncryptionConsistency(t *testing.T) {
 		secondPassphrase := "second-passphrase"
 
 		os.Setenv("BUNDLE_PASSPHRASE", firstPassphrase)
+
 		value1, _ := GetEnvOrFile(envVarBundlePassphrase)
 		assert.Equal(t, firstPassphrase, value1, "Should read first passphrase")
 
 		os.Setenv("BUNDLE_PASSPHRASE", secondPassphrase)
+
 		value2, _ := GetEnvOrFile(envVarBundlePassphrase)
 		assert.Equal(t, secondPassphrase, value2, "Should read updated passphrase")
 	})
