@@ -99,6 +99,9 @@ const (
 	// compare types
 	compareTypeRefs  = "refs"
 	compareTypeClone = "clone"
+
+	// encryption
+	envVarBundlePassphrase = "BUNDLE_PASSPHRASE"
 )
 
 var (

@@ -24,16 +24,19 @@ func Sourcehut(backupDir string) *ProviderBackupResults {
 		}
 	}
 
+	bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
+
 	sourcehutHost, err := githosts.NewSourcehutHost(githosts.NewSourcehutHostInput{
-		Caller:              AppName,
-		BackupDir:           backupDir,
-		HTTPClient:          httpClient,
-		APIURL:              os.Getenv(envSourcehutAPIURL),
-		DiffRemoteMethod:    os.Getenv(envSourcehutCompare),
-		PersonalAccessToken: ghToken,
-		BackupsToRetain:     getBackupsToRetain(envSourcehutBackups),
-		LogLevel:            getLogLevel(),
-		BackupLFS:           envTrue(envSourcehutBackupLFS),
+		Caller:               AppName,
+		BackupDir:            backupDir,
+		HTTPClient:           httpClient,
+		APIURL:               os.Getenv(envSourcehutAPIURL),
+		DiffRemoteMethod:     os.Getenv(envSourcehutCompare),
+		PersonalAccessToken:  ghToken,
+		BackupsToRetain:      getBackupsToRetain(envSourcehutBackups),
+		LogLevel:             getLogLevel(),
+		BackupLFS:            envTrue(envSourcehutBackupLFS),
+		EncryptionPassphrase: bundlePassphrase,
 	})
 	if err != nil {
 		return &ProviderBackupResults{

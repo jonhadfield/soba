@@ -36,17 +36,20 @@ func AzureDevOps(backupDir string) *ProviderBackupResults {
 		}
 	}
 
+	bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
+
 	azureDevOpsHost, err := githosts.NewAzureDevOpsHost(githosts.NewAzureDevOpsHostInput{
-		Caller:           AppName,
-		HTTPClient:       httpClient,
-		BackupDir:        backupDir,
-		DiffRemoteMethod: os.Getenv(envAzureDevOpsCompare),
-		UserName:         adou,
-		PAT:              pat,
-		Orgs:             getOrgsListFromEnvVar(envAzureDevOpsOrgs),
-		BackupsToRetain:  getBackupsToRetain(envAzureDevOpsBackups),
-		LogLevel:         getLogLevel(),
-		BackupLFS:        envTrue(envAzureDevOpsBackupLFS),
+		Caller:               AppName,
+		HTTPClient:           httpClient,
+		BackupDir:            backupDir,
+		DiffRemoteMethod:     os.Getenv(envAzureDevOpsCompare),
+		UserName:             adou,
+		PAT:                  pat,
+		Orgs:                 getOrgsListFromEnvVar(envAzureDevOpsOrgs),
+		BackupsToRetain:      getBackupsToRetain(envAzureDevOpsBackups),
+		LogLevel:             getLogLevel(),
+		BackupLFS:            envTrue(envAzureDevOpsBackupLFS),
+		EncryptionPassphrase: bundlePassphrase,
 	})
 	if err != nil {
 		return &ProviderBackupResults{

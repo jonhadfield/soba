@@ -50,22 +50,25 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 		authType = githosts.AuthTypeBitbucketOAuth2
 	}
 
+	bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
+
 	bitbucketHost, err := githosts.NewBitBucketHost(githosts.NewBitBucketHostInput{
-		Caller:           AppName,
-		HTTPClient:       httpClient,
-		APIURL:           os.Getenv(envBitBucketAPIURL),
-		DiffRemoteMethod: os.Getenv(envBitBucketCompare),
-		BackupDir:        backupDir,
-		Email:            bbEmail,
-		BasicAuth:        githosts.BasicAuth{},
-		AuthType:         authType,
-		APIToken:         bbAPIToken,
-		User:             bbUser,
-		Key:              bbKey,
-		Secret:           bbSecret,
-		BackupsToRetain:  getBackupsToRetain(envBitBucketBackups),
-		LogLevel:         getLogLevel(),
-		BackupLFS:        envTrue(envBitBucketBackupLFS),
+		Caller:               AppName,
+		HTTPClient:           httpClient,
+		APIURL:               os.Getenv(envBitBucketAPIURL),
+		DiffRemoteMethod:     os.Getenv(envBitBucketCompare),
+		BackupDir:            backupDir,
+		Email:                bbEmail,
+		BasicAuth:            githosts.BasicAuth{},
+		AuthType:             authType,
+		APIToken:             bbAPIToken,
+		User:                 bbUser,
+		Key:                  bbKey,
+		Secret:               bbSecret,
+		BackupsToRetain:      getBackupsToRetain(envBitBucketBackups),
+		LogLevel:             getLogLevel(),
+		BackupLFS:            envTrue(envBitBucketBackupLFS),
+		EncryptionPassphrase: bundlePassphrase,
 	})
 	if err != nil {
 		return &ProviderBackupResults{

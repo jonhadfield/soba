@@ -23,17 +23,20 @@ func Gitea(backupDir string) *ProviderBackupResults {
 		}
 	}
 
+	bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
+
 	giteaHost, err := githosts.NewGiteaHost(githosts.NewGiteaHostInput{
-		Caller:           AppName,
-		BackupDir:        backupDir,
-		HTTPClient:       httpClient,
-		APIURL:           os.Getenv(envGiteaAPIURL),
-		DiffRemoteMethod: os.Getenv(envGiteaCompare),
-		Token:            giteaToken,
-		Orgs:             getOrgsListFromEnvVar(envGiteaOrgs),
-		BackupsToRetain:  getBackupsToRetain(envGiteaBackups),
-		LogLevel:         getLogLevel(),
-		BackupLFS:        envTrue(envGiteaBackupLFS),
+		Caller:               AppName,
+		BackupDir:            backupDir,
+		HTTPClient:           httpClient,
+		APIURL:               os.Getenv(envGiteaAPIURL),
+		DiffRemoteMethod:     os.Getenv(envGiteaCompare),
+		Token:                giteaToken,
+		Orgs:                 getOrgsListFromEnvVar(envGiteaOrgs),
+		BackupsToRetain:      getBackupsToRetain(envGiteaBackups),
+		LogLevel:             getLogLevel(),
+		BackupLFS:            envTrue(envGiteaBackupLFS),
+		EncryptionPassphrase: bundlePassphrase,
 	})
 	if err != nil {
 		return &ProviderBackupResults{

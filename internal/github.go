@@ -24,19 +24,22 @@ func GitHub(backupDir string) *ProviderBackupResults {
 		}
 	}
 
+	bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
+
 	githubHost, err := githosts.NewGitHubHost(githosts.NewGitHubHostInput{
-		Caller:           AppName,
-		BackupDir:        backupDir,
-		HTTPClient:       httpClient,
-		APIURL:           os.Getenv(envGitHubAPIURL),
-		DiffRemoteMethod: os.Getenv(envGitHubCompare),
-		Token:            ghToken,
-		Orgs:             getOrgsListFromEnvVar(envGitHubOrgs),
-		BackupsToRetain:  getBackupsToRetain(envGitHubBackups),
-		SkipUserRepos:    envTrue(envGitHubSkipUserRepos),
-		LimitUserOwned:   envTrue(envGitHubLimitUserOwned),
-		LogLevel:         getLogLevel(),
-		BackupLFS:        envTrue(envGitHubBackupLFS),
+		Caller:               AppName,
+		BackupDir:            backupDir,
+		HTTPClient:           httpClient,
+		APIURL:               os.Getenv(envGitHubAPIURL),
+		DiffRemoteMethod:     os.Getenv(envGitHubCompare),
+		Token:                ghToken,
+		Orgs:                 getOrgsListFromEnvVar(envGitHubOrgs),
+		BackupsToRetain:      getBackupsToRetain(envGitHubBackups),
+		SkipUserRepos:        envTrue(envGitHubSkipUserRepos),
+		LimitUserOwned:       envTrue(envGitHubLimitUserOwned),
+		LogLevel:             getLogLevel(),
+		BackupLFS:            envTrue(envGitHubBackupLFS),
+		EncryptionPassphrase: bundlePassphrase,
 	})
 	if err != nil {
 		return &ProviderBackupResults{
