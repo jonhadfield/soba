@@ -24,6 +24,8 @@ func Gitlab(backupDir string) *ProviderBackupResults {
 		}
 	}
 
+	bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
+
 	gitlabHost, err := githosts.NewGitLabHost(githosts.NewGitLabHostInput{
 		Caller:                AppName,
 		HTTPClient:            httpClient,
@@ -35,6 +37,7 @@ func Gitlab(backupDir string) *ProviderBackupResults {
 		ProjectMinAccessLevel: getProjectMinimumAccessLevel(),
 		LogLevel:              getLogLevel(),
 		BackupLFS:             envTrue(envGitLabBackupLFS),
+		EncryptionPassphrase:  bundlePassphrase,
 	})
 	if err != nil {
 		return &ProviderBackupResults{
