@@ -50,6 +50,7 @@ func notify(backupResults BackupResults, succeeded int, failed int) {
 	// Skip notifications if success-only and no failures
 	if notifyOnFailureOnly && failed == 0 {
 		logger.Println("skipping notification (no failures)")
+
 		return
 	}
 
