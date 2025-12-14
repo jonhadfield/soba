@@ -357,8 +357,8 @@ func Run() error {
 	}
 
 	logger.Println("creating working directory:", workingDIR)
-	createWorkingDIRErr := os.MkdirAll(workingDIR, workingDIRMode)
 
+	createWorkingDIRErr := os.MkdirAll(workingDIR, workingDIRMode)
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
 	}

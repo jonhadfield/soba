@@ -35,6 +35,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create temp backup directory
 		tempDir, err := os.MkdirTemp("", "soba-github-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
@@ -63,6 +64,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create temp backup directory
 		tempDir, err := os.MkdirTemp("", "soba-gitlab-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
@@ -90,6 +92,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create temp backup directory
 		tempDir, err := os.MkdirTemp("", "soba-gitea-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
@@ -117,6 +120,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create temp backup directory
 		tempDir, err := os.MkdirTemp("", "soba-bitbucket-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
@@ -147,6 +151,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create temp backup directory
 		tempDir, err := os.MkdirTemp("", "soba-azure-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
@@ -176,6 +181,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create temp backup directory
 		tempDir, err := os.MkdirTemp("", "soba-sourcehut-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		backupDir := filepath.Join(tempDir, "backup")
@@ -215,6 +221,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Create a temporary file with the passphrase
 		tempDir, err := os.MkdirTemp("", "soba-file-test")
 		require.NoError(t, err)
+
 		defer os.RemoveAll(tempDir)
 
 		passphraseFile := filepath.Join(tempDir, "passphrase.txt")
