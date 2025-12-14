@@ -95,6 +95,7 @@ func TestGitInstalled(t *testing.T) {
 	lookPath = func(file string) (string, error) { //nolint:revive
 		return "", errors.New("command not found")
 	}
+
 	defer func() { lookPath = exec.LookPath }()
 
 	gitPath = gitInstallPath()
@@ -212,7 +213,9 @@ func resetBackups() {
 
 func TestGitHubEnvs(t *testing.T) {
 	envBackup := backupEnvironmentVariables()
+
 	defer restoreEnvironmentVariables(envBackup)
+
 	require.NoError(t, os.Unsetenv(envGitHubToken))
 	require.NoError(t, os.Unsetenv(envGitLabToken))
 	require.NoError(t, os.Setenv(envGitHubOrgs, "example,example2"))
@@ -458,11 +461,10 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 		LogLevel:         getLogLevel(),
 	})
 	require.NoError(t, err)
-
 	// skip if github.com is unreachable to avoid timeouts in restricted environments
 	dialer := &net.Dialer{}
-	conn, dialErr := dialer.DialContext(context.Background(), "tcp", "github.com:443")
 
+	conn, dialErr := dialer.DialContext(context.Background(), "tcp", "github.com:443")
 	if dialErr != nil {
 		t.Skipf("Skipping GitHub invalid credential test: %v", dialErr)
 	}
