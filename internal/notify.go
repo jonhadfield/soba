@@ -16,11 +16,12 @@ import (
 )
 
 const (
-	envSobaNtfyURL      = "SOBA_NTFY_URL"
-	envSlackChannelID   = "SLACK_CHANNEL_ID"
-	envSlackAPIToken    = "SLACK_API_TOKEN" //nolint:gosec
-	envTelegramBotToken = "SOBA_TELEGRAM_BOT_TOKEN"
-	envTelegramChatID   = "SOBA_TELEGRAM_CHAT_ID"
+	envSobaNtfyURL             = "SOBA_NTFY_URL"
+	envSlackChannelID          = "SLACK_CHANNEL_ID"
+	envSlackAPIToken           = "SLACK_API_TOKEN" //nolint:gosec
+	envTelegramBotToken        = "SOBA_TELEGRAM_BOT_TOKEN"
+	envTelegramChatID          = "SOBA_TELEGRAM_CHAT_ID"
+	envSobaNotifyOnFailureOnly = "SOBA_NOTIFY_ON_FAILURE_ONLY"
 )
 
 func getResultsErrors(results BackupResults) []errors.E {
@@ -42,6 +43,15 @@ func getResultsErrors(results BackupResults) []errors.E {
 func notify(backupResults BackupResults, succeeded int, failed int) {
 	// optimistic create retryable http client
 	errs := getResultsErrors(backupResults)
+
+	// Check if we should only notify on failure
+	notifyOnFailureOnly := envTrue(envSobaNotifyOnFailureOnly)
+
+	// Skip notifications if success-only and no failures
+	if notifyOnFailureOnly && failed == 0 {
+		logger.Println("skipping notification (no failures)")
+		return
+	}
 
 	webHookURL := os.Getenv(envSobaWebHookURL)
 	if webHookURL != "" {
