@@ -319,6 +319,16 @@ export GIT_REQUEST_TIMEOUT=600
 
 ## notifications
 
+### Notification Control
+
+By default, soba sends notifications on every backup run. To reduce noise when running on a schedule, you can configure soba to only send notifications when backups fail or complete with errors:
+
+```bash
+export SOBA_NOTIFY_ON_FAILURE_ONLY=true
+```
+
+When enabled, successful backup runs will skip all notifications (Telegram, Slack, webhooks, and ntfy).
+
 ### Telegram
 *(since release 1.2.20)*
 To send a Telegram message on completion, set the environment variables:
