@@ -789,6 +789,7 @@ func TestPublicBitBucketInvalidCredentials(t *testing.T) {
 	}
 
 	cmd := exec.CommandContext(context.Background(), os.Args[0], "-test.run=TestPublicBitBucketInvalidCredentials") // nolint:gosec
+
 	cmd.Env = append(os.Environ(), "BE_CRASHER=1")
 
 	err := cmd.Run()
