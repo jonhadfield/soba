@@ -22,7 +22,7 @@ fmt:
 	goimports -w . && gofumpt -l -w .
 
 lint:
-	golangci-lint run --config .golangci.yml
+	GOTOOLCHAIN=go1.25.1 golangci-lint run --config .golangci.yml
 
 ci: lint test
 

@@ -230,6 +230,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 
 		// Set the environment variable to point to the file
 		os.Setenv("BUNDLE_PASSPHRASE_FILE", passphraseFile)
+
 		defer os.Unsetenv("BUNDLE_PASSPHRASE_FILE")
 
 		// Read using GetEnvOrFile (assuming it supports _FILE suffix)
