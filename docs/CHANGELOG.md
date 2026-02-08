@@ -1,3 +1,7 @@
+### 1.4.2 release 2025-12-14
+
+- Add `SOBA_NOTIFY_ON_FAILURE_ONLY` environment variable to reduce notification noise when running on a schedule
+
 ### 1.3.9 release 2025-07-05
 
 - Add Sourcehut provider support
