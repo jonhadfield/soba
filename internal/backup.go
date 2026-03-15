@@ -83,7 +83,7 @@ func execProviderBackups() {
 		workingDirToDelete = backupDir + pathSep + workingDIRName
 	}
 
-	delErr := os.RemoveAll(workingDirToDelete + pathSep)
+	delErr := os.RemoveAll(filepath.Clean(workingDirToDelete))
 	if delErr != nil {
 		logger.Printf("failed to delete working directory: %s",
 			workingDirToDelete)
@@ -358,7 +358,7 @@ func Run() error {
 
 	logger.Println("creating working directory:", workingDIR)
 
-	createWorkingDIRErr := os.MkdirAll(workingDIR, workingDIRMode)
+	createWorkingDIRErr := os.MkdirAll(filepath.Clean(workingDIR), workingDIRMode)
 	if createWorkingDIRErr != nil {
 		logger.Fatal(createWorkingDIRErr)
 	}
