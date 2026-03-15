@@ -2,6 +2,7 @@ package internal
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ func GetEnvOrFile(envVar string) (string, bool) {
 
 	filePath := os.Getenv(fileEnv)
 	if filePath != "" {
-		b, err := os.ReadFile(strings.TrimSpace(filePath))
+		b, err := os.ReadFile(filepath.Clean(strings.TrimSpace(filePath)))
 		if err == nil {
 			return strings.TrimSpace(string(b)), true
 		}
