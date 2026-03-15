@@ -1,3 +1,15 @@
+### 1.4.4 release 2026-03-15
+
+- Fix gosec linting issues
+- Bump dependencies
+- Update GitHub Actions and Docker build actions
+- Rewrite README for clarity and extract provider docs
+
+### 1.4.3 release 2026-01-26
+
+- Bump dependencies
+- Fix linting issues
+
 ### 1.4.2 release 2025-12-14
 
 - Add `SOBA_NOTIFY_ON_FAILURE_ONLY` environment variable to reduce notification noise when running on a schedule
