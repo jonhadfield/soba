@@ -103,7 +103,7 @@ func TestGitInstalled(t *testing.T) {
 }
 
 func removeContents(dir string) error {
-	d, err := os.Open(dir)
+	d, err := os.Open(filepath.Clean(dir))
 	if err != nil {
 		return fmt.Errorf("removeContents: %w", err)
 	}
@@ -120,7 +120,7 @@ func removeContents(dir string) error {
 	}
 
 	for _, name := range names {
-		if err = os.RemoveAll(filepath.Join(dir, name)); err != nil {
+		if err = os.RemoveAll(filepath.Clean(filepath.Join(dir, name))); err != nil {
 			return fmt.Errorf("removeContents %w", err)
 		}
 	}
@@ -146,7 +146,7 @@ func preflight() {
 		return
 	}
 
-	_, err = os.Stat(bud)
+	_, err = os.Stat(filepath.Clean(bud))
 	if os.IsNotExist(err) {
 		if err = os.MkdirAll(bud, 0o700); err != nil {
 			panic(err)
