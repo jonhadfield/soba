@@ -148,7 +148,7 @@ func preflight() {
 
 	_, err = os.Stat(filepath.Clean(bud))
 	if os.IsNotExist(err) {
-		if err = os.MkdirAll(bud, 0o700); err != nil {
+		if err = os.MkdirAll(filepath.Clean(bud), 0o700); err != nil {
 			panic(err)
 		}
 
@@ -249,12 +249,12 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	// create invalid bundle
 	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
-	require.NoError(t, os.MkdirAll(dfDir, 0o755))
+	require.NoError(t, os.MkdirAll(filepath.Clean(dfDir), 0o755))
 
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
 
-	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
+	_, err := os.OpenFile(filepath.Clean(dfPath), os.O_RDONLY|os.O_CREATE, 0o666)
 	require.NoError(t, err)
 	require.NoError(t, os.Setenv(envGitHubBackups, "1"))
 	// run
@@ -360,7 +360,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 	// create dummy bundle
 	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
-	require.NoError(t, os.MkdirAll(dfDir, 0o755))
+	require.NoError(t, os.MkdirAll(filepath.Clean(dfDir), 0o755))
 	require.NoError(t, os.Setenv(envGitHubBackups, "1"))
 	// run
 	require.NoError(t, Run())
@@ -409,12 +409,12 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
 	// create dummy bundle
 	backupDir := os.Getenv(envGitBackupDir)
 	dfDir := path.Join(backupDir, "github.com", goSobaOrg, "repo0")
-	require.NoError(t, os.MkdirAll(dfDir, 0o755))
+	require.NoError(t, os.MkdirAll(filepath.Clean(dfDir), 0o755))
 
 	dfName := "repo0.20200401111111.bundle"
 	dfPath := path.Join(dfDir, dfName)
 
-	_, err := os.OpenFile(dfPath, os.O_RDONLY|os.O_CREATE, 0o666)
+	_, err := os.OpenFile(filepath.Clean(dfPath), os.O_RDONLY|os.O_CREATE, 0o666)
 	require.NoError(t, err)
 	// run
 	require.NoError(t, Run())
