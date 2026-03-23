@@ -8,7 +8,7 @@ require (
 	github.com/go-co-op/gocron/v2 v2.19.1
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jonhadfield/githosts-utils v0.0.0-20260315150158-8c6c7e6f02d6
-	github.com/slack-go/slack v0.19.0
+	github.com/slack-go/slack v0.20.0
 	github.com/stretchr/testify v1.11.1
 	gitlab.com/tozd/go/errors v0.11.0
 	gopkg.in/h2non/gock.v1 v1.1.2
