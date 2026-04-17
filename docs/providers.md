@@ -51,9 +51,11 @@ If both the variable and `_FILE` version are set, the variable takes precedence.
 |           | AZURE_DEVOPS_BACKUPS            |
 | BitBucket (API tokens)  | BITBUCKET_EMAIL   | [instructions](https://id.atlassian.com/manage-profile/security/api-tokens)         |
 |           | BITBUCKET_API_TOKEN             |                                                                                                          |
+|           | BITBUCKET_WORKSPACE             | Optional &mdash; comma-separated list of workspaces (auto-discovered if unset)                           |
 | BitBucket (OAuth2)      | BITBUCKET_USER    | [instructions](https://support.atlassian.com/bitbucket-cloud/docs/use-oauth-on-bitbucket-cloud/)         |
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |
+|           | BITBUCKET_WORKSPACE             | Optional &mdash; comma-separated list of workspaces (auto-discovered if unset)                           |
 | Gitea     | GITEA_APIURL                    | [instructions](#gitea) |
 |           | GITEA_TOKEN                     | |
 | GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
@@ -87,6 +89,18 @@ Environment variable: `AZURE_DEVOPS_COMPARE`
 ---
 
 ## BitBucket
+
+### Workspace selection
+
+Bitbucket requires repositories to be listed per workspace. By default, soba will auto-discover all workspaces the authenticated user is a member of and back up repositories from each.
+
+To limit backups to specific workspaces, set `BITBUCKET_WORKSPACE` to a comma-separated list:
+
+```bash
+export BITBUCKET_WORKSPACE=my-workspace
+# or multiple:
+export BITBUCKET_WORKSPACE=workspace-a,workspace-b
+```
 
 ### Repo/Bundle comparison method
 
@@ -345,6 +359,7 @@ _A useful tool for testing cron jobs is [crontab guru](https://crontab.guru/)._
     - **variable** BITBUCKET_USER **Value**
     - **variable** BITBUCKET_KEY **Value**
     - **variable** BITBUCKET_SECRET **Value**
+    - **variable** BITBUCKET_WORKSPACE **Value** (Optional - comma separated list of workspaces)
     - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
     - **variable** GITEA_APIURL **Value**
     - **variable** GITEA_TOKEN **Value**
