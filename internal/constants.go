@@ -79,6 +79,7 @@ const (
 	envBitBucketCompare     = "BITBUCKET_COMPARE"
 	envBitBucketBackups     = "BITBUCKET_BACKUPS"
 	envBitBucketBackupLFS   = "BITBUCKET_BACKUP_LFS"
+	envBitBucketWorkspace   = "BITBUCKET_WORKSPACE"
 	envGiteaToken           = "GITEA_TOKEN"
 	envGiteaAPIURL          = "GITEA_APIURL"
 	envGiteaBackups         = "GITEA_BACKUPS"

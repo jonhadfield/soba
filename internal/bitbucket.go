@@ -69,6 +69,7 @@ func Bitbucket(backupDir string) *ProviderBackupResults {
 		LogLevel:             getLogLevel(),
 		BackupLFS:            envTrue(envBitBucketBackupLFS),
 		EncryptionPassphrase: bundlePassphrase,
+		Workspaces:           getOrgsListFromEnvVar(envBitBucketWorkspace),
 	})
 	if err != nil {
 		return &ProviderBackupResults{

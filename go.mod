@@ -5,9 +5,9 @@ go 1.25.1
 //replace github.com/jonhadfield/githosts-utils => ../githosts-utils
 
 require (
-	github.com/go-co-op/gocron/v2 v2.20.0
+	github.com/go-co-op/gocron/v2 v2.21.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/jonhadfield/githosts-utils v0.0.0-20260323171117-08e9d7633def
+	github.com/jonhadfield/githosts-utils v0.0.0-20260417183421-ea76978ac33c
 	github.com/slack-go/slack v0.22.0
 	github.com/stretchr/testify v1.11.1
 	gitlab.com/tozd/go/errors v0.11.1
@@ -28,8 +28,8 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	golang.org/x/crypto v0.49.0 // indirect
-	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/crypto v0.50.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
