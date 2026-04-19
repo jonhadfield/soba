@@ -122,6 +122,7 @@ To use Bitbucket Server or another custom endpoint, set `BITBUCKET_APIURL` with 
 When using API tokens as your auth method, only the following scopes are required:
 - `read:project:bitbucket`
 - `read:repository:bitbucket`
+- `read:workspace:bitbucket` (required to list/view workspaces)
 
 ---
 
