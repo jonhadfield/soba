@@ -10,6 +10,8 @@ import (
 	tozdErrors "gitlab.com/tozd/go/errors"
 )
 
+const testProvider = "test"
+
 func TestFormatIntervalDurationAdditional(t *testing.T) {
 	require.Equal(t, "", formatIntervalDuration(0))
 	require.Equal(t, "1h", formatIntervalDuration(60))
@@ -70,7 +72,7 @@ func TestGitInstallPathAdditional(t *testing.T) {
 func TestGetBackupsStatsAdditional(t *testing.T) {
 	// two success
 	br := BackupResults{Results: &[]ProviderBackupResults{{
-		Provider: "test",
+		Provider: testProvider,
 		Results: githosts.ProviderBackupResult{
 			BackupResults: []githosts.RepoBackupResults{{Repo: "a"}, {Repo: "b"}},
 		},
@@ -82,7 +84,7 @@ func TestGetBackupsStatsAdditional(t *testing.T) {
 
 	// one failed provider error
 	br = BackupResults{Results: &[]ProviderBackupResults{{
-		Provider: "test",
+		Provider: testProvider,
 		Results:  githosts.ProviderBackupResult{Error: tozdErrors.New("err")},
 	}}}
 
@@ -92,7 +94,7 @@ func TestGetBackupsStatsAdditional(t *testing.T) {
 
 	// repo error counts as failed
 	br = BackupResults{Results: &[]ProviderBackupResults{{
-		Provider: "test",
+		Provider: testProvider,
 		Results: githosts.ProviderBackupResult{
 			BackupResults: []githosts.RepoBackupResults{{Repo: "a", Error: tozdErrors.New("boom")}},
 		},

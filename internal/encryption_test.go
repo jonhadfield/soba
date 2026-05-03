@@ -10,6 +10,8 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const testToken = "test-token"
+
 // TestBundlePassphraseEnvVar tests that BUNDLE_PASSPHRASE environment variable is correctly used
 func TestBundlePassphraseEnvVar(t *testing.T) {
 	// Save original env var value and restore after test
@@ -43,7 +45,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
-		os.Setenv("GITHUB_TOKEN", "test-token")
+		os.Setenv("GITHUB_TOKEN", testToken)
 
 		// Mock the NewGitHubHost function call to verify passphrase is passed
 		// Since we can't easily mock the actual function, we'll test the input construction
@@ -52,7 +54,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		input := githosts.NewGitHubHostInput{
 			Caller:               AppName,
 			BackupDir:            backupDir,
-			Token:                "test-token",
+			Token:                testToken,
 			EncryptionPassphrase: bundlePassphrase,
 		}
 
@@ -72,7 +74,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
-		os.Setenv("GITLAB_TOKEN", "test-token")
+		os.Setenv("GITLAB_TOKEN", testToken)
 
 		// Mock the NewGitLabHost function call to verify passphrase is passed
 		bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
@@ -80,7 +82,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		input := githosts.NewGitLabHostInput{
 			Caller:               AppName,
 			BackupDir:            backupDir,
-			Token:                "test-token",
+			Token:                testToken,
 			EncryptionPassphrase: bundlePassphrase,
 		}
 
@@ -100,7 +102,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
-		os.Setenv("GITEA_TOKEN", "test-token")
+		os.Setenv("GITEA_TOKEN", testToken)
 
 		// Mock the NewGiteaHost function call to verify passphrase is passed
 		bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
@@ -108,7 +110,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		input := githosts.NewGiteaHostInput{
 			Caller:               AppName,
 			BackupDir:            backupDir,
-			Token:                "test-token",
+			Token:                testToken,
 			EncryptionPassphrase: bundlePassphrase,
 		}
 
@@ -129,7 +131,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
 		os.Setenv("BITBUCKET_EMAIL", "test@example.com")
-		os.Setenv("BITBUCKET_API_TOKEN", "test-token")
+		os.Setenv("BITBUCKET_API_TOKEN", testToken)
 
 		// Mock the NewBitBucketHost function call to verify passphrase is passed
 		bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
@@ -138,7 +140,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 			Caller:               AppName,
 			BackupDir:            backupDir,
 			Email:                "test@example.com",
-			APIToken:             "test-token",
+			APIToken:             testToken,
 			AuthType:             githosts.AuthTypeBitbucketAPIToken,
 			EncryptionPassphrase: bundlePassphrase,
 		}
@@ -189,7 +191,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 
 		// Set environment variables
 		os.Setenv("BUNDLE_PASSPHRASE", testPassphrase)
-		os.Setenv("SOURCEHUT_PAT", "test-token")
+		os.Setenv("SOURCEHUT_PAT", testToken)
 
 		// Mock the NewSourcehutHost function call to verify passphrase is passed
 		bundlePassphrase, _ := GetEnvOrFile(envVarBundlePassphrase)
@@ -197,7 +199,7 @@ func TestBundlePassphraseEnvVar(t *testing.T) {
 		input := githosts.NewSourcehutHostInput{
 			Caller:               AppName,
 			BackupDir:            backupDir,
-			PersonalAccessToken:  "test-token",
+			PersonalAccessToken:  testToken,
 			EncryptionPassphrase: bundlePassphrase,
 		}
 
