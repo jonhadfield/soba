@@ -1,15 +1,18 @@
 package internal
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
@@ -25,11 +28,33 @@ type BackupResults struct {
 }
 
 func execProviderBackups() {
-	backupDir, _ := GetEnvOrFile(envGitBackupDir)
+	failed := runProviderBackups()
+
+	// If running one-shot (no scheduler) and any provider failed, surface a
+	// non-zero exit. With a scheduler the next-run banner is enough.
+	if job == nil && failed > 0 {
+		os.Exit(1)
+	}
+}
+
+func runProviderBackups() int {
+	backupDir, exists := GetEnvOrFile(envGitBackupDir)
+	if !exists || backupDir == "" {
+		logger.Printf("environment variable %s is not set; skipping backup run", envGitBackupDir)
+
+		return 0
+	}
 
 	if httpClient == nil {
 		httpClient = getHTTPClient(os.Getenv(envSobaLogLevel))
 	}
+
+	workingDir := resolveWorkingDir(backupDir)
+
+	// Cleanup runs on normal completion via this defer. Signal-driven
+	// shutdown calls gocron's Shutdown() which waits for the current job to
+	// finish, so this defer still fires before process exit on SIGINT/SIGTERM.
+	defer cleanupWorkingDir(workingDir, backupDir)
 
 	backupResults := BackupResults{
 		StartedAt: sobaTime{
@@ -47,7 +72,6 @@ func execProviderBackups() {
 	bbKey, keyExists := GetEnvOrFile(envBitBucketKey)
 	bbSecret, secretExists := GetEnvOrFile(envBitBucketSecret)
 
-	// Check if either authentication method is complete
 	apiTokenComplete := emailExists && bbEmail != "" && tokenExists && bbToken != ""
 	oauth2Complete := userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != ""
 
@@ -55,38 +79,24 @@ func execProviderBackups() {
 		providerBackupResults = append(providerBackupResults, *Bitbucket(backupDir))
 	}
 
-	if giteaToken, exists := GetEnvOrFile(envGiteaToken); exists && giteaToken != "" {
+	if giteaToken, ok := GetEnvOrFile(envGiteaToken); ok && giteaToken != "" {
 		providerBackupResults = append(providerBackupResults, *Gitea(backupDir))
 	}
 
-	if ghToken, exists := GetEnvOrFile(envGitHubToken); exists && ghToken != "" {
+	if ghToken, ok := GetEnvOrFile(envGitHubToken); ok && ghToken != "" {
 		providerBackupResults = append(providerBackupResults, *GitHub(backupDir))
 	}
 
-	if glToken, exists := GetEnvOrFile(envGitLabToken); exists && glToken != "" {
+	if glToken, ok := GetEnvOrFile(envGitLabToken); ok && glToken != "" {
 		providerBackupResults = append(providerBackupResults, *Gitlab(backupDir))
 	}
 
-	if azureDevOpsUserName, exists := GetEnvOrFile(envAzureDevOpsUserName); exists && azureDevOpsUserName != "" {
+	if azureDevOpsUserName, ok := GetEnvOrFile(envAzureDevOpsUserName); ok && azureDevOpsUserName != "" {
 		providerBackupResults = append(providerBackupResults, *AzureDevOps(backupDir))
 	}
 
-	if shToken, exists := GetEnvOrFile(envSourcehutToken); exists && shToken != "" {
+	if shToken, ok := GetEnvOrFile(envSourcehutToken); ok && shToken != "" {
 		providerBackupResults = append(providerBackupResults, *Sourcehut(backupDir))
-	}
-
-	logger.Println("cleaning up")
-
-	// Use GIT_WORKING_DIR if set, otherwise use default
-	workingDirToDelete := os.Getenv(envGitWorkingDir)
-	if workingDirToDelete == "" {
-		workingDirToDelete = backupDir + pathSep + workingDIRName
-	}
-
-	delErr := os.RemoveAll(filepath.Clean(workingDirToDelete + pathSep))
-	if delErr != nil {
-		logger.Printf("failed to delete working directory: %s",
-			workingDirToDelete)
 	}
 
 	backupResults.Results = &providerBackupResults
@@ -111,8 +121,58 @@ func execProviderBackups() {
 	if job != nil {
 		nextRun, _ := job.NextRun()
 		logger.Printf("next Run scheduled for: %s", nextRun.Format("2006-01-02 15:04:05 -0700 MST"))
-	} else if failed > 0 { // if no interval is set then exit
-		os.Exit(1)
+	}
+
+	return failed
+}
+
+func resolveWorkingDir(backupDir string) string {
+	if w := os.Getenv(envGitWorkingDir); w != "" {
+		return w
+	}
+
+	return filepath.Join(backupDir, workingDIRName)
+}
+
+// cleanupWorkingDir removes the working directory after a backup run.
+// It refuses to remove anything that does not resolve to a path inside
+// backupDir to protect against a misconfigured GIT_WORKING_DIR wiping
+// arbitrary filesystem locations.
+func cleanupWorkingDir(workingDir, backupDir string) {
+	logger.Println("cleaning up")
+
+	if workingDir == "" {
+		return
+	}
+
+	absWorking, err := filepath.Abs(filepath.Clean(workingDir))
+	if err != nil {
+		logger.Printf("failed to resolve working directory %q: %v", workingDir, err)
+
+		return
+	}
+
+	absBackup, err := filepath.Abs(filepath.Clean(backupDir))
+	if err != nil {
+		logger.Printf("failed to resolve backup directory %q: %v", backupDir, err)
+
+		return
+	}
+
+	if absWorking == absBackup {
+		logger.Printf("refusing to clean working directory %q: equals backup directory", absWorking)
+
+		return
+	}
+
+	if !strings.HasPrefix(absWorking+string(os.PathSeparator), absBackup+string(os.PathSeparator)) {
+		logger.Printf("refusing to clean working directory %q: not inside backup directory %q", absWorking, absBackup)
+
+		return
+	}
+
+	if err := os.RemoveAll(absWorking); err != nil {
+		logger.Printf("failed to clean working directory %q: %v", absWorking, err)
 	}
 }
 
@@ -253,55 +313,58 @@ func getBackupInterval() int {
 	return 0
 }
 
-func checkProviderFactory(provider string) func() {
-	retFunc := func() {
-		var outputErrs strings.Builder
-		// tokenOnlyProviders
-		if slices.Contains(justTokenProviders, provider) {
-			for _, param := range enabledProviderAuth[provider] {
-				val, exists := GetEnvOrFile(param)
-				if exists {
-					if strings.Trim(val, " ") == "" {
-						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
-					} else {
-						numUserDefinedProviders++
-					}
+// checkProvider validates a single provider's credentials. It returns the
+// number of fully-configured provider entries it found (0 or 1) and any
+// partial-configuration errors so the caller can surface them rather than
+// terminating the process from a library function.
+func checkProvider(provider string) (int, error) {
+	var outputErrs strings.Builder
+
+	var count int
+
+	if slices.Contains(justTokenProviders, provider) {
+		for _, param := range enabledProviderAuth[provider] {
+			val, exists := GetEnvOrFile(param)
+			if exists {
+				if strings.Trim(val, " ") == "" {
+					_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+				} else {
+					count++
 				}
 			}
-		}
-
-		// userAndPasswordProviders
-		if slices.Contains(userAndPasswordProviders, provider) { // nolint: nestif
-			var foundCount, totalCount int
-			for _, param := range enabledProviderAuth[provider] {
-				totalCount++
-
-				val, exists := GetEnvOrFile(param)
-				if exists && strings.Trim(val, " ") != "" {
-					foundCount++
-				}
-			}
-
-			if foundCount > 0 && foundCount < totalCount {
-				for _, param := range enabledProviderAuth[provider] {
-					val, exists := GetEnvOrFile(param)
-					if !exists || strings.Trim(val, " ") == "" {
-						_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
-					}
-				}
-			}
-
-			if foundCount == totalCount {
-				numUserDefinedProviders++
-			}
-		}
-
-		if outputErrs.Len() > 0 {
-			logger.Fatalln(outputErrs.String())
 		}
 	}
 
-	return retFunc
+	if slices.Contains(userAndPasswordProviders, provider) { // nolint: nestif
+		var foundCount, totalCount int
+		for _, param := range enabledProviderAuth[provider] {
+			totalCount++
+
+			val, exists := GetEnvOrFile(param)
+			if exists && strings.Trim(val, " ") != "" {
+				foundCount++
+			}
+		}
+
+		if foundCount > 0 && foundCount < totalCount {
+			for _, param := range enabledProviderAuth[provider] {
+				val, exists := GetEnvOrFile(param)
+				if !exists || strings.Trim(val, " ") == "" {
+					_, _ = fmt.Fprintf(&outputErrs, "%s parameter '%s' is not defined.\n", provider, param)
+				}
+			}
+		}
+
+		if foundCount == totalCount {
+			count++
+		}
+	}
+
+	if outputErrs.Len() > 0 {
+		return count, errors.New(outputErrs.String())
+	}
+
+	return count, nil
 }
 
 func Run() error {
@@ -313,6 +376,7 @@ func Run() error {
 	displayStartupConfig()
 
 	logger.Println("using git executable:", gitExecPath)
+	logGitVersion(gitExecPath)
 
 	ok, reqTimeout, err := getRequestTimeout()
 	if err != nil {
@@ -341,13 +405,16 @@ func Run() error {
 
 	backupDIR = strings.TrimSuffix(backupDIR, "\n")
 
-	_, err = os.Stat(backupDIR)
-	if os.IsNotExist(err) {
-		return errors.Wrap(err, fmt.Sprintf("specified backup directory \"%s\" does not exist", backupDIR))
+	if _, statErr := os.Stat(backupDIR); statErr != nil {
+		if os.IsNotExist(statErr) {
+			return errors.Wrap(statErr, fmt.Sprintf("specified backup directory \"%s\" does not exist", backupDIR))
+		}
+
+		return errors.Wrap(statErr, fmt.Sprintf("cannot access backup directory \"%s\"", backupDIR))
 	}
 
 	if err = checkProvidersDefined(); err != nil {
-		logger.Fatal("no providers defined")
+		return errors.Wrap(err, "provider configuration invalid")
 	}
 
 	// Check if GIT_WORKING_DIR is set, otherwise use default
@@ -358,9 +425,8 @@ func Run() error {
 
 	logger.Println("creating working directory:", workingDIR)
 
-	createWorkingDIRErr := os.MkdirAll(filepath.Clean(workingDIR), workingDIRMode)
-	if createWorkingDIRErr != nil {
-		logger.Fatal(createWorkingDIRErr)
+	if mkErr := os.MkdirAll(filepath.Clean(workingDIR), workingDIRMode); mkErr != nil {
+		return errors.Wrap(mkErr, fmt.Sprintf("failed to create working directory %q", workingDIR))
 	}
 
 	backupInterval := getBackupInterval()
@@ -392,8 +458,7 @@ func Run() error {
 		}
 
 		s.Start()
-
-		select {}
+		waitForShutdown(s)
 	case backupCron != "":
 		logger.Printf("scheduling to Run with cron '%s'", backupCron)
 
@@ -412,13 +477,27 @@ func Run() error {
 		}
 
 		s.Start()
-
-		select {}
+		waitForShutdown(s)
 	default:
 		execProviderBackups()
 	}
 
 	return nil
+}
+
+// waitForShutdown blocks until SIGINT or SIGTERM is received and then
+// shuts the scheduler down gracefully so any running job finishes (and
+// its deferred cleanup runs) before the process exits.
+func waitForShutdown(s gocron.Scheduler) {
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	sig := <-sigCh
+	logger.Printf("received %s; shutting down scheduler", sig)
+
+	if err := s.Shutdown(); err != nil {
+		logger.Printf("scheduler shutdown error: %v", err)
+	}
 }
 
 type ProviderBackupResults struct {
@@ -504,6 +583,24 @@ func gitInstallPath() string {
 	return p
 }
 
+// logGitVersion records the resolved git version at startup. Failure is
+// non-fatal — gitInstallPath already verified the binary exists, but a
+// version probe can fail in restricted environments (sandboxes, PATH
+// shimming, etc.) and should not abort the run.
+func logGitVersion(gitExecPath string) {
+	ctx, cancel := context.WithTimeout(context.Background(), gitVersionProbeTimeout)
+	defer cancel()
+
+	out, err := exec.CommandContext(ctx, gitExecPath, "--version").Output()
+	if err != nil {
+		logger.Printf("could not determine git version: %v", err)
+
+		return
+	}
+
+	logger.Printf("git version: %s", strings.TrimSpace(string(out)))
+}
+
 func init() {
 	logger = log.New(os.Stdout, fmt.Sprintf("%s: ", AppName), log.Lshortfile|log.LstdFlags)
 }
@@ -511,54 +608,63 @@ func init() {
 func getLogLevel() int {
 	sobaLogLevelEnv := os.Getenv(envSobaLogLevel)
 
-	if sobaLogLevelEnv != "" {
-		sobaLogLevel, err := strconv.Atoi(sobaLogLevelEnv)
-		if err != nil {
-			logger.Fatalf("%s must be a number.", envSobaLogLevel)
-		}
-
-		return sobaLogLevel
+	if sobaLogLevelEnv == "" {
+		return 0
 	}
 
-	return 0
+	sobaLogLevel, err := strconv.Atoi(sobaLogLevelEnv)
+	if err != nil {
+		logger.Printf("%s must be a number; defaulting to 0", envSobaLogLevel)
+
+		return 0
+	}
+
+	return sobaLogLevel
 }
 
 func checkProvidersDefined() error {
-	// Special handling for BitBucket since it has two authentication methods
-	// Check if either BitBucket auth method is complete before counting it
+	var count int
+
+	var errBuilder strings.Builder
+
 	bitbucketAPITokenComplete := false
 
 	for provider := range enabledProviderAuth {
-		if provider == providerNameBitBucketAPIToken { // nolint: gocritic,nestif,staticcheck
-			// Check if API OAuthToken method is complete
+		switch provider {
+		case providerNameBitBucketAPIToken:
 			bbEmail, emailExists := GetEnvOrFile(envBitBucketEmail)
 			bbToken, tokenExists := GetEnvOrFile(envBitBucketAPIToken)
 
 			if emailExists && bbEmail != "" && tokenExists && bbToken != "" {
 				bitbucketAPITokenComplete = true
-				numUserDefinedProviders++
+				count++
 			}
-		} else if provider == providerNameBitBucketOAuth {
-			// Check if OAuth2 method is complete
+		case providerNameBitBucketOAuth:
 			bbUser, userExists := GetEnvOrFile(envBitBucketUser)
-
 			bbKey, keyExists := GetEnvOrFile(envBitBucketKey)
-
 			bbSecret, secretExists := GetEnvOrFile(envBitBucketSecret)
 
 			if userExists && bbUser != "" && keyExists && bbKey != "" && secretExists && bbSecret != "" {
-				// Only increment if API OAuthToken method wasn't already complete
+				// Only count if API OAuthToken method wasn't already complete.
 				if !bitbucketAPITokenComplete {
-					numUserDefinedProviders++
+					count++
 				}
 			}
-		} else {
-			// Handle other providers normally
-			checkProviderFactory(provider)()
+		default:
+			n, err := checkProvider(provider)
+			count += n
+
+			if err != nil {
+				errBuilder.WriteString(err.Error())
+			}
 		}
 	}
 
-	if numUserDefinedProviders == 0 {
+	if errBuilder.Len() > 0 {
+		return errors.New(errBuilder.String())
+	}
+
+	if count == 0 {
 		return errors.New("no providers defined")
 	}
 
