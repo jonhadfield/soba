@@ -116,7 +116,21 @@ func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succ
 
 	req.Header.Add("Content-Type", "application/json")
 
-	resp, err := hc.Do(req)
+	// Build a dedicated client with the logger disabled — the Telegram URL
+	// contains the bot token in its path, and the shared retryablehttp logger
+	// would otherwise leak it at debug log level. retryablehttp clients are
+	// non-copyable (sync.Once), so construct a fresh one.
+	tc := retryablehttp.NewClient()
+	if hc != nil && hc.HTTPClient != nil {
+		tc.HTTPClient = hc.HTTPClient
+		tc.RetryMax = hc.RetryMax
+		tc.RetryWaitMin = hc.RetryWaitMin
+		tc.RetryWaitMax = hc.RetryWaitMax
+	}
+
+	tc.Logger = nil
+
+	resp, err := tc.Do(req)
 	if err != nil {
 		logger.Printf("telegram failed to send api request - error: %s", err)
 
@@ -125,7 +139,7 @@ func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succ
 
 	defer resp.Body.Close()
 
-	buf, err := io.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		logger.Printf("telegram failed to read response: %v", err)
 
@@ -133,7 +147,9 @@ func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succ
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		logger.Printf("telegram failed to send message - code [%d] - msg [%s]", resp.StatusCode, string(buf))
+		// Do not log response body — Telegram error responses can echo
+		// chat_id and other metadata that is sensitive in shared deployments.
+		logger.Printf("telegram failed to send message - code [%d]", resp.StatusCode)
 
 		return
 	}
@@ -179,7 +195,9 @@ func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs
 
 	resp, err := hc.Do(req)
 	if err != nil {
-		logger.Printf("error: %s", err)
+		logger.Printf("ntfy request failed: %s", err)
+
+		return
 	}
 
 	defer resp.Body.Close()
