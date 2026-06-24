@@ -41,10 +41,18 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 		return fmt.Errorf("error marshalling webhook data: %w", err)
 	}
 
-	// send to webhook
-	c.RetryMax = webhookRetryMax
-	c.RetryWaitMin = webhookRetryWaitMin
-	c.RetryWaitMax = webhookRetryWaitMax
+	// Build a dedicated webhook client so webhook-specific retry tuning does
+	// not mutate the shared client used by provider HTTP calls. retryablehttp
+	// clients are non-copyable (sync.Once), so construct a fresh one.
+	wc := retryablehttp.NewClient()
+	if c != nil && c.HTTPClient != nil {
+		wc.HTTPClient = c.HTTPClient
+	}
+
+	wc.RetryMax = webhookRetryMax
+	wc.RetryWaitMin = webhookRetryWaitMin
+	wc.RetryWaitMax = webhookRetryWaitMax
+	wc.Logger = nil
 
 	var req *retryablehttp.Request
 
@@ -55,7 +63,7 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 
 	req.Header.Set("Content-Type", "application/json")
 
-	resp, err := c.Do(req)
+	resp, err := wc.Do(req)
 	if err != nil {
 		return fmt.Errorf("webhook request failed: %w", err)
 	}

@@ -9,13 +9,20 @@ import (
 )
 
 const (
-	AppName                                = "soba"
-	workingDIRName                         = ".working"
-	workingDIRMode                         = 0o755
-	defaultBackupsToRetain                 = 2
-	defaultGitLabMinimumProjectAccessLevel = 20
+	AppName        = "soba"
+	workingDIRName = ".working"
+	workingDIRMode = 0o700
+	// maxEnvFileSize caps the bytes read from any *_FILE indirection so a
+	// pathological path (e.g. /dev/zero) cannot OOM the process.
+	maxEnvFileSize                         int64 = 1 << 20
+	defaultBackupsToRetain                       = 2
+	defaultGitLabMinimumProjectAccessLevel       = 20
 
 	defaultHTTPClientRequestTimeout = 600 * time.Second
+
+	// gitVersionProbeTimeout bounds the `git --version` startup probe so it
+	// cannot hang the process in a restricted environment.
+	gitVersionProbeTimeout = 5 * time.Second
 
 	// general constants
 	pathSep        = string(os.PathSeparator)
@@ -150,5 +157,4 @@ var (
 		providerNameBitBucketOAuth,
 		providerNameAzureDevOps,
 	}
-	numUserDefinedProviders int64
 )

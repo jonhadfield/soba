@@ -170,8 +170,8 @@ func TestMain(m *testing.M) {
 }
 
 func resetGlobals() {
-	// reset global var
-	numUserDefinedProviders = 0
+	// retained for tests that historically reset package-level counters;
+	// no globals to reset after the provider-count refactor.
 }
 
 func backupEnvironmentVariables() map[string]string {
