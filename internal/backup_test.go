@@ -35,7 +35,25 @@ const (
 	sobaOrgOne                 = "soba-org-one"
 	sobaOrgTwo                 = "soba-org-two"
 	skipGitHubTestMissingToken = "Skipping GitHub test as %s is missing" //nolint:gosec
+	// envSobaLiveGitHubTests opts in to the live GitHub integration tests.
+	// They are skipped by default (including in CI) because GitHub secondary-
+	// rate-limits the shared token under the suite's back-to-back call volume;
+	// deterministic coverage lives in TestGithubRepositoryBackupWithMockAPI.
+	// See #176.
+	envSobaLiveGitHubTests = "SOBA_LIVE_GITHUB_TESTS"
 )
+
+// skipUnlessLiveGitHub skips a test unless live GitHub integration tests are
+// explicitly enabled and a token is present.
+func skipUnlessLiveGitHub(t *testing.T) {
+	t.Helper()
+
+	if os.Getenv(envSobaLiveGitHubTests) == "" {
+		t.Skipf("skipping live GitHub test; set %s=true to run (see #176)", envSobaLiveGitHubTests)
+	}
+
+	skipUnlessLiveGitHub(t)
+}
 
 func TestGetBackupInterval(t *testing.T) {
 	os.Setenv(envGitBackupInterval, "1h")
@@ -232,9 +250,7 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 	// set comparison to use refs, rather than bundle
 	require.NoError(t, os.Setenv(envGitHubCompare, compareTypeRefs))
 
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -341,9 +357,7 @@ func TestGetRequestTimeout(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
@@ -389,9 +403,7 @@ func TestPublicGithubRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackupWithBackupsToKeepUnset(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
@@ -479,9 +491,7 @@ func TestGithubRepositoryBackupWithInvalidToken(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackup(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
@@ -499,9 +509,7 @@ func TestPublicGithubRepositoryBackup(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	envBackup := backupEnvironmentVariables()
 	defer restoreEnvironmentVariables(envBackup)
@@ -519,9 +527,7 @@ func TestPublicGithubRepositoryBackupWithExistingBackups(t *testing.T) {
 }
 
 func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
@@ -839,9 +845,7 @@ func TestFailureIfGitBackupDirUndefined(t *testing.T) {
 }
 
 func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
@@ -893,9 +897,7 @@ func TestGithubRepositoryBackupWithSingleOrgNoPersonal(t *testing.T) {
 }
 
 func TestGithubRepositoryBackupWithWildcardOrgsAndPersonal(t *testing.T) {
-	if os.Getenv(envGitHubToken) == "" {
-		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
-	}
+	skipUnlessLiveGitHub(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
