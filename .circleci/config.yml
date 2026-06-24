@@ -17,4 +17,8 @@ jobs:
           # production default baked into githosts-utils.
           environment:
             GITHUB_REQUEST_TIMEOUT: "300"
-          command: go test -v -p 1 -parallel 1 -failfast ./...
+          # Go's default 10m test timeout is too low for this suite: under
+          # GitHub secondary-rate-limiting a single throttled call can take
+          # ~250s, so the full serial integration run can exceed 10m even
+          # though every individual test passes. Raise the overall budget.
+          command: go test -v -p 1 -parallel 1 -failfast -timeout 30m ./...
