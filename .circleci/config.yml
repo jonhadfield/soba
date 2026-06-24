@@ -8,4 +8,13 @@ jobs:
       - run:
           name: make git backups dir
           command: mkdir /home/circleci/project/backup
-      - run: go test -v -p 1 -parallel 1 -failfast ./...
+      - run:
+          name: run tests
+          # The integration suite fires many GitHub backups back-to-back,
+          # which trips GitHub's secondary rate limits; individual GraphQL
+          # calls can then block on Retry-After backoff for over a minute.
+          # Give them generous headroom here without inflating the lean
+          # production default baked into githosts-utils.
+          environment:
+            GITHUB_REQUEST_TIMEOUT: "300"
+          command: go test -v -p 1 -parallel 1 -failfast ./...
