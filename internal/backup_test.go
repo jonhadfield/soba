@@ -52,7 +52,9 @@ func skipUnlessLiveGitHub(t *testing.T) {
 		t.Skipf("skipping live GitHub test; set %s=true to run (see #176)", envSobaLiveGitHubTests)
 	}
 
-	skipUnlessLiveGitHub(t)
+	if os.Getenv(envGitHubToken) == "" {
+		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
+	}
 }
 
 func TestGetBackupInterval(t *testing.T) {
