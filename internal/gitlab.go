@@ -5,7 +5,7 @@ import (
 
 	"gitlab.com/tozd/go/errors"
 
-	"github.com/jonhadfield/githosts-utils"
+	"github.com/jonhadfield/githosts-utils/v2"
 )
 
 func Gitlab(backupDir string) *ProviderBackupResults {

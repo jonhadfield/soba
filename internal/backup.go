@@ -17,7 +17,7 @@ import (
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/hashicorp/go-retryablehttp"
-	"github.com/jonhadfield/githosts-utils"
+	"github.com/jonhadfield/githosts-utils/v2"
 	"gitlab.com/tozd/go/errors"
 )
 

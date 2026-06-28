@@ -2,12 +2,12 @@ module github.com/jonhadfield/soba
 
 go 1.25.1
 
-//replace github.com/jonhadfield/githosts-utils => ../githosts-utils
+//replace github.com/jonhadfield/githosts-utils/v2 => ../githosts-utils
 
 require (
 	github.com/go-co-op/gocron/v2 v2.21.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/jonhadfield/githosts-utils v0.0.0-20260628124917-dd7970d2dc27
+	github.com/jonhadfield/githosts-utils/v2 v2.1.1
 	github.com/slack-go/slack v0.24.0
 	github.com/stretchr/testify v1.11.1
 	gitlab.com/tozd/go/errors v0.11.1
@@ -33,4 +33,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-//replace github.com/jonhadfield/githosts-utils => ../githosts-utils
+//replace github.com/jonhadfield/githosts-utils/v2 => ../githosts-utils

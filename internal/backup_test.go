@@ -16,7 +16,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jonhadfield/githosts-utils"
+	"github.com/jonhadfield/githosts-utils/v2"
 
 	"github.com/stretchr/testify/require"
 )
