@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"testing"
 
-	githosts "github.com/jonhadfield/githosts-utils"
+	githosts "github.com/jonhadfield/githosts-utils/v2"
 	"github.com/stretchr/testify/require"
 	tozdErrors "gitlab.com/tozd/go/errors"
 )
