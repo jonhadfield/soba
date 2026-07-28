@@ -2,8 +2,6 @@ module github.com/jonhadfield/soba
 
 go 1.25.1
 
-//replace github.com/jonhadfield/githosts-utils/v2 => ../githosts-utils
-
 require (
 	github.com/go-co-op/gocron/v2 v2.21.2
 	github.com/hashicorp/go-retryablehttp v0.7.8
