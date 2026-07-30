@@ -288,9 +288,9 @@ func displayAzureDevOpsStartupConfig() {
 		return
 	}
 
-	logProviderOrgs("Azure DevOps", envAzureDevOpsOrgs)
-	logProviderCompareMethod("Azure DevOps", envAzureDevOpsCompare)
-	logProviderBackupLFS("Azure DevOps", envAzureDevOpsBackupLFS)
+	logProviderOrgs(providerLabelAzureDevOps, envAzureDevOpsOrgs)
+	logProviderCompareMethod(providerLabelAzureDevOps, envAzureDevOpsCompare)
+	logProviderBackupLFS(providerLabelAzureDevOps, envAzureDevOpsBackupLFS)
 }
 
 func getBackupInterval() int {

@@ -104,6 +104,9 @@ const (
 	providerNameGitea             = "Gitea"
 	providerNameSourcehut         = "Sourcehut"
 
+	// provider display labels
+	providerLabelAzureDevOps = "Azure DevOps"
+
 	// compare types
 	compareTypeRefs  = "refs"
 	compareTypeClone = "clone"
