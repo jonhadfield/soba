@@ -567,25 +567,6 @@ func TestPublicGitLabRepositoryBackup(t *testing.T) {
 	require.NoError(t, Run())
 }
 
-func TestPublicGitLabRepositoryBackup2(t *testing.T) {
-	if os.Getenv(envGitLabToken) == "" {
-		t.Skipf("Skipping GitLab test as %s is missing", envGitLabToken)
-	}
-
-	_ = os.Unsetenv(envSobaWebHookURL)
-
-	envBackup := backupEnvironmentVariables()
-	defer restoreEnvironmentVariables(envBackup)
-
-	preflight()
-	resetGlobals()
-
-	defer resetBackups()
-
-	unsetEnvVarsExcept([]string{envPath, envGitBackupDir, envGitLabToken})
-	require.NoError(t, Run())
-}
-
 func TestGiteaRepositoryBackup(t *testing.T) {
 	if os.Getenv(envGiteaToken) == "" {
 		t.Skipf("Skipping Gitea test as %s is missing", envGiteaToken)
@@ -644,67 +625,59 @@ func TestGiteaOrgsRepositoryBackup(t *testing.T) {
 
 		switch org {
 		case sobaOrgTwo:
-			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
-			require.NoDirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
-			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
-			require.NoError(t, err)
-
-			require.Len(t, entriesOrgTwo, 2)
-
-			var foundOne, foundTwo bool
-
-			for _, entry := range entriesOrgTwo {
-				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
-					foundOne = true
-				}
-
-				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
-					foundTwo = true
-				}
-			}
-
-			require.True(t, foundOne)
-			require.True(t, foundTwo)
-
+			assertGiteaOrgTwoOnlyBackedUp(t)
 			resetBackups()
 		case "*":
-			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
-			require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
-			entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
-			require.NoError(t, err)
-			entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
-			require.NoError(t, err)
-
-			require.Len(t, entriesOrgOne, 1)
-			require.Len(t, entriesOrgTwo, 2)
-
-			var foundOne, foundTwo, foundThree bool
-
-			for _, entry := range entriesOrgOne {
-				if strings.HasPrefix(entry.Name(), "soba-org-one-repo-one") {
-					foundThree = true
-				}
-			}
-
-			for _, entry := range entriesOrgTwo {
-				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-one") {
-					foundOne = true
-				}
-
-				if strings.HasPrefix(entry.Name(), "soba-org-two-repo-two") {
-					foundTwo = true
-				}
-			}
-
-			require.True(t, foundOne)
-			require.True(t, foundTwo)
-			require.True(t, foundThree)
-
+			assertGiteaAllOrgsBackedUp(t)
 			resetBackups()
 		}
 
 		resetBackups()
 	}
+}
+
+// dirHasEntryWithPrefix reports whether any directory entry's name starts
+// with the given prefix.
+func dirHasEntryWithPrefix(entries []os.DirEntry, prefix string) bool {
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), prefix) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func assertGiteaOrgTwoOnlyBackedUp(t *testing.T) {
+	t.Helper()
+
+	require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
+	require.NoDirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
+	entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
+	require.NoError(t, err)
+
+	require.Len(t, entriesOrgTwo, 2)
+
+	require.True(t, dirHasEntryWithPrefix(entriesOrgTwo, "soba-org-two-repo-one"))
+	require.True(t, dirHasEntryWithPrefix(entriesOrgTwo, "soba-org-two-repo-two"))
+}
+
+func assertGiteaAllOrgsBackedUp(t *testing.T) {
+	t.Helper()
+
+	require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
+	require.DirExists(t, path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
+	entriesOrgOne, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgOne))
+	require.NoError(t, err)
+	entriesOrgTwo, err := os.ReadDir(path.Join(os.Getenv(envGitBackupDir), "gitea.lessknown.co.uk", sobaOrgTwo))
+	require.NoError(t, err)
+
+	require.Len(t, entriesOrgOne, 1)
+	require.Len(t, entriesOrgTwo, 2)
+
+	require.True(t, dirHasEntryWithPrefix(entriesOrgTwo, "soba-org-two-repo-one"))
+	require.True(t, dirHasEntryWithPrefix(entriesOrgTwo, "soba-org-two-repo-two"))
+	require.True(t, dirHasEntryWithPrefix(entriesOrgOne, "soba-org-one-repo-one"))
 }
 
 func TestPublicBitBucketRepositoryBackupWithRefCompareOAuth(t *testing.T) {

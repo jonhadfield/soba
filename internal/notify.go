@@ -22,7 +22,22 @@ const (
 	envTelegramBotToken        = "SOBA_TELEGRAM_BOT_TOKEN"
 	envTelegramChatID          = "SOBA_TELEGRAM_CHAT_ID"
 	envSobaNotifyOnFailureOnly = "SOBA_NOTIFY_ON_FAILURE_ONLY"
+
+	titleBackupsSucceeded = "🚀 soba backups succeeded"
+	titleBackupsErrors    = "️⚠️ soba backups completed with errors"
+	titleBackupsFailed    = "️🚨 soba backups failed"
 )
+
+func backupStatusTitle(succeeded, failed int) string {
+	switch {
+	case succeeded > 0 && failed == 0:
+		return titleBackupsSucceeded
+	case failed > 0 && succeeded > 0:
+		return titleBackupsErrors
+	default:
+		return titleBackupsFailed
+	}
+}
 
 func getResultsErrors(results BackupResults) []errors.E {
 	var errs []errors.E
@@ -86,16 +101,7 @@ func notify(backupResults BackupResults, succeeded int, failed int) {
 }
 
 func sendTelegramMessage(hc *retryablehttp.Client, botToken, chatID string, succeeded, failed int, errs []errors.E) {
-	var text string
-
-	switch {
-	case succeeded > 0 && failed == 0:
-		text = "🚀 soba backups succeeded"
-	case failed > 0 && succeeded > 0:
-		text = "️⚠️ soba backups completed with errors"
-	default:
-		text = "️🚨 soba backups failed"
-	}
+	text := backupStatusTitle(succeeded, failed)
 
 	text += fmt.Sprintf("\ncompleted: %d, failed: %d",
 		succeeded, failed)
@@ -182,14 +188,7 @@ func sendNtfy(hc *retryablehttp.Client, nURL string, succeeded, failed int, errs
 		return
 	}
 
-	switch {
-	case succeeded > 0 && failed == 0:
-		req.Header.Set("Title", "🚀 soba backups succeeded")
-	case failed > 0 && succeeded > 0:
-		req.Header.Set("Title", "️⚠️ soba backups completed with errors")
-	default:
-		req.Header.Set("Title", "️🚨 soba backups failed")
-	}
+	req.Header.Set("Title", backupStatusTitle(succeeded, failed))
 
 	req.Header.Set("Tags", "soba,backup,git")
 
@@ -214,16 +213,7 @@ func sendSlackMessage(slackChannelID string, succeeded, failed int, errs []error
 		}
 	}
 
-	var title string
-
-	switch {
-	case succeeded > 0 && failed == 0:
-		title = "🚀 soba backups succeeded"
-	case failed > 0 && succeeded > 0:
-		title = "️⚠️ soba backups completed with errors"
-	default:
-		title = "️🚨 soba backups failed"
-	}
+	title := backupStatusTitle(succeeded, failed)
 
 	attachment := slack.Attachment{
 		Pretext: fmt.Sprintf("succeeded: %d, failed: %d", succeeded, failed),
