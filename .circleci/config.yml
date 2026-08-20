@@ -2,7 +2,10 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/go:1.24.0
+      # Must track the go directive in go.mod (1.25.1). On an older image Go
+      # silently downloads a matching toolchain on every build, and would fail
+      # outright under GOTOOLCHAIN=local.
+      - image: cimg/go:1.25.1
     steps:
       - checkout
       - run:

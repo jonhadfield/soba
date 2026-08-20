@@ -4,22 +4,26 @@ on:
     tags:
       - '*'
     branches:
-      - '*'
+      - '**'
   pull_request:
 jobs:
   golangci:
     name: lint
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      # Checkout first so setup-go can find go.sum and cache modules, and read
+      # the version from go.mod rather than a literal that drifts from it.
       - name: Setup Go
         uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
         with:
-          go-version: '1.25.1'
-          cache: false
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+          go-version-file: go.mod
       - name: golangci-lint
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9
         with:
-          version: latest
+          # Pinned deliberately: "latest" lets an upstream release change the
+          # result with no change to this repo. v2.13.0 is the version the
+          # action last resolved to and passed with.
+          version: v2.13.0
           args: --timeout=5m -v --config .golangci.yml
           skip-cache: false
