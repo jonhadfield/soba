@@ -32,13 +32,13 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    # This workflow only triggers on tag pushes, so github.ref_name is the tag
+    # name. It replaces git describe --tags, which depended on the tag object
+    # being present in a fetch-depth 1 checkout and would emit a
+    # <tag>-<n>-g<sha> string if HEAD were ever not exactly on a tag.
     -
-      if: startsWith(github.ref, 'refs/heads/main')
-      run: echo "TAG=latest" >> $GITHUB_ENV
-
-    -
-      if: startsWith(github.ref, 'refs/tags')
-      run: echo "TAG=$(git describe --tags)" >> $GITHUB_ENV
+      name: Set release tag
+      run: echo "TAG=${{ github.ref_name }}" >> $GITHUB_ENV
 
     -
       name: build image
