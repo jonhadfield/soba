@@ -2,6 +2,8 @@ module github.com/jonhadfield/soba
 
 go 1.25.1
 
+toolchain go1.26.7
+
 require (
 	github.com/go-co-op/gocron/v2 v2.22.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
