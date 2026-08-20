@@ -9,6 +9,9 @@ jobs:
   build-and-push-docker-image:
     runs-on: ubuntu-latest
     name: Docker Build, Tag, Push
+    permissions:
+      contents: read
+      packages: write   # push to ghcr.io using github.token
     steps:
     -
       name: Checkout
@@ -45,18 +48,35 @@ jobs:
         file: ./docker/Dockerfile
         build-args: TAG=${{ env.TAG }}
         push: false
+        load: true    # without this the image stays in the buildkit cache and
+                      # the scan below silently falls back to the copy already
+                      # published on Docker Hub, i.e. the previous release
         tags: |
           ${{ github.repository }}:latest
           ${{ github.repository }}:${{ env.TAG }}
           ghcr.io/${{ github.repository }}:latest
           ghcr.io/${{ github.repository }}:${{ env.TAG }}
 
-    - name: trivy image scan
+    # Reported for visibility, does not block. The release binary currently
+    # carries Go stdlib HIGHs that clear only when goreleaser builds against a
+    # newer toolchain.
+    - name: trivy image scan (report HIGH and CRITICAL)
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
       with:
-        image-ref: ${{ github.repository }}:latest
+        image-ref: ${{ github.repository }}:${{ env.TAG }}
         exit-code: 0
-        severity: UNKNOWN,LOW,MEDIUM
+        severity: HIGH,CRITICAL
+        ignore-unfixed: true
+
+    # The gate. Scans the image built above, not whatever :latest happens to be
+    # on Docker Hub, and fails the release before the push step runs.
+    - name: trivy image scan (fail on CRITICAL)
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        image-ref: ${{ github.repository }}:${{ env.TAG }}
+        exit-code: 1
+        severity: CRITICAL
+        ignore-unfixed: true
 
     -
       name: push image
