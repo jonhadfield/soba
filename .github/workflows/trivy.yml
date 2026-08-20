@@ -12,6 +12,10 @@ jobs:
   Trivy-Scan:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      security-events: write
+
     steps:
       - name: Checkout code
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -44,6 +48,11 @@ jobs:
           severity: 'CRITICAL'
 
       - name: DEBUG Upload Trivy scan results to GitHub Security tab
+        # Dependabot-triggered runs get a read-only GITHUB_TOKEN no matter what
+        # this block requests, so the upload fails with "Resource not accessible
+        # by integration". The scan itself still runs on those PRs; only the
+        # publish to the Security tab is skipped.
+        if: github.actor != 'dependabot[bot]'
         uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
         with:
           sarif_file: 'trivy-results.sarif'
