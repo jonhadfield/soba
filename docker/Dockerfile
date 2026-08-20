@@ -13,8 +13,13 @@ RUN addgroup -S nonroot \
 
 ARG TAG
 
+# Supplied automatically by buildx, one value per platform being built
+# (amd64, arm64). Matches Go's naming, and therefore the goreleaser archive
+# names, so it can be substituted into the asset URL directly.
+ARG TARGETARCH
+
 WORKDIR /tmp
-RUN curl -fL --proto "=https" --tlsv1.2 -o soba.tar.gz "https://github.com/jonhadfield/soba/releases/download/${TAG}/soba_linux_amd64.tar.gz" \
+RUN curl -fL --proto "=https" --tlsv1.2 -o soba.tar.gz "https://github.com/jonhadfield/soba/releases/download/${TAG}/soba_linux_${TARGETARCH}.tar.gz" \
     && tar -xvzf soba.tar.gz \
     && rm ./*.gz \
     && mv ./soba /soba \
