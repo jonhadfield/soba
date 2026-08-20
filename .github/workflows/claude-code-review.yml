@@ -25,6 +25,14 @@ jobs:
       issues: read
       id-token: write
 
+    env:
+      # Dependabot-triggered runs read the Dependabot secret store rather than
+      # the Actions one, so this is empty unless CLAUDE_CODE_OAUTH_TOKEN has
+      # been added there too. Surfaced as an env var so the step below can skip
+      # instead of failing the check. The secrets context is not available in a
+      # job-level `if`, which is why the guard sits on the step.
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -33,9 +41,10 @@ jobs:
 
       - name: Run Claude Code Review
         id: claude-review
+        if: env.CLAUDE_CODE_OAUTH_TOKEN != ''
         uses: anthropics/claude-code-action@dde2242db6af13460b916652159b6ba19a598f30 # v1
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_code_oauth_token: ${{ env.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'dependabot[bot],dependabot'
           prompt: |
             Please review this pull request and provide feedback on:
