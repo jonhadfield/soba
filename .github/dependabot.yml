@@ -14,3 +14,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      # The codeql-action sub-actions (init/autobuild/analyze/upload-sarif) must
+      # always move together: CodeQL aborts if the version that wrote the config
+      # differs from the version that runs the analysis.
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
