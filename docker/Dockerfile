@@ -14,7 +14,7 @@ RUN addgroup -S nonroot \
 ARG TAG
 
 WORKDIR /tmp
-RUN curl -L --proto "=https" --tlsv1.2 -o soba.tar.gz "https://github.com/jonhadfield/soba/releases/download/${TAG}/soba_linux_amd64.tar.gz" \
+RUN curl -fL --proto "=https" --tlsv1.2 -o soba.tar.gz "https://github.com/jonhadfield/soba/releases/download/${TAG}/soba_linux_amd64.tar.gz" \
     && tar -xvzf soba.tar.gz \
     && rm ./*.gz \
     && mv ./soba /soba \
