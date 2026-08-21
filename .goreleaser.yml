@@ -109,10 +109,15 @@ snapshot:
 changelog:
   sort: asc
   filters:
+    # Anchored to conventional-commit prefixes. These were previously bare
+    # substrings matched anywhere in the message, so "test" also matched
+    # "testify", "tests" and "test-file", silently dropping real entries from
+    # every release: 1.5.0 lost the testify bump, the CI test-workflow PR and
+    # a Sonar fix.
     exclude:
-      - README
-      - test
-      - ignore
+      - '^test(\([^)]*\))?:'
+      - '^docs?(\([^)]*\))?:'
+      - '^ignore(\([^)]*\))?:'
 
 checksum:
   name_template: 'checksums.txt'
