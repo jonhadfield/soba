@@ -35,12 +35,20 @@ const (
 	sobaOrgOne                 = "soba-org-one"
 	sobaOrgTwo                 = "soba-org-two"
 	skipGitHubTestMissingToken = "Skipping GitHub test as %s is missing" //nolint:gosec
+	skipGitLabTestMissingToken = "Skipping GitLab test as %s is missing" //nolint:gosec
 	// envSobaLiveGitHubTests opts in to the live GitHub integration tests.
 	// They are skipped by default (including in CI) because GitHub secondary-
 	// rate-limits the shared token under the suite's back-to-back call volume;
 	// deterministic coverage lives in TestGithubRepositoryBackupWithMockAPI.
 	// See #176.
 	envSobaLiveGitHubTests = "SOBA_LIVE_GITHUB_TESTS"
+
+	// envSobaLiveGitLabTests opts in to the live GitLab integration tests.
+	// Like the GitHub ones they clone real repositories, so they fail on
+	// throttling or transient 403s from the host rather than on anything in
+	// this repository; CircleCI has a GitLab token configured and was failing
+	// intermittently as a result.
+	envSobaLiveGitLabTests = "SOBA_LIVE_GITLAB_TESTS"
 )
 
 // skipUnlessLiveGitHub skips a test unless live GitHub integration tests are
@@ -54,6 +62,20 @@ func skipUnlessLiveGitHub(t *testing.T) {
 
 	if os.Getenv(envGitHubToken) == "" {
 		t.Skipf(skipGitHubTestMissingToken, envGitHubToken)
+	}
+}
+
+// skipUnlessLiveGitLab skips a test unless live GitLab integration tests are
+// explicitly enabled and a token is present.
+func skipUnlessLiveGitLab(t *testing.T) {
+	t.Helper()
+
+	if os.Getenv(envSobaLiveGitLabTests) == "" {
+		t.Skipf("skipping live GitLab test; set %s=true to run", envSobaLiveGitLabTests)
+	}
+
+	if os.Getenv(envGitLabToken) == "" {
+		t.Skipf(skipGitLabTestMissingToken, envGitLabToken)
 	}
 }
 
@@ -549,9 +571,7 @@ func TestPublicGithubRepositoryBackupWithExistingBackupsUsingRefs(t *testing.T) 
 }
 
 func TestPublicGitLabRepositoryBackup(t *testing.T) {
-	if os.Getenv(envGitLabToken) == "" {
-		t.Skipf("Skipping GitLab test as %s is missing", envGitLabToken)
-	}
+	skipUnlessLiveGitLab(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
