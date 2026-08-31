@@ -1,3 +1,36 @@
+### 1.5.0 release 2026-08-20
+
+- Publish the Docker image for arm64 as well as amd64, so a single tag serves both architectures and runs natively on Apple Silicon, AWS Graviton and Raspberry Pi
+- Build releases with Go 1.26.7, clearing ten fixable vulnerabilities in the Go standard library
+- Base the Docker image on the Alpine 3.22 branch rather than a frozen point release, clearing nineteen inherited CVEs
+- Fail the release if the built image carries a critical vulnerability, rather than reporting after publishing
+- Bump slack-go to 0.29.0 and testify to 1.12.1
+- Run the test suite in GitHub Actions alongside CircleCI
+
+### 1.4.8 release 2026-07-28
+
+- Harden the backup runner, environment file reads, and notification clients
+- Retry on GitHub primary rate limits via githosts-utils v2.1.2
+- Migrate to the githosts-utils /v2 module path
+- Make the live GitHub integration tests opt-in so CI no longer depends on a rate-limited token
+- Bump dependencies
+
+### 1.4.7 release 2026-04-19
+
+- Use the replacement Bitbucket API via githosts-utils
+- Document the Bitbucket scopes required for workspaces
+- Pin GitHub Actions to specific commit SHAs
+
+### 1.4.6 release 2026-04-17
+
+- Add support for Bitbucket workspaces
+- Bump dependencies
+
+### 1.4.5 release 2026-03-23
+
+- Improve error logging from githosts-utils
+- Bump dependencies
+
 ### 1.4.4 release 2026-03-15
 
 - Fix gosec linting issues
