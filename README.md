@@ -5,6 +5,7 @@
 <img src="docs/soba.png" alt="logo" width="200"/>
 
 [![GitHub Release][release-img]][release]
+[![Test](https://github.com/jonhadfield/soba/actions/workflows/test.yml/badge.svg)](https://github.com/jonhadfield/soba/actions/workflows/test.yml)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1bd46b99467c45d99e4903b44a16f874)](https://app.codacy.com/gh/jonhadfield/soba/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![CodeQL](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
@@ -22,7 +23,7 @@ soba backs up your Git repositories from GitHub, GitLab, Bitbucket, Azure DevOps
 | **Smart rotation** | Keep only the _n_ most recent backups per repo |
 | **Git LFS** | Back up large file storage objects alongside repo bundles |
 | **Notifications** | Slack, Telegram, webhooks, and [ntfy](https://ntfy.sh/) alerts |
-| **Runs anywhere** | Binary, Docker, Kubernetes, or Synology NAS |
+| **Runs anywhere** | Binary, Docker, Kubernetes, or Synology NAS &mdash; amd64 and arm64 |
 
 ## Quick Start
 
@@ -211,8 +212,22 @@ If the bundle is encrypted, [decrypt it first](#decrypting-backups).
 
 ## Supported Platforms
 
-Tested on Windows 10, macOS, and Linux (amd64).
-Should also work on Linux (386, arm, arm64), FreeBSD, NetBSD, and OpenBSD.
+Binaries are published for every combination below on each [release](https://github.com/jonhadfield/soba/releases):
+
+| OS | amd64 | arm64 |
+|:--------|:-----:|:-----:|
+| Linux   |   ✅   |   ✅   |
+| macOS   |   ✅   |   ✅   |
+| Windows |   ✅   |   ✅   |
+| FreeBSD |   ✅   |   ✅   |
+
+The Docker image is multi-architecture, so `ghcr.io/jonhadfield/soba` resolves to the right build automatically and runs natively on Apple Silicon, AWS Graviton, and Raspberry Pi:
+
+```bash
+docker buildx imagetools inspect ghcr.io/jonhadfield/soba:latest
+```
+
+soba is pure Go with cgo disabled, so it should also build from source for any other target Go supports.
 
 ## Changelog
 
