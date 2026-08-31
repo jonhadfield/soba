@@ -49,16 +49,24 @@ jobs:
     # name. It replaces git describe --tags, which depended on the tag object
     # being present in a fetch-depth 1 checkout and would emit a
     # <tag>-<n>-g<sha> string if HEAD were ever not exactly on a tag.
+    # Passed via env rather than interpolated into the run script: git permits
+    # backticks, $, ; and | in tag names, which would otherwise execute in a job
+    # holding the registry credentials.
     -
       name: Set release tag
-      run: echo "TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+      env:
+        TAG_NAME: ${{ github.ref_name }}
+      run: echo "TAG=$TAG_NAME" >> "$GITHUB_ENV"
 
-    # Built for a single platform and loaded locally so the scan below has a
-    # real image to inspect: a multi-platform result cannot be loaded into the
-    # docker image store. The layers are reused by the push build, which is a
-    # cache hit for amd64.
+    # Each architecture is built and loaded separately, because a
+    # multi-platform result cannot be loaded into the docker image store and so
+    # cannot be scanned. Both are scanned below: Alpine's arm64 package set can
+    # carry a CRITICAL that amd64 does not, or receive the fix later, so
+    # scanning only amd64 would publish an unscanned arm64 layer under the same
+    # tag. These tags are local to the runner and never pushed; the push build
+    # reuses their layers.
     -
-      name: build image for scanning
+      name: build amd64 image for scanning
       uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
       with:
         context: ./docker
@@ -67,25 +75,56 @@ jobs:
         platforms: linux/amd64
         push: false
         load: true
-        tags: ${{ github.repository }}:${{ env.TAG }}
+        tags: soba-scan:amd64
 
-    # Reported for visibility, does not block. The release binary currently
-    # carries Go stdlib HIGHs that clear only when goreleaser builds against a
-    # newer toolchain.
-    - name: trivy image scan (report HIGH and CRITICAL)
+    -
+      name: build arm64 image for scanning
+      uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
+      with:
+        context: ./docker
+        file: ./docker/Dockerfile
+        build-args: TAG=${{ env.TAG }}
+        platforms: linux/arm64
+        push: false
+        load: true
+        tags: soba-scan:arm64
+
+    # Reported for visibility, does not block. The release binary carries Go
+    # stdlib HIGHs whenever goreleaser builds against a toolchain older than the
+    # one the advisories require.
+    - name: trivy scan amd64 (report HIGH and CRITICAL)
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
       with:
-        image-ref: ${{ github.repository }}:${{ env.TAG }}
+        image-ref: soba-scan:amd64
         exit-code: 0
         severity: HIGH,CRITICAL
         ignore-unfixed: true
 
-    # The gate: fails the job before the push step, so a CRITICAL finding stops
-    # the release rather than being published and reported afterwards.
-    - name: trivy image scan (fail on CRITICAL)
+    - name: trivy scan arm64 (report HIGH and CRITICAL)
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
       with:
-        image-ref: ${{ github.repository }}:${{ env.TAG }}
+        image-ref: soba-scan:arm64
+        exit-code: 0
+        severity: HIGH,CRITICAL
+        ignore-unfixed: true
+
+    # The gates: these fail the job before the push step, so a CRITICAL finding
+    # on either architecture stops the release rather than being published and
+    # reported afterwards. ignore-unfixed is deliberate: a CRITICAL with no
+    # patched Alpine package available would otherwise block every release until
+    # upstream ships a fix.
+    - name: trivy scan amd64 (fail on CRITICAL)
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        image-ref: soba-scan:amd64
+        exit-code: 1
+        severity: CRITICAL
+        ignore-unfixed: true
+
+    - name: trivy scan arm64 (fail on CRITICAL)
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        image-ref: soba-scan:arm64
         exit-code: 1
         severity: CRITICAL
         ignore-unfixed: true

@@ -3,7 +3,7 @@
 - Publish the Docker image for arm64 as well as amd64, so a single tag serves both architectures and runs natively on Apple Silicon, AWS Graviton and Raspberry Pi
 - Build releases with Go 1.26.7, clearing ten fixable vulnerabilities in the Go standard library
 - Base the Docker image on the Alpine 3.22 branch rather than a frozen point release, clearing nineteen inherited CVEs
-- Fail the release if the built image carries a critical vulnerability, rather than reporting after publishing
+- Fail the release if the built image carries a critical vulnerability with a fix available, rather than reporting after publishing
 - Bump slack-go to 0.29.0 and testify to 1.12.1
 - Run the test suite in GitHub Actions alongside CircleCI
 
