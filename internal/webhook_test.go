@@ -119,3 +119,105 @@ func TestWebhookShortFormat(t *testing.T) {
 	require.NoError(t, sendWebhook(c, theTime, backupResults, exampleWebHookURL, "short"))
 	require.True(t, gock.IsDone())
 }
+
+func TestBackupEventType(t *testing.T) {
+	tests := []struct {
+		name      string
+		succeeded int
+		failed    int
+		want      string
+	}{
+		{name: "all succeeded", succeeded: 171, failed: 0, want: eventBackupsComplete},
+		{name: "some failed", succeeded: 171, failed: 1, want: eventBackupsWithErrors},
+		{name: "all failed", succeeded: 0, failed: 12, want: eventBackupsFailed},
+		{name: "nothing ran", succeeded: 0, failed: 0, want: eventBackupsComplete},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := backupEventType(tc.succeeded, tc.failed); got != tc.want {
+				t.Errorf("backupEventType(%d, %d) = %q, want %q", tc.succeeded, tc.failed, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestWithPushStatus(t *testing.T) {
+	tests := []struct {
+		name       string
+		url        string
+		succeeded  int
+		failed     int
+		wantStatus string
+		wantMsg    string
+	}{
+		{
+			name:       "healthy run reports up",
+			url:        "http://kuma.example/api/push/abc123",
+			succeeded:  171,
+			failed:     0,
+			wantStatus: "up",
+			wantMsg:    "succeeded: 171, failed: 0",
+		},
+		{
+			name:       "a single failure reports down",
+			url:        "http://kuma.example/api/push/abc123",
+			succeeded:  171,
+			failed:     1,
+			wantStatus: "down",
+			wantMsg:    "succeeded: 171, failed: 1",
+		},
+		{
+			name:       "existing query parameters are preserved",
+			url:        "http://kuma.example/api/push/abc123?ping=1",
+			succeeded:  0,
+			failed:     3,
+			wantStatus: "down",
+			wantMsg:    "succeeded: 0, failed: 3",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := withPushStatus(tc.url, tc.succeeded, tc.failed)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			u, err := url.Parse(got)
+			if err != nil {
+				t.Fatalf("result is not a valid url: %v", err)
+			}
+
+			if u.Query().Get("status") != tc.wantStatus {
+				t.Errorf("status = %q, want %q", u.Query().Get("status"), tc.wantStatus)
+			}
+
+			if u.Query().Get("msg") != tc.wantMsg {
+				t.Errorf("msg = %q, want %q", u.Query().Get("msg"), tc.wantMsg)
+			}
+
+			if u.Path != "/api/push/abc123" {
+				t.Errorf("path was altered: %q", u.Path)
+			}
+		})
+	}
+
+	t.Run("existing parameters survive", func(t *testing.T) {
+		got, err := withPushStatus("http://kuma.example/api/push/abc123?ping=1", 1, 0)
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		u, _ := url.Parse(got)
+		if u.Query().Get("ping") != "1" {
+			t.Errorf("pre-existing query parameter was dropped: %q", got)
+		}
+	})
+
+	t.Run("invalid url is reported", func(t *testing.T) {
+		if _, err := withPushStatus("://not-a-url", 1, 0); err == nil {
+			t.Error("expected an error for an unparsable url")
+		}
+	})
+}

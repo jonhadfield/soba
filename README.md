@@ -193,7 +193,7 @@ export SOBA_NOTIFY_ON_FAILURE_ONLY=true
 |:--------|:----------|
 | **Slack** | `SLACK_CHANNEL_ID`, `SLACK_API_TOKEN` |
 | **Telegram** | `SOBA_TELEGRAM_BOT_TOKEN`, `SOBA_TELEGRAM_CHAT_ID` |
-| **Webhooks** | `SOBA_WEBHOOK_URL`, `SOBA_WEBHOOK_FORMAT` (`long` or `short`) |
+| **Webhooks** | `SOBA_WEBHOOK_URL`, `SOBA_WEBHOOK_FORMAT` (`long` or `short`), `SOBA_WEBHOOK_PUSH_STATUS` |
 | **ntfy** | `SOBA_NTFY_URL` |
 
 Webhook payload examples: [long format](examples/webhook.json), [short format](examples/webhook-short.json).
