@@ -4,14 +4,71 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	neturl "net/url"
 	"strings"
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
 )
 
+// withPushStatus adds the status and msg query parameters that push-style
+// monitors (Uptime Kuma, and others following the same convention) read to
+// decide whether a heartbeat is healthy. Without it every run reads as healthy,
+// because such monitors treat the arrival of the request as the signal and
+// ignore the body - so a run in which every repository failed would still show
+// green. Opt-in, since appending parameters to an arbitrary webhook URL would
+// otherwise be surprising.
+func withPushStatus(rawURL string, succeeded, failed int) (string, error) {
+	u, err := neturl.Parse(rawURL)
+	if err != nil {
+		return "", fmt.Errorf("error parsing webhook url: %w", err)
+	}
+
+	status := "up"
+	if failed > 0 {
+		status = "down"
+	}
+
+	q := u.Query()
+	q.Set("status", status)
+	q.Set("msg", fmt.Sprintf("succeeded: %d, failed: %d", succeeded, failed))
+	u.RawQuery = q.Encode()
+
+	return u.String(), nil
+}
+
+// Event types reported in the webhook payload. They mirror the three outcomes
+// backupStatusTitle distinguishes for the other notifiers, so a consumer can
+// branch on the outcome without having to compare the counts itself.
+const (
+	eventBackupsComplete   = "backups.complete"
+	eventBackupsWithErrors = "backups.complete_with_errors"
+	eventBackupsFailed     = "backups.failed"
+)
+
+// backupEventType classifies a run. Every run previously reported
+// backups.complete, including one in which every repository failed, which left
+// the field useless for deciding whether to alert.
+func backupEventType(succeeded, failed int) string {
+	switch {
+	case failed == 0:
+		return eventBackupsComplete
+	case succeeded > 0:
+		return eventBackupsWithErrors
+	default:
+		return eventBackupsFailed
+	}
+}
+
 func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResults, url, format string) error {
 	ok, failed := getBackupsStats(results)
+
+	if envTrue(envSobaWebHookPushStatus) {
+		var err error
+		if url, err = withPushStatus(url, ok, failed); err != nil {
+			return err
+		}
+	}
 
 	if sendTime.IsZero() {
 		sendTime = sobaTime{
@@ -22,7 +79,7 @@ func sendWebhook(c *retryablehttp.Client, sendTime sobaTime, results BackupResul
 
 	webhookData := WebhookData{
 		App:       AppName,
-		Type:      "backups.complete",
+		Type:      backupEventType(ok, failed),
 		Timestamp: sendTime,
 		Stats: BackupStats{
 			Succeeded: ok,
