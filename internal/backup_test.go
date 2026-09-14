@@ -49,6 +49,13 @@ const (
 	// this repository; CircleCI has a GitLab token configured and was failing
 	// intermittently as a result.
 	envSobaLiveGitLabTests = "SOBA_LIVE_GITLAB_TESTS"
+
+	// envSobaLiveAzureDevOpsTests opts in to the live Azure DevOps integration
+	// test. It clones a real repository, so it fails whenever the organisation
+	// or the credentials in the environment are no longer valid - which is a
+	// statement about the account, not about this code. Left ungated it turned
+	// every CI run red.
+	envSobaLiveAzureDevOpsTests = "SOBA_LIVE_AZURE_DEVOPS_TESTS"
 )
 
 // skipUnlessLiveGitHub skips a test unless live GitHub integration tests are
@@ -67,6 +74,20 @@ func skipUnlessLiveGitHub(t *testing.T) {
 
 // skipUnlessLiveGitLab skips a test unless live GitLab integration tests are
 // explicitly enabled and a token is present.
+// skipUnlessLiveAzureDevOps skips a test unless live Azure DevOps integration
+// tests are opted in to and credentials are present.
+func skipUnlessLiveAzureDevOps(t *testing.T) {
+	t.Helper()
+
+	if os.Getenv(envSobaLiveAzureDevOpsTests) == "" {
+		t.Skipf("skipping live Azure DevOps test; set %s=true to run", envSobaLiveAzureDevOpsTests)
+	}
+
+	if os.Getenv(envAzureDevOpsUserName) == "" {
+		t.Skipf("Skipping Azure DevOps test as %s is missing", envAzureDevOpsUserName)
+	}
+}
+
 func skipUnlessLiveGitLab(t *testing.T) {
 	t.Helper()
 
@@ -327,9 +348,7 @@ func TestInvalidBundleIsMovedWithRefCompare(t *testing.T) {
 }
 
 func TestAzureDevOpsRepositoryBackupWithBackupsToKeepAsOne(t *testing.T) {
-	if os.Getenv(envAzureDevOpsUserName) == "" {
-		t.Skipf("Skipping Azure DevOps test as %s is missing", envAzureDevOpsUserName)
-	}
+	skipUnlessLiveAzureDevOps(t)
 
 	_ = os.Unsetenv(envSobaWebHookURL)
 
