@@ -1,3 +1,8 @@
+// and returns the same result type. Keeping them parallel and independent is
+// deliberate: collapsing them into a parameterised helper would hide which
+// provider does what, for no behavioural gain.
+//
+//nolint:dupl // Each provider reads its own variables, builds its own host
 package internal
 
 import (

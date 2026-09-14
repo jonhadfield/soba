@@ -1,3 +1,4 @@
+//nolint:dupl // Parallel to the other providers by design; see codeberg.go.
 package internal
 
 import (
