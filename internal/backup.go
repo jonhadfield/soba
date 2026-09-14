@@ -111,6 +111,7 @@ func collectProviderBackupResults(backupDir string) []ProviderBackupResults {
 		{envGitLabToken, Gitlab},
 		{envAzureDevOpsUserName, AzureDevOps},
 		{envSourcehutToken, Sourcehut},
+		{envCodebergToken, Codeberg},
 	}
 
 	for _, p := range tokenProviders {
@@ -194,6 +195,7 @@ func displayStartupConfig() {
 
 	displayGitHubStartupConfig()
 	displayGiteaStartupConfig()
+	displayCodebergStartupConfig()
 	displayGitLabStartupConfig()
 	displayBitBucketStartupConfig()
 	displayAzureDevOpsStartupConfig()
@@ -243,6 +245,17 @@ func displayGitHubStartupConfig() {
 
 	logProviderCompareMethod("GitHub", envGitHubCompare)
 	logProviderBackupLFS("GitHub", envGitHubBackupLFS)
+}
+
+func displayCodebergStartupConfig() {
+	if codebergToken, exists := GetEnvOrFile(envCodebergToken); !exists || codebergToken == "" {
+		return
+	}
+
+	logProviderOrgs("Codeberg", envCodebergOrgs)
+	logProviderBackupsToKeep("Codeberg", envCodebergBackups)
+	logProviderCompareMethod("Codeberg", envCodebergCompare)
+	logProviderBackupLFS("Codeberg", envCodebergBackupLFS)
 }
 
 func displayGiteaStartupConfig() {

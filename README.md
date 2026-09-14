@@ -83,6 +83,7 @@ Run soba via the Docker GUI on your NAS. See the [Synology guide](docs/providers
 | [Azure DevOps](docs/providers.md#azure-devops) | [Create PAT](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops) | `AZURE_DEVOPS_USERNAME` + `AZURE_DEVOPS_PAT` + `AZURE_DEVOPS_ORGS` |
 | [Gitea](docs/providers.md#gitea) | [Create token](https://docs.gitea.com/development/api-usage#generating-and-listing-api-tokens) | `GITEA_APIURL` + `GITEA_TOKEN` |
 | [Sourcehut](docs/providers.md#sourcehut) | [Create PAT](https://man.sr.ht/accounts.md#api) | `SOURCEHUT_PAT` |
+| [Codeberg](https://codeberg.org) | [Create token](https://codeberg.org/user/settings/applications) | `CODEBERG_TOKEN` |
 
 For full provider configuration, organisation filtering, comparison modes, and self-hosted endpoints, see the [provider documentation](docs/providers.md).
 

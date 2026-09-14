@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -6,12 +6,25 @@ jobs:
       # directive. On an older image Go silently downloads a matching toolchain
       # on every build, and would fail outright under GOTOOLCHAIN=local.
       - image: cimg/go:1.26.7
+    # The tests read GIT_BACKUP_DIR to decide where to write bundles. The
+    # directory below was created but never exported, so anything depending on
+    # the variable saw whatever the environment happened to hold.
+    environment:
+      GIT_BACKUP_DIR: /home/circleci/project/backup
     steps:
       - checkout
       - run:
           name: make git backups dir
-          command: mkdir /home/circleci/project/backup
+          command: mkdir -p "$GIT_BACKUP_DIR"
       # Live GitHub integration tests are opt-in (SOBA_LIVE_GITHUB_TESTS) and
       # not enabled here, so CI no longer depends on a rate-limited live token;
       # deterministic GitHub coverage runs via mocked API + local git fixtures.
       - run: go test -v -p 1 -parallel 1 -failfast ./...
+
+# Declared explicitly. Under config version 2 a job named "build" ran
+# implicitly when no workflows were defined; that behaviour is legacy, so the
+# workflow is spelled out rather than depended upon.
+workflows:
+  test:
+    jobs:
+      - build

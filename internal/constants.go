@@ -95,6 +95,15 @@ const (
 	envGiteaCompare         = "GITEA_COMPARE"
 	envGiteaOrgs            = "GITEA_ORGS"
 
+	envCodebergToken          = "CODEBERG_TOKEN" //nolint:gosec // the variable name, not a credential
+	envCodebergAPIURL         = "CODEBERG_APIURL"
+	envCodebergBackups        = "CODEBERG_BACKUPS"
+	envCodebergBackupLFS      = "CODEBERG_BACKUP_LFS"
+	envCodebergCompare        = "CODEBERG_COMPARE"
+	envCodebergOrgs           = "CODEBERG_ORGS"
+	envCodebergSkipUserRepos  = "CODEBERG_SKIP_USER_REPOS"
+	envCodebergLimitUserOwned = "CODEBERG_LIMIT_USER_OWNED"
+
 	// provider names
 	providerNameAzureDevOps       = "AzureDevOps"
 	providerNameBitBucket         = "BitBucket"
@@ -104,6 +113,7 @@ const (
 	providerNameGitLab            = "GitLab"
 	providerNameGitea             = "Gitea"
 	providerNameSourcehut         = "Sourcehut"
+	providerNameCodeberg          = "Codeberg"
 
 	// provider display labels
 	providerLabelAzureDevOps = "Azure DevOps"
@@ -149,12 +159,18 @@ var (
 			envSourcehutAPIURL,
 			envSourcehutToken,
 		},
+		// Only the token: unlike Gitea, which is self-hosted and needs an API
+		// URL, Codeberg's is a fixed default the user does not have to supply.
+		providerNameCodeberg: {
+			envCodebergToken,
+		},
 	}
 	justTokenProviders = []string{
 		providerNameGitHub,
 		providerNameGitLab,
 		providerNameGitea,
 		providerNameSourcehut,
+		providerNameCodeberg,
 	}
 	userAndPasswordProviders = []string{
 		providerNameBitBucketAPIToken,
