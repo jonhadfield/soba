@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -20,3 +20,11 @@ jobs:
       # not enabled here, so CI no longer depends on a rate-limited live token;
       # deterministic GitHub coverage runs via mocked API + local git fixtures.
       - run: go test -v -p 1 -parallel 1 -failfast ./...
+
+# Declared explicitly. Under config version 2 a job named "build" ran
+# implicitly when no workflows were defined; that behaviour is legacy, so the
+# workflow is spelled out rather than depended upon.
+workflows:
+  test:
+    jobs:
+      - build
