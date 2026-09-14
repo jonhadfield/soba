@@ -27,8 +27,8 @@ github.com/hashicorp/go-retryablehttp v0.7.8 h1:ylXZWnqa7Lhqpk0L1P1LzDtGcCR0rPVU
 github.com/hashicorp/go-retryablehttp v0.7.8/go.mod h1:rjiScheydd+CxvumBsIrFKlx3iS0jrZ7LvzFGFmuKbw=
 github.com/jonboulle/clockwork v0.5.0 h1:Hyh9A8u51kptdkR+cqRpT1EebBwTn1oK9YfGYbdFz6I=
 github.com/jonboulle/clockwork v0.5.0/go.mod h1:3mZlmanh0g2NDKO5TWZVJAfofYk64M7XN3SzBPjZF60=
-github.com/jonhadfield/githosts-utils/v2 v2.1.7 h1:0LZU957XL+zKvAMF6k7IEexHT6iJ2zoubLJno1LcAJg=
-github.com/jonhadfield/githosts-utils/v2 v2.1.7/go.mod h1:aEWEUKccRD07p/pPyYpVi2Hb6HBhoelRDnIQF/9d80Y=
+github.com/jonhadfield/githosts-utils/v2 v2.1.8 h1:FPPIS/XeANsIlQvbAZzK4r7bQV3GtwaaeMPf9gDr7RY=
+github.com/jonhadfield/githosts-utils/v2 v2.1.8/go.mod h1:i4QFK/hc/qd+/gwTwAddUwot6RGbolEBjq+mTIZmxD4=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
