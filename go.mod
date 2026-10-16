@@ -7,7 +7,7 @@ toolchain go1.26.7
 require (
 	github.com/go-co-op/gocron/v2 v2.22.0
 	github.com/hashicorp/go-retryablehttp v0.7.8
-	github.com/jonhadfield/githosts-utils/v2 v2.1.8
+	github.com/jonhadfield/githosts-utils/v2 v2.3.1
 	github.com/slack-go/slack v0.29.0
 	github.com/stretchr/testify v1.12.1
 	gitlab.com/tozd/go/errors v0.11.1
@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	filippo.io/age v1.3.1 // indirect
+	filippo.io/age v1.3.2 // indirect
 	filippo.io/hpke v0.4.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
