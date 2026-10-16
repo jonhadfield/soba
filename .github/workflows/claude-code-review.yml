@@ -42,7 +42,10 @@ jobs:
       - name: Run Claude Code Review
         id: claude-review
         if: env.CLAUDE_CODE_OAUTH_TOKEN != ''
-        uses: anthropics/claude-code-action@1d6de8cb0c237e7c15e9e1bdf973826ebae490cc # v1
+        # Upstream SDK can return is_error:true with zero cost (auth/rate-limit
+        # flakes). Keep the review advisory so it does not block otherwise-green PRs.
+        continue-on-error: true
+        uses: anthropics/claude-code-action@f27be6b65a4652f08a2ba3cff79114829b588967 # v1.0.252
         with:
           claude_code_oauth_token: ${{ env.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'dependabot[bot],dependabot'
