@@ -45,7 +45,7 @@ jobs:
         # Upstream SDK can return is_error:true with zero cost (auth/rate-limit
         # flakes). Keep the review advisory so it does not block otherwise-green PRs.
         continue-on-error: true
-        uses: anthropics/claude-code-action@f27be6b65a4652f08a2ba3cff79114829b588967 # v1.0.252
+        uses: anthropics/claude-code-action@e4a6faad497d33dbc7144135c75e41f82f0bf6c0 # v1.0.255
         with:
           claude_code_oauth_token: ${{ env.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: 'dependabot[bot],dependabot'
