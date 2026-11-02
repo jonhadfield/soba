@@ -200,3 +200,27 @@ func getBackupsStats(br BackupResults) (ok, failed int) {
 
 	return ok, failed
 }
+
+// logBackupErrors writes provider-level and per-repository failures so they
+// appear in soba's log before the summary line. githosts-utils may return a
+// listing error on ProviderBackupResult.Error without printing it; without
+// this, a timeout surfaces only as "all backups failed".
+func logBackupErrors(br BackupResults) {
+	if br.Results == nil {
+		return
+	}
+
+	for _, pr := range *br.Results {
+		if pr.Results.Error != nil {
+			logger.Printf("%s: %v", pr.Provider, pr.Results.Error)
+
+			continue
+		}
+
+		for _, r := range pr.Results.BackupResults {
+			if r.Error != nil {
+				logger.Printf("%s: %s: %v", pr.Provider, r.Repo, r.Error)
+			}
+		}
+	}
+}

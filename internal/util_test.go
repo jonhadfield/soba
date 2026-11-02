@@ -1,8 +1,11 @@
 package internal
 
 import (
+	"bytes"
 	"errors"
+	"log"
 	"os/exec"
+	"strings"
 	"testing"
 
 	githosts "github.com/jonhadfield/githosts-utils/v2"
@@ -102,4 +105,53 @@ func TestGetBackupsStatsAdditional(t *testing.T) {
 	ok, failed = getBackupsStats(br)
 	require.Zero(t, ok)
 	require.Equal(t, 1, failed)
+}
+
+func TestLogBackupErrorsIncludesProviderListingError(t *testing.T) {
+	var buf bytes.Buffer
+
+	prev := logger
+	logger = log.New(&buf, "", 0)
+
+	t.Cleanup(func() { logger = prev })
+
+	br := BackupResults{Results: &[]ProviderBackupResults{{
+		Provider: providerNameBitBucket,
+		Results: githosts.ProviderBackupResult{
+			Error: tozdErrors.New("context deadline exceeded"),
+		},
+	}}}
+
+	logBackupErrors(br)
+
+	out := buf.String()
+	require.Contains(t, out, providerNameBitBucket)
+	require.Contains(t, out, "context deadline exceeded")
+}
+
+func TestLogBackupErrorsIncludesRepoError(t *testing.T) {
+	var buf bytes.Buffer
+
+	prev := logger
+	logger = log.New(&buf, "", 0)
+
+	t.Cleanup(func() { logger = prev })
+
+	br := BackupResults{Results: &[]ProviderBackupResults{{
+		Provider: providerNameGitHub,
+		Results: githosts.ProviderBackupResult{
+			BackupResults: []githosts.RepoBackupResults{{
+				Repo:  "https://github.com/example/repo",
+				Error: tozdErrors.New("clone failed"),
+			}},
+		},
+	}}}
+
+	logBackupErrors(br)
+
+	out := buf.String()
+	require.Contains(t, out, providerNameGitHub)
+	require.Contains(t, out, "https://github.com/example/repo")
+	require.Contains(t, out, "clone failed")
+	require.False(t, strings.Contains(out, "context deadline exceeded"))
 }

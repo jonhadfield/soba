@@ -73,6 +73,8 @@ func runProviderBackups() int {
 
 	succeeded, failed := getBackupsStats(backupResults)
 
+	logBackupErrors(backupResults)
+
 	switch {
 	case succeeded == 0 && failed >= 0:
 		logger.Println("all backups failed")
