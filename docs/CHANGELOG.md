@@ -1,3 +1,39 @@
+### 1.5.7 release 2026-11-14
+
+- Log provider-level and per-repository backup errors before the summary, so listing failures (for example `context deadline exceeded`) are no longer hidden behind only `all backups failed` ([#259](https://github.com/jonhadfield/soba/issues/259))
+- Document Bitbucket listing behaviour for large workspaces
+- Bump dependencies (slack-go, gocron, and GitHub Actions)
+
+### 1.5.6 release 2026-11-01
+
+- Fix Bitbucket backups that timed out when listing large workspaces (~460 repositories) by bumping githosts-utils to v2.3.2 (`pagelen=100` and a per-request HTTP timeout) ([#259](https://github.com/jonhadfield/soba/issues/259))
+- Bump golang.org/x/crypto to v0.57.0
+
+### 1.5.5 release 2026-09-14
+
+- Add Codeberg as a backup provider
+- Bump githosts-utils to v2.1.8
+
+### 1.5.4 release 2026-09-13
+
+- Include the run outcome in webhook notifications
+- Bump githosts-utils to v2.1.7
+
+### 1.5.3 release 2026-09-05
+
+- Bump githosts-utils to v2.1.6
+
+### 1.5.2 release 2026-09-02
+
+- Require golang.org/x/crypto v0.55.0
+
+### 1.5.1 release 2026-09-02
+
+- Make live GitLab integration tests opt-in (matching GitHub)
+- Correct supported-platform claims and surface arm64 more clearly
+- Backfill the changelog for 1.4.5 through 1.5.0
+- Harden release tagging and multi-arch image scanning in CI
+
 ### 1.5.0 release 2026-08-20
 
 - Publish the Docker image for arm64 as well as amd64, so a single tag serves both architectures and runs natively on Apple Silicon, AWS Graviton and Raspberry Pi

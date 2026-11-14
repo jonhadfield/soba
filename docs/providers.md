@@ -102,6 +102,12 @@ export BITBUCKET_WORKSPACE=my-workspace
 export BITBUCKET_WORKSPACE=workspace-a,workspace-b
 ```
 
+### Large workspaces
+
+From soba 1.5.6 (githosts-utils v2.3.2), repository listing requests `pagelen=100` (Bitbucket Cloud's maximum) and applies the HTTP timeout to each request rather than to the whole listing. Earlier releases shared a single 30-second budget across every page, which could fail workspaces with hundreds of repositories before any clone started.
+
+`GIT_REQUEST_TIMEOUT` still controls how long each HTTP request may take; increase it if individual API pages are slow. See [Setting the request timeout](#setting-the-request-timeout).
+
 ### Repo/Bundle comparison method
 
 Environment variable: `BITBUCKET_COMPARE`
