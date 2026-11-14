@@ -56,6 +56,10 @@ If both the variable and `_FILE` version are set, the variable takes precedence.
 |           | BITBUCKET_KEY                   |                                                                                                          |
 |           | BITBUCKET_SECRET                |                                                                                                          |
 |           | BITBUCKET_WORKSPACE             | Optional &mdash; comma-separated list of workspaces (auto-discovered if unset)                           |
+| Codeberg  | CODEBERG_TOKEN                  | [instructions](#codeberg) |
+|           | CODEBERG_ORGS                   | Optional &mdash; comma-separated list of organisations (`*` for all) |
+|           | CODEBERG_BACKUPS                | |
+|           | CODEBERG_BACKUP_LFS             | |
 | Gitea     | GITEA_APIURL                    | [instructions](#gitea) |
 |           | GITEA_TOKEN                     | |
 | GitHub    | GITHUB_TOKEN                    | [instructions](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token#personal-access-tokens-classic) |
@@ -129,6 +133,52 @@ When using API tokens as your auth method, only the following scopes are require
 - `read:project:bitbucket`
 - `read:repository:bitbucket`
 - `read:workspace:bitbucket` (required to list/view workspaces)
+
+---
+
+## Codeberg
+
+Codeberg is a Forgejo/Gitea-compatible host. Set `CODEBERG_TOKEN` to back up repositories for the authenticated user. The default API endpoint is Codeberg's public instance; override with `CODEBERG_APIURL` only for a different Forgejo/Gitea-compatible host.
+
+### Generating a token
+
+[Create an access token](https://codeberg.org/user/settings/applications) in Codeberg:
+
+1. Open **Settings** → **Applications**
+2. Under **Generate New Token**, enter a name (e.g. `soba backups`)
+3. Grant at least read access to repositories (and organisations if you use `CODEBERG_ORGS`)
+4. Generate the token and set it as `CODEBERG_TOKEN`
+
+### Returning organisations' repositories
+
+Repositories in Codeberg organisations are not backed up by default. To back these up, specify a comma-separated list of organisations in `CODEBERG_ORGS`. To include all organisations, set it to `*`.
+
+### Skipping user repository backups
+
+By default, the authenticated user's repositories are backed up even when organisations are specified. To skip user repositories, set `CODEBERG_SKIP_USER_REPOS` to `true`.
+
+### Limit user repo backups to those owned by the user
+
+By default, repositories the user is affiliated with (for example as a collaborator) are included. To limit backups to repositories owned by the user, set `CODEBERG_LIMIT_USER_OWNED` to `true`.
+
+### Repo/Bundle comparison method
+
+Environment variable: `CODEBERG_COMPARE`
+
+[See explanation below](#comparing-remote-repository-with-local-backup)
+
+| Value           |                                                               |
+|:----------------|:--------------------------------------------------------------|
+| clone (default) | Clone the remote and compare latest bundle                    |
+| refs            | Compare refs without downloading (available since soba 1.1.4) |
+
+### Git LFS
+
+To also back up Git LFS objects, set `CODEBERG_BACKUP_LFS` to `y` or `yes`.
+
+### Custom endpoints
+
+To use a different Forgejo/Gitea-compatible API endpoint, set `CODEBERG_APIURL` (for example `https://git.example.com/api/v1`).
 
 ---
 
@@ -368,6 +418,12 @@ _A useful tool for testing cron jobs is [crontab guru](https://crontab.guru/)._
     - **variable** BITBUCKET_SECRET **Value**
     - **variable** BITBUCKET_WORKSPACE **Value** (Optional - comma separated list of workspaces)
     - **variable** BITBUCKET_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** CODEBERG_TOKEN **Value**
+    - **variable** CODEBERG_ORGS **Value** (Optional - comma separated list of organisations)
+    - **variable** CODEBERG_SKIP_USER_REPOS **Value** (Optional - defaults to false)
+    - **variable** CODEBERG_LIMIT_USER_OWNED **Value** (Optional - defaults to false)
+    - **variable** CODEBERG_BACKUPS **Value** (Number of backups to keep for each repo)
+    - **variable** CODEBERG_BACKUP_LFS **Value** (y/yes to also back up LFS objects)
     - **variable** GITEA_APIURL **Value**
     - **variable** GITEA_TOKEN **Value**
     - **variable** GITEA_ORGS **Value**

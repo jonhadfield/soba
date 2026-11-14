@@ -26,10 +26,18 @@ builds:
       - "-s -w -X main.version={{ .Version }} -X main.sha={{ .ShortCommit }} -X main.buildDate={{ .Date }} -X main.tag={{ .Tag }}"
     hooks:
       post:
+        # Sign and notarize the binary just built for this GOARCH. Skip when
+        # AC_PASSWORD is unset so local/unsigned releases still work; when it
+        # is set, gon failures must fail the release (do not swallow $?).
         - |
           sh -c '
-          cat > /tmp/soba_gon_arm64.hcl << EOF
-          source = ["./dist/macos-soba_darwin_arm64_v8.0/soba"]
+          set -eu
+          if [ -z "${AC_PASSWORD:-}" ]; then
+            echo "AC_PASSWORD unset; skipping macOS signed zip for {{ .Target }}"
+            exit 0
+          fi
+          cat > /tmp/soba_gon_{{ .Arch }}.hcl << EOF
+          source = ["{{ .Path }}"]
           bundle_id = "uk.co.lessknown.soba"
           apple_id {
             username = "jon@lessknown.co.uk"
@@ -39,32 +47,10 @@ builds:
             application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
           }
           zip {
-            output_path = "./dist/soba_darwin_arm64_signed.zip"
+            output_path = "./dist/soba_darwin_{{ .Arch }}_signed.zip"
           }
           EOF
-          gon /tmp/soba_gon_arm64.hcl
-          echo $?
-          '
-          echo $?
-        - |
-          sh -c '
-          cat > /tmp/soba_gon_amd64.hcl << EOF
-          source = ["./dist/macos-soba_darwin_amd64_v1/soba"]
-          bundle_id = "uk.co.lessknown.soba"
-          apple_id {
-            username = "jon@lessknown.co.uk"
-            password = "@env:AC_PASSWORD"
-          }
-          sign {
-            application_identity = "Developer ID Application: Jonathan Hadfield (VBZY8FBYR5)"
-          }
-          zip {
-            output_path = "./dist/soba_darwin_amd64_signed.zip"
-          }
-          EOF
-          echo $?
-          gon /tmp/soba_gon_amd64.hcl
-          echo $?
+          gon /tmp/soba_gon_{{ .Arch }}.hcl
           '
 
   - id: soba
@@ -91,14 +77,28 @@ archives:
     files:
       - none*
 
+# Upload notarized macOS zips only when the post-hooks produced them. A static
+# release.extra_files glob fails the release when AC_PASSWORD is unset and no
+# signed zips exist.
+publishers:
+  - name: macos-signed-zips
+    cmd: >
+      bash -c 'shopt -s nullglob;
+      files=(./dist/soba_darwin*_signed.zip);
+      if ((${#files[@]}==0)); then
+        echo "No signed macOS zips to upload";
+        exit 0;
+      fi;
+      gh release upload "{{ .Tag }}" "${files[@]}" --clobber -R jonhadfield/soba'
+    env:
+      - GH_TOKEN={{ .Env.GITHUB_TOKEN }}
+
 release:
   github:
     owner: jonhadfield
     name: soba
   prerelease: auto
   name_template: '{{ .Tag }}'
-  extra_files:
-    - glob: ./dist/soba_darwin*_signed.zip
 
 announce:
   skip: true

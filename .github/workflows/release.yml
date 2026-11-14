@@ -58,6 +58,32 @@ jobs:
         TAG_NAME: ${{ github.ref_name }}
       run: echo "TAG=$TAG_NAME" >> "$GITHUB_ENV"
 
+    # goreleaser publishes the linux tarballs the Dockerfile curls. Tag push
+    # starts this workflow immediately, so without a wait the first build can
+    # 404 before those assets exist (as happened on 1.5.7).
+    -
+      name: Wait for GitHub release assets
+      env:
+        TAG_NAME: ${{ github.ref_name }}
+        REPO: ${{ github.repository }}
+      run: |
+        set -euo pipefail
+        for arch in amd64 arm64; do
+          url="https://github.com/${REPO}/releases/download/${TAG_NAME}/soba_linux_${arch}.tar.gz"
+          echo "Waiting for ${url}"
+          for i in $(seq 1 60); do
+            if curl -fsI -o /dev/null "$url"; then
+              echo "Found soba_linux_${arch}.tar.gz"
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "Timed out waiting for soba_linux_${arch}.tar.gz after 10m" >&2
+              exit 1
+            fi
+            sleep 10
+          done
+        done
+
     # Each architecture is built and loaded separately, because a
     # multi-platform result cannot be loaded into the docker image store and so
     # cannot be scanned. Both are scanned below: Alpine's arm64 package set can

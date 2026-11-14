@@ -10,13 +10,13 @@
 [![CodeQL](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jonhadfield/soba/actions/workflows/codeql-analysis.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/jonhadfield/soba)](https://goreportcard.com/report/github.com/jonhadfield/soba)
 
-soba backs up your Git repositories from GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, and Sourcehut. Each repository is saved as a single-file [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling), and only new bundles are stored when changes are detected. Bundles can optionally be encrypted with [age](https://age-encryption.org/) for secure offsite storage.
+soba backs up your Git repositories from GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, Sourcehut, and Codeberg. Each repository is saved as a single-file [git bundle](https://git-scm.com/book/en/v2/Git-Tools-Bundling), and only new bundles are stored when changes are detected. Bundles can optionally be encrypted with [age](https://age-encryption.org/) for secure offsite storage.
 
 ## Features
 
 | | |
 |---|---|
-| **Multi-provider** | GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, Sourcehut |
+| **Multi-provider** | GitHub, GitLab, Bitbucket, Azure DevOps, Gitea, Sourcehut, Codeberg |
 | **Efficient storage** | Git bundles with change detection &mdash; unchanged repos are skipped |
 | **Encryption** | Optional [age encryption](https://age-encryption.org/) for bundles, manifests, and LFS archives |
 | **Built-in scheduler** | Interval (`24h`, `45m`) or cron (`0 3 * * *`) scheduling |
@@ -83,7 +83,7 @@ Run soba via the Docker GUI on your NAS. See the [Synology guide](docs/providers
 | [Azure DevOps](docs/providers.md#azure-devops) | [Create PAT](https://learn.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops) | `AZURE_DEVOPS_USERNAME` + `AZURE_DEVOPS_PAT` + `AZURE_DEVOPS_ORGS` |
 | [Gitea](docs/providers.md#gitea) | [Create token](https://docs.gitea.com/development/api-usage#generating-and-listing-api-tokens) | `GITEA_APIURL` + `GITEA_TOKEN` |
 | [Sourcehut](docs/providers.md#sourcehut) | [Create PAT](https://man.sr.ht/accounts.md#api) | `SOURCEHUT_PAT` |
-| [Codeberg](https://codeberg.org) | [Create token](https://codeberg.org/user/settings/applications) | `CODEBERG_TOKEN` |
+| [Codeberg](docs/providers.md#codeberg) | [Create token](https://codeberg.org/user/settings/applications) | `CODEBERG_TOKEN` |
 
 For full provider configuration, organisation filtering, comparison modes, and self-hosted endpoints, see the [provider documentation](docs/providers.md).
 
