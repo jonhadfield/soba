@@ -8,7 +8,7 @@ require (
 	github.com/go-co-op/gocron/v2 v2.23.1
 	github.com/hashicorp/go-retryablehttp v0.7.8
 	github.com/jonhadfield/githosts-utils/v2 v2.3.2
-	github.com/slack-go/slack v0.35.0
+	github.com/slack-go/slack v0.36.0
 	github.com/stretchr/testify v1.12.1
 	gitlab.com/tozd/go/errors v0.11.1
 	gopkg.in/h2non/gock.v1 v1.1.2
@@ -26,7 +26,7 @@ require (
 	github.com/peterhellberg/link v1.2.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	go.yaml.in/yaml/v3 v3.0.5 // indirect
+	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/crypto v0.57.0 // indirect
 	golang.org/x/sys v0.48.0 // indirect
 )
