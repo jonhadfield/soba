@@ -18,3 +18,6 @@ data:
   GITEA_APIURL: https://gitea.example.com/api/v1
   GITEA_ORGS: "*"
   GITEA_COMPARE: refs
+  # Codeberg (Forgejo); default API URL is fine for codeberg.org
+  CODEBERG_ORGS: "*"
+  CODEBERG_COMPARE: refs

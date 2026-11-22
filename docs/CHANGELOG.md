@@ -1,3 +1,9 @@
+### Unreleased
+
+- Document Codeberg as a backup provider (README and provider docs) and harden the release pipeline (wait for goreleaser assets before Docker builds; fail macOS signing when `AC_PASSWORD` is set instead of swallowing gon errors)
+- Bump golang.org/x/crypto to v0.59.0, clearing GO-2026-5932 (unmaintained `openpgp` package removed from the module)
+- Bump dependencies (slack-go and GitHub Actions)
+
 ### 1.5.7 release 2026-11-14
 
 - Log provider-level and per-repository backup errors before the summary, so listing failures (for example `context deadline exceeded`) are no longer hidden behind only `all backups failed` ([#259](https://github.com/jonhadfield/soba/issues/259))
